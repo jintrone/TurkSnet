@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" id="menu" version="2.0">
+	<jsp:directive.page contentType="text/html;charset=UTF-8"/>
+	<jsp:output omit-xml-declaration="yes"/>
+
+<menu:menu id="_menu" z="nZaf43BjUg1iM0v70HJVEsXDopc=">
+        <menu:category id="c_hit" z="QLEhCWjtAJLKS7uadE3v/4vszlY=">
+            <menu:item id="i_hit_new" messageCode="global_menu_new" url="/hits?form" z="Gu7/H6pO9e/Z/NHM8DGFGsH1Wi0="/>
+        <menu:item id="i_hit_list" messageCode="global_menu_list" url="/hits?page=1&amp;size=${empty param.size ? 10 : param.size}" z="jOqbYYM/IPTZygDMt1qvSFhCgRY="/>
+        </menu:category>
+    <menu:category id="c_session_" z="3aAgO7p+87wYoYYxcWanJNx61Fo=">
+            <menu:item id="i_session__new" messageCode="global_menu_new" url="/session_s?form" z="OqZ8/PUV2+5z4fPztlBiBo3q70w="/>
+        <menu:item id="i_session__list" messageCode="global_menu_list" url="/session_s?page=1&amp;size=${empty param.size ? 10 : param.size}" z="15v2P5lLmf5WFqhMvs/0vNUjWIo="/>
+        </menu:category>
+    <menu:category id="c_results" z="vqjk/Hpg8kv+QWYK8QzKDai/XVk=">
+            <menu:item id="i_results_new" messageCode="global_menu_new" url="/resultses?form" z="U8jU0Fu0MN+7CTSfoGUW9HBsSro="/>
+        <menu:item id="i_results_list" messageCode="global_menu_list" url="/resultses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="QhoDS9a2wucnWw0WaQ0T0wRXOmk="/>
+        </menu:category>
+    <menu:category id="c_node" z="1BfWzBbme8JY4GYylULnesTcaFI=">
+            <menu:item id="i_node_new" messageCode="global_menu_new" url="/nodes?form" z="tj1P1wqQRAko39Fvin6hdqOR79o="/>
+        <menu:item id="i_node_list" messageCode="global_menu_list" url="/nodes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="AKlbqIMfx8JbSW5mVXqyCUncYdw="/>
+        </menu:category>
+    <menu:category id="c_sessionlog" z="8ib3Q1RpR+V7GhM8+OboGaXXqkQ=">
+            <menu:item id="i_sessionlog_new" messageCode="global_menu_new" url="/sessionlogs?form" z="mJ5Y9xD6PH3HolXxPV+gAT38bpY="/>
+        <menu:item id="i_sessionlog_list" messageCode="global_menu_list" url="/sessionlogs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="eLGiP06UO4QGHTLdyd7mWWC3/wg="/>
+        </menu:category>
+    <menu:category id="c_experiment" z="W5OakP5QbaEqEHbKqCeTcck19zg=">
+            <menu:item id="i_experiment_new" messageCode="global_menu_new" url="/experiments?form" z="EVZT/gaNGpJpHt/Gjzy7RqeROmw="/>
+        <menu:item id="i_experiment_list" messageCode="global_menu_list" url="/experiments?page=1&amp;size=${empty param.size ? 10 : param.size}" z="x3HHZQOwFIYuEEtmv/C3xfJRZo8="/>
+        </menu:category>
+    </menu:menu>
+</div>

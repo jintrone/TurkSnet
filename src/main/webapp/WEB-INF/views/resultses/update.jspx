@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <form:update id="fu_edu_mit_cci_turksnet_Results" modelAttribute="results" path="/resultses" z="LD+nwPY+afgEc0WK/g3ih9OT3LQ=">
+        <field:select field="session_" id="c_edu_mit_cci_turksnet_Results_session_" itemValue="id" items="${session_s}" path="/session_s" z="x8ycoS73Ey010WmsOM87Ug2S5LM="/>
+        <field:input field="node" id="c_edu_mit_cci_turksnet_Results_node" z="8IWtEkSCge8pfXZ0jUUrYR2wlf4="/>
+        <field:datetime dateTimePattern="${results_received_date_format}" field="received" id="c_edu_mit_cci_turksnet_Results_received" z="7cVBiWczhn0ASLmzA2XgjbxyDX0="/>
+        <field:input field="turkerId" id="c_edu_mit_cci_turksnet_Results_turkerId" z="0YXlY82jgA021BaOgyDZpIPSAiQ="/>
+        <field:input field="resultBody" id="c_edu_mit_cci_turksnet_Results_resultBody" z="iKazLYj2cuOoVis3HGLjBrMSoPI="/>
+        <field:input field="iteration" id="c_edu_mit_cci_turksnet_Results_iteration" validationMessageCode="field_invalid_integer" z="UUtzjLn3Oa36jESgeTwXhbqpna8="/>
+    </form:update>
+</div>

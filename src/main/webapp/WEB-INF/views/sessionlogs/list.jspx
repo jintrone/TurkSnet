@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:list id="pl_edu_mit_cci_turksnet_SessionLog" items="${sessionlogs}" z="3+v3rkGD7RE5gkL/eoZnmEwBtcg=">
+        <table:table data="${sessionlogs}" id="l_edu_mit_cci_turksnet_SessionLog" path="/sessionlogs" z="zjWBwzkrvfuAr8Isf9osN6eXyOw=">
+            <table:column id="c_edu_mit_cci_turksnet_SessionLog_session_" property="session_" z="BshX3FeVWLMgOznFouk1Zim8TQ8="/>
+            <table:column id="c_edu_mit_cci_turksnet_SessionLog_node" property="node" z="9HaPCEuBkuej1sxzXYjY464znSg="/>
+            <table:column id="c_edu_mit_cci_turksnet_SessionLog_date_" property="date_" z="XwheUEJyAmx/H/97kiI+Vq4JUK0="/>
+        <table:column id="c_edu_mit_cci_turksnet_SessionLog_nodePrivateData" property="nodePrivateData" z="OHmb6MA6xQBnjVst6NiMOfi+CqY="/>
+            <table:column id="c_edu_mit_cci_turksnet_SessionLog_nodePublicData" property="nodePublicData" z="ZbQ8VxhXYH8TqYYxeujCcNR1s+Q="/>
+            <table:column id="c_edu_mit_cci_turksnet_SessionLog_type" property="type" z="8ew3Xhmjmdx+kxyUsimk+v+QB+g="/>
+        </table:table>
+    </page:list>
+</div>

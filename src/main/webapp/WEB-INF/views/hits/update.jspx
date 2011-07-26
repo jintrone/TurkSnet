@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <form:update id="fu_edu_mit_cci_turksnet_Hit" modelAttribute="hit" path="/hits" z="2FTdcbhxjRlCL198rgWlHzLXB50=">
+        <field:input field="node" id="c_edu_mit_cci_turksnet_Hit_node" z="+vI6GdvO7xaNv4kgtmX7EzE6IHo="/>
+        <field:datetime dateTimePattern="${hit_created_date_format}" field="created" id="c_edu_mit_cci_turksnet_Hit_created" z="xhd/iXvxl1SX5FEIjhpGpGKhQ70="/>
+        <field:input field="turkerId" id="c_edu_mit_cci_turksnet_Hit_turkerId" z="j+g6KdT8BZGr/wMLsSKlc0APxwI="/>
+        <field:input field="sources" id="c_edu_mit_cci_turksnet_Hit_sources" z="A4E3bvtQnOYj4BxX4sYNMYbUQZY="/>
+        <field:select field="session_" id="c_edu_mit_cci_turksnet_Hit_session_" itemValue="id" items="${session_s}" path="/session_s" z="567FcrbSsNJY685oLfca7qq6234="/>
+    <field:input field="sourceArray" id="c_edu_mit_cci_turksnet_Hit_sourceArray" z="VD+r3mgfprE+WJMfcSroXepBlb4="/>
+    </form:update>
+</div>

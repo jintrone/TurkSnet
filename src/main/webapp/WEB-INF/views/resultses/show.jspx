@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:show id="ps_edu_mit_cci_turksnet_Results" object="${results}" path="/resultses" z="jhujAWLmOoGG6wb/X2g5OjF07Mk=">
+        <field:display field="session_" id="s_edu_mit_cci_turksnet_Results_session_" object="${results}" z="5o7gt+uDs2nm2sbIaOyelh3mNwY="/>
+        <field:display field="node" id="s_edu_mit_cci_turksnet_Results_node" object="${results}" z="eMgQZ1V+jyoBX8ci6qPPbxTYKcU="/>
+        <field:display date="true" dateTimePattern="${results_received_date_format}" field="received" id="s_edu_mit_cci_turksnet_Results_received" object="${results}" z="XUY11qmjielTnvf67gVFdLXp4RE="/>
+        <field:display field="turkerId" id="s_edu_mit_cci_turksnet_Results_turkerId" object="${results}" z="Hp3+dy/X6oud0WJxzr+iy4T1iHc="/>
+        <field:display field="resultBody" id="s_edu_mit_cci_turksnet_Results_resultBody" object="${results}" z="ldmRBeUHGWzj3fX2cfwZo0khP1k="/>
+        <field:display field="iteration" id="s_edu_mit_cci_turksnet_Results_iteration" object="${results}" z="rvcmBds1Z/md5aRL29caVP4hAKc="/>
+    </page:show>
+</div>

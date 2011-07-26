@@ -1,0 +1,117 @@
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-02-17 08:14:55
+hint
+project --topLevelPackage edu.mit.cci.turksnet
+hint
+persistence setup --provider HIBERNATE --database MYSQL --databaseName turksnet --userName turksnet --password turksnet
+// [failed] entity --class ~.Session
+entity --class ~.Session_
+field string --fieldName name
+field string --fieldName description
+field date --fieldName created --type java.util.Date
+ent --class  ~.Results
+field reference --fieldName session_ --type ~.Session_
+field string --fieldName node
+field date --fieldName received --type java.util.Date
+field string --fieldName turkerId
+field string --fieldName resultBody
+field number --fieldName iteration --type java.lang.Integer
+entity --class ~.Hit
+field string --fieldName node
+field date --fieldName created --type java.util.Date
+field string --fieldName turkerId
+field string --fieldName sources
+field reference --fieldName session_ --type ~.Session_
+controller all --package ~.web
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-02-18 07:34:28
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-02-24 12:09:23
+entity --class ~.Node
+field string --fieldName turkerId
+field reference --fieldName session_ --type ~.Session_
+// [failed] field string --fieldName data
+field string --fieldName data_
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-02-25 11:01:05
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-04-28 07:51:12
+// [failed] entity --class ~.Node
+field set --fieldName incoming --type ~.Node
+quit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-04-29 17:36:12
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-04-29 17:36:17
+quit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-05-02 08:15:12
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-05-02 08:57:53
+entity --class ~.Experiment
+field string properties
+field string network
+entity --class SessionLog
+// [failed] field reference --fieldName session --type ~.Session_
+field reference --fieldName session_ --type ~.Session_
+field reference --fieldName node --type ~.Node
+// [failed] field reference --fieldName date --type java.util.Date
+// [failed] field date --fieldName date --type java.utilDate
+field date --fieldName date_ --type java.util.Date
+// [failed] ent --class ~.Session_
+field boolean --fieldName active
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-06-29 17:00:58
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-06-29 17:04:33
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-06-29 17:04:36
+hint
+// [failed] entity --class Session_
+// [failed] entity --class ~.Session_
+hint
+field reference --fieldName experiment --type ~.Experiment
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-06-29 20:29:15
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-06-30 07:24:41
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-01 15:17:06
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-01 15:44:52
+hint
+hint eclipse
+hint
+help
+hint eclipse
+help
+hint
+hint eclipse
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-18 13:50:45
+quit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-18 14:39:00
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-18 14:39:06
+// [failed] ent --class ~.Session_
+field set --fieldName pendingNodes --type ~.Node
+field set --fieldName availableNodes --type ~.Node
+help controller
+controller scaffold --class ~.Experiment
+controller scaffold all
+controller scaffold Experiment
+// [failed] ent --class ~.Experiment
+controller scaffold --class ~.Experiment
+controller all --package ~.web
+quit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-19 09:06:04
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-19 13:01:31
+quit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-19 21:11:38
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-19 21:11:41
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-20 14:41:32
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-20 14:41:36
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-20 15:17:58
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-20 15:18:03
+hint
+version
+quit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-21 10:23:07
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-21 10:43:38
+quit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-21 11:32:26
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-21 12:46:41
+quit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-21 12:47:05
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-21 12:48:58
+quit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-21 12:49:26

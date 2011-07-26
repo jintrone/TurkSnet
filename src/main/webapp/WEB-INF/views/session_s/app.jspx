@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <field:display id="private_data" label="private_data" field="privateData_" object="${node}"/>
+    <field:table id="incoming_data" data="${node.incoming}" path="/nodes" create="false" delete="false" update="false">
+       <field:column id="incoming_id" label="node_id" property="id"/>
+       <field:column id="incoming_data" label="node_data" property="publicData_"/>
+    </field:table>
+</div>

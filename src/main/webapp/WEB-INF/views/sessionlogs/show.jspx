@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:show id="ps_edu_mit_cci_turksnet_SessionLog" object="${sessionlog}" path="/sessionlogs" z="GV4SPTjM2Wkv2NptT7q/6oFreQc=">
+        <field:display field="session_" id="s_edu_mit_cci_turksnet_SessionLog_session_" object="${sessionlog}" z="T7AJTqt3/w3V/GeOqcSwDq/p4SI="/>
+        <field:display field="node" id="s_edu_mit_cci_turksnet_SessionLog_node" object="${sessionlog}" z="LPcGiG8rYg4Enrjpgf1y1wue1Xw="/>
+        <field:display date="true" dateTimePattern="${sessionLog_date__date_format}" field="date_" id="s_edu_mit_cci_turksnet_SessionLog_date_" object="${sessionlog}" z="K5Y8gi0Zwb7aiGfvU5PMBTcGerU="/>
+    <field:display field="nodePrivateData" id="s_edu_mit_cci_turksnet_SessionLog_nodePrivateData" object="${sessionlog}" z="8CxuGfz68mS74FCNoNIJf9CV8ck="/>
+        <field:display field="nodePublicData" id="s_edu_mit_cci_turksnet_SessionLog_nodePublicData" object="${sessionlog}" z="F9qF85YfwMuTCgVh9DYyZlIvM7Q="/>
+        <field:display field="type" id="s_edu_mit_cci_turksnet_SessionLog_type" object="${sessionlog}" z="s9A1oOA/ErASiw/nIHlPhUwsJYc="/>
+    </page:show>
+</div>

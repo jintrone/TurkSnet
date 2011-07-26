@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <form:create id="fc_edu_mit_cci_turksnet_Experiment" modelAttribute="experiment" path="/experiments" render="${empty dependencies}" z="1Rn9SaSif1bXszFV1rnsPaiO8hQ=">
+        <field:textarea field="properties" id="c_edu_mit_cci_turksnet_Experiment_properties" z="user-managed"/>
+        <field:textarea field="javaScript" id="c_edu_mit_cci_turksnet_Experiment_javaScript" z="user-managed"/>
+        <field:input field="pluginClazz" id="c_edu_mit_cci_turksnet_Experiment_pluginClazz" z="H9aj3KRemSlfnRvLzRSCDrOjoE8="/>
+        <field:input field="network" id="c_edu_mit_cci_turksnet_Experiment_network" z="E9pISY2sxqo/KJn5z0NNHBHbWfQ="/>
+
+
+    </form:create>
+    <form:dependency dependencies="${dependencies}" id="d_edu_mit_cci_turksnet_Experiment" render="${not empty dependencies}" z="vf5hHK241WrQGXILzw50+mjCtSU="/>
+</div>

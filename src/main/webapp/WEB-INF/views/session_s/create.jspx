@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <form:create id="fc_edu_mit_cci_turksnet_Session_" modelAttribute="session_" path="/session_s" render="${empty dependencies}" z="jY70DQwQiy4F6bhvGoKluDoL5/I=">
+        
+        
+        <field:datetime dateTimePattern="${session__created_date_format}" field="created" id="c_edu_mit_cci_turksnet_Session__created" z="UY2EpeGHzjAjtNLsFThCjkyAOHc="/>
+    <field:checkbox field="active" id="c_edu_mit_cci_turksnet_Session__active" z="BjWFZE2shwxRFrrqqYQ3SgBW/Fw="/>
+    <field:select field="experiment" id="c_edu_mit_cci_turksnet_Session__experiment" itemValue="id" items="${experiments}" path="/experiments" z="EV4rno05FlhE4HRqWvUxd3OU60E="/>
+    <field:input field="iteration" id="c_edu_mit_cci_turksnet_Session__iteration" z="jt5LvtwApVheahJxIO+VxgO4M6o="/>
+        
+        
+    <field:select field="pendingNodes" id="c_edu_mit_cci_turksnet_Session__pendingNodes" itemValue="id" items="${nodes}" multiple="true" path="/nodes" z="Kklfr4vQQl3dcsE5W54ZKmreEys="/>
+    <field:select field="availableNodes" id="c_edu_mit_cci_turksnet_Session__availableNodes" itemValue="id" items="${nodes}" multiple="true" path="/nodes" z="+yebzx5hcYcbAgG5Amk80Cli4RM="/>
+    <field:input field="network" id="c_edu_mit_cci_turksnet_Session__network" z="I+9jmUhPLqly4IG7lT38VMv0PZU="/>
+    <field:input field="outputLog" id="c_edu_mit_cci_turksnet_Session__outputLog" z="nswrKe3x/4dq8tRMHu9ToLmQF00="/>
+        <field:input field="runner" id="c_edu_mit_cci_turksnet_Session__runner" z="iFfrLvOtv9GuqLrOKvuthuC9t94="/>
+    <field:input field="properties" id="c_edu_mit_cci_turksnet_Session__properties" z="jEdL8gQ6rw/U9Uqxdfzcaap7tW4="/>
+    <field:input field="log" id="c_edu_mit_cci_turksnet_Session__log" z="rbIoCSHo8xjwtHi4ybSO1LP6QjE="/>
+    </form:create>
+    <form:dependency dependencies="${dependencies}" id="d_edu_mit_cci_turksnet_Session_" render="${not empty dependencies}" z="FNAHUEF17YlM7XGu/0qBaWLffZU="/>
+</div>
