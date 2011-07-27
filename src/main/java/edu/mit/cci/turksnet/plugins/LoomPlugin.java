@@ -7,6 +7,7 @@ import edu.mit.cci.snatools.util.jung.DefaultJungNode;
 import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
+import edu.mit.cci.turksnet.web.NodeForm;
 import edu.uci.ics.jung.algorithms.generators.Lattice2DGenerator;
 import edu.uci.ics.jung.graph.util.Pair;
 import org.apache.log4j.Logger;
@@ -34,10 +35,10 @@ import java.util.Map;
 public class LoomPlugin implements Plugin {
 
     public static final String PROP_STORY = "story";
-    public static final String PROP_CAUSAL_DEGREE = "item_degree";
     private static final String PROP_NODE_COUNT = "node count";
     private static final String PROP_GRAPH_TYPE = "graph_type";
     private static final String PROP_PRIVATE_TILES = "private_tile_count";
+     private static final String PROP_ITERATION_COUNT = "iteration_count";
 
 
     private static Logger log = Logger.getLogger(LoomPlugin.class);
@@ -59,8 +60,21 @@ public class LoomPlugin implements Plugin {
     }
 
     @Override
-    public void processResults(Node n, String results) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public boolean checkDone(Session_ s) {
+        for (Node n:s.getAvailableNodes()) {
+            if (n.isAcceptingInput()) {
+                return true;
+            }
+        }
+        return (s.getIteration() >= Integer.getInteger(s.getExperiment().getPropsAsMap().get(PROP_ITERATION_COUNT)));
+
+    }
+
+    @Override
+    public void processResults(Node n, NodeForm results) {
+        n.setPublicData_(results.getPublicData());
+        n.setPrivateData_(results.getPrivateData());
+        n.merge();
     }
 
     private void createGraph(Map<String, String> props, Session_ session) throws GraphCreationException {
@@ -118,9 +132,34 @@ public class LoomPlugin implements Plugin {
 
     }
 
-    private String getHitCreation(Session session) {
+    @Override
+    public String getHitCreation(Session_ session, String rooturl) {
+       Map<String,String> result = new HashMap<String, String>();
+        result.put("title","Figure out the story");
+        result.put("desc","Combine your story pieces with your neighbors to create the best story you can");
+        result.put("url",rooturl+"/session_s/"+session.getId()+"/turk/app");
+        result.put("reward",".03");
+        result.put("assignments",session.getExperiment().getPropsAsMap().get(PROP_NODE_COUNT));
+        result.put("height","800");
+        return jsonify(result);
 
-      return "";
+    }
+
+    private static String jsonify(Map<String,String> vals) {
+        StringBuilder buffer = new StringBuilder();
+        String sep = "";
+        buffer.append("({");
+        for (Map.Entry<String,String> ent:vals.entrySet()) {
+            buffer.append(sep).append(ent.getKey()).append(":");
+            if (ent.getValue().contains(" ")) {
+              buffer.append("\"").append(ent.getValue()).append("\"");
+            } else {
+                buffer.append(ent.getValue());
+            }
+            sep = ",";
+        }
+        buffer.append("})");
+        return buffer.toString();
     }
 
 }

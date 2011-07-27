@@ -4,12 +4,12 @@ import edu.mit.cci.turkit.gui.HeadlessRunner;
 import edu.mit.cci.turkit.util.TurkitOutputSink;
 import edu.mit.cci.turkit.util.U;
 import edu.mit.cci.turkit.util.WireTap;
+import edu.mit.cci.turksnet.web.NodeForm;
 import org.apache.log4j.Logger;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
-import sun.rmi.runtime.Log;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -62,7 +62,7 @@ public class Session_ {
 
 
     @Transient
-    Map<String,String> propertiesAsMap = null;
+    Map<String, String> propertiesAsMap = null;
 
     @Transient
     HeadlessRunner runner;
@@ -74,64 +74,74 @@ public class Session_ {
 
     public Session_(long experimentId) {
         setExperiment(Experiment.findExperiment(experimentId));
-         setIteration(0);
+        setIteration(0);
         setActive(true);
     }
 
     public void addNode(Node n) {
-      getAvailableNodes().add(n);
+        getAvailableNodes().add(n);
     }
 
-    public Map<String,String> getPropertiesAsMap() {
-       if (propertiesAsMap == null) {
-           propertiesAsMap = new HashMap<String,String>();
-           propertiesAsMap.putAll(U.splitProperties(getProperties()));
-       }
+    public Map<String, String> getPropertiesAsMap() {
+        if (propertiesAsMap == null) {
+            propertiesAsMap = new HashMap<String, String>();
+            propertiesAsMap.putAll(U.splitProperties(getProperties()));
+        }
         return Collections.unmodifiableMap(propertiesAsMap);
     }
 
     public void storePropertyMap() {
         StringBuffer buffer = new StringBuffer();
-        for (Map.Entry<String,String> ent:getPropertiesAsMap().entrySet()) {
-          buffer.append(ent.getKey()).append("=").append(ent.getValue()).append("\n");
+        for (Map.Entry<String, String> ent : getPropertiesAsMap().entrySet()) {
+            buffer.append(ent.getKey()).append("=").append(ent.getValue()).append("\n");
         }
         setProperties(buffer.toString());
     }
 
 
-    public void updateProperty(String property,Object value) {
+    public void updateProperty(String property, Object value) {
         if (propertiesAsMap == null) {
             getPropertiesAsMap();
         }
-        propertiesAsMap.put(property,value.toString());
+        propertiesAsMap.put(property, value.toString());
         storePropertyMap();
         merge();
     }
 
-    public String getHitCreationString() {
-        return "";
-    }
 
-    public void registerHit(String hitid) {
-    }
+    public void processNodeResults(String turkerId, NodeForm results) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Node n = findNodeForTurker(turkerId);
+        if (n == null) {
+            log.info("Could not identify node for turker " + turkerId);
+            throw new IllegalArgumentException("Could not identify turker " + turkerId);
+        } else {
+            logNodeEvent(n, "results");
+            n.setAcceptingInput(false);
+            n.merge();
+            synchronized (getClass()) {
+                experiment.getActualPlugin().processResults(n, results);
+                boolean doneiteration = true;
+                for (Node node : getAvailableNodes()) {
+                    if (node.isAcceptingInput()) {
+                        doneiteration = false;
+                    }
+                }
+                if (doneiteration) {
+                    setIteration(getIteration() + 1);
+                    merge();
+                }
+                if (experiment.getActualPlugin().checkDone(Session_.this)) {
+                    setActive(false);
 
-    public Node getNodeForAssignment(String workerId, String assignmentId) {
-        return null;
-    }
+                }
+                merge();
 
-    public void processNodeResults(String turkerId, String results) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-       Node n = findNodeForTurker(turkerId);
-       if (n == null) {
-           log.info("Could not identify node for turker " + turkerId);
-        return;
-       } else {
-            experiment.getActualPlugin().processResults(n,results);
-            logNodeEvent(n,"results");
-       }
+            }
+        }
     }
 
     public Node findNodeForTurker(String turkerId) {
-        for (Node n:availableNodes) {
+        for (Node n : availableNodes) {
             if (turkerId.equals(n.getTurkerId())) {
                 return n;
             }
@@ -139,7 +149,27 @@ public class Session_ {
         return null;
     }
 
-    private void logNodeEvent(Node n,String type) {
+    public Node assignNodeToTurker(String turkerId) {
+        for (Node n : availableNodes) {
+            if (n.getTurkerId() == null) {
+                n.setTurkerId(turkerId);
+                n.merge();
+                logNodeEvent(n, "assigned");
+                return n;
+            }
+        }
+        return null;
+    }
+
+    public Node getNodeForTurker(String turkerId) {
+        Node n = findNodeForTurker(turkerId);
+        if (n == null) {
+            n = assignNodeToTurker(turkerId);
+        }
+        return n;
+    }
+
+    private void logNodeEvent(Node n, String type) {
 
     }
 
@@ -151,6 +181,16 @@ public class Session_ {
         runner.run(true);
         this.active = true;
         this.merge();
+    }
+
+    public String getHitCreationString(String baseurl) throws Exception {
+        String result = null;
+        try {
+            result = this.experiment.getActualPlugin().getHitCreation(this, baseurl);
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
+        return result;
     }
 
     public class BeanFieldSink implements TurkitOutputSink {
@@ -165,13 +205,13 @@ public class Session_ {
 
         @Override
         public void stopCapture() {
-             updateLog(wireTap.close());
+            updateLog(wireTap.close());
             wireTap = null;
         }
 
         @Override
         public void setText(String text) {
-           updateLog(text);
+            updateLog(text);
 
         }
 

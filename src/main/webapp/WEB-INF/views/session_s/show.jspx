@@ -15,8 +15,8 @@
     <field:display field="availableNodes" id="s_edu_mit_cci_turksnet_Session__availableNodes" object="${session_}" z="yB7NIE3FDf9dXoNWE84fB+uQZ2M="/>
     <field:display field="network" id="s_edu_mit_cci_turksnet_Session__network" object="${session_}" z="5c6HhdQ915tXn7Em6Ut/sNrOUhQ="/>
     <field:display field="outputLog" id="s_edu_mit_cci_turksnet_Session__outputLog" object="${session_}" z="Fj70sfnyN9x2C5eUrKSvLwBKoMA="/>
-     <field:display render="false" field="runner" id="s_edu_mit_cci_turksnet_Session__runner" object="${session_}" z="HKN+1bOVer99s20lRpbKRXkdyCw="/>
+     <field:display field="runner" id="s_edu_mit_cci_turksnet_Session__runner" object="${session_}" render="false" z="user-managed"/>
     <field:display field="properties" id="s_edu_mit_cci_turksnet_Session__properties" object="${session_}" z="zXpVyLXw1SeIAzbC6uy2AOEq05w="/>
-    <field:display render="false" field="log" id="s_edu_mit_cci_turksnet_Session__log" object="${session_}" z="vYq8cNXLZtBUPDJ9+VpgsxAnelM="/>
+    <field:display field="log" id="s_edu_mit_cci_turksnet_Session__log" object="${session_}" render="false" z="user-managed"/>
     </page:show>
 </div>

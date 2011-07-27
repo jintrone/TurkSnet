@@ -10,7 +10,6 @@ privileged aspect Session__Roo_ToString {
     public String Session_.toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("PropertiesAsMap: ").append(getPropertiesAsMap() == null ? "null" : getPropertiesAsMap().size()).append(", ");
-        sb.append("HitCreationString: ").append(getHitCreationString()).append(", ");
         sb.append("Log: ").append(getLog()).append(", ");
         sb.append("Network: ").append(getNetwork()).append(", ");
         sb.append("Created: ").append(getCreated()).append(", ");

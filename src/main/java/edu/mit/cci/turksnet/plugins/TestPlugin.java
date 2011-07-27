@@ -3,8 +3,10 @@ package edu.mit.cci.turksnet.plugins;
 import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
+import edu.mit.cci.turksnet.web.NodeForm;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * User: jintrone
@@ -22,7 +24,19 @@ public class TestPlugin implements Plugin {
     }
 
     @Override
-    public void processResults(Node n, String results) {
+    public boolean checkDone(Session_ s) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getHitCreation(Session_ session, String rooturl) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void processResults(Node n, NodeForm results) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+
+
 }

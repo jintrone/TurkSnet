@@ -33,6 +33,10 @@ public class RhinoUtil {
 		public Object func() throws Exception;
 	}
 
+     public static String testAccess() {
+      return "RhinoUtil";
+    }
+
 	private static Object evaluate(Context cx, Func f) throws Exception {
 		try {
 			return f.func();
@@ -97,6 +101,8 @@ public class RhinoUtil {
 			throws Exception {
 		return evaluate(cx, new Func() {
 			public Object func() {
+                System.err.println("Conext "+cx);
+                System.err.println("Current thread "+Thread.currentThread());
 				return cx.evaluateString(scope, source, sourceName, 1, null);
 			}
 		});

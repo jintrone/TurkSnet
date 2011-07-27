@@ -37,6 +37,10 @@ public class WireTap {
 		}
 	}
 
+     public static String testAccess() {
+      return "WireTap";
+    }
+
 	public WireTap() {
 		realOut = System.out;
 		realErr = System.err;

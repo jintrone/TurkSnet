@@ -279,6 +279,7 @@ public class JavaScriptDatabase {
         Object ret = RhinoUtil.evaluateString(cx, scope, q, "query");
 
         String key = getKey(q);
+
         if (storageFileOut == null) {
             storageFileOut = new PrintWriter(new FileOutputStream(storageFile,
                     true));

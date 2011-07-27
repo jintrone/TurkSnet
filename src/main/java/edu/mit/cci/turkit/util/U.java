@@ -42,6 +42,10 @@ public class U {
 		System.out.println("hello world");
 	}
 
+    public static String testAccess() {
+      return "U";
+    }
+
 	/**
 	 * adapted from: http://www.uofr.net/~greg/java/get-resource-listing.html
 	 * 

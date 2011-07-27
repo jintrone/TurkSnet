@@ -46,6 +46,10 @@ public class S3 {
 		return dateFormat.format(new Date());
 	}
 
+     public static String testAccess() {
+      return "S3";
+    }
+
 	/**
 	 * Computes a Signature for use in S3 REST requests.
 	 */
