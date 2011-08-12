@@ -80,5 +80,23 @@ public class Experiment {
         return sb.toString();
     }
 
+     public void storePropertyMap() {
+        StringBuffer buffer = new StringBuffer();
+        for (Map.Entry<String, String> ent : getPropsAsMap().entrySet()) {
+            buffer.append(ent.getKey()).append("=").append(ent.getValue()).append("\n");
+        }
+        setProperties(buffer.toString());
+    }
+
+
+    public void updateProperty(String property, Object value) {
+        if (propsAsMap == null) {
+            getPropsAsMap();
+        }
+        propsAsMap.put(property, value.toString());
+        storePropertyMap();
+       // merge();
+    }
+
 
 }

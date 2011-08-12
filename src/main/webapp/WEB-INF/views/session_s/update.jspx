@@ -18,5 +18,6 @@
         <field:input field="runner" id="c_edu_mit_cci_turksnet_Session__runner" z="iFfrLvOtv9GuqLrOKvuthuC9t94="/>
     <field:input field="properties" id="c_edu_mit_cci_turksnet_Session__properties" z="jEdL8gQ6rw/U9Uqxdfzcaap7tW4="/>
     <field:input field="log" id="c_edu_mit_cci_turksnet_Session__log" z="rbIoCSHo8xjwtHi4ybSO1LP6QjE="/>
+    <field:input field="format" id="c_edu_mit_cci_turksnet_Session__format" z="tx5EMO+dHdBhkNV+YuZL0u0ATO8="/>
     </form:update>
 </div>

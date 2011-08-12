@@ -38,5 +38,10 @@ public class TestPlugin implements Plugin {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public void preprocessProperties(Experiment experiment) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 
 }

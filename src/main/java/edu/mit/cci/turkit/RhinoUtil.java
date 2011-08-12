@@ -1,5 +1,6 @@
 package edu.mit.cci.turkit;
 
+
 import edu.mit.cci.turkit.util.NamedSource;
 
 import edu.mit.cci.turkit.util.U;
@@ -12,6 +13,8 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.WrappedException;
 
+
+import javax.swing.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -37,8 +40,16 @@ public class RhinoUtil {
       return "RhinoUtil";
     }
 
+    private static void ensureValidContext() {
+      if (Context.getCurrentContext() == null) {
+          Context.enter();
+      }
+    }
+
 	private static Object evaluate(Context cx, Func f) throws Exception {
-		try {
+
+       // ensureValidContext();
+        try {
 			return f.func();
 		} catch (Throwable t) {
 			boolean retry = false;
@@ -101,10 +112,15 @@ public class RhinoUtil {
 			throws Exception {
 		return evaluate(cx, new Func() {
 			public Object func() {
-                System.err.println("Conext "+cx);
-                System.err.println("Current thread "+Thread.currentThread());
-				return cx.evaluateString(scope, source, sourceName, 1, null);
-			}
+//                System.out.println("Context "+cx);
+//                System.out.println("Current thread "+Thread.currentThread());
+//                System.out.println("Attempting to Exceute "+source);
+//                //System.out.println("Check access first:"+cx.evaluateString(scope, "printp(test())", sourceName, 1, null));
+
+				Object result = cx.evaluateString(scope, source, sourceName, 1, null);
+//			    System.out.println("Successful execution "+result+"\n");
+                return result;
+            }
 		});
 	}
 

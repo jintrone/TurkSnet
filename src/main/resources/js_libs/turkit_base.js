@@ -6,7 +6,7 @@ var verbose = javaTurKit.verbose
  */
 function verbosePrint(s) {
 	if (verbose) {
-		print(s)
+		printp(s)
 	}
 }
 

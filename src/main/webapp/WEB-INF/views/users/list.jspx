@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:list id="pl_edu_mit_cci_turksnet_domain_User" items="${users}" z="WOlyg+JygaFbTvH3sOxpo2q20fU=">
+        <table:table data="${users}" id="l_edu_mit_cci_turksnet_domain_User" path="/users" z="jpcpM1a3Upn/buQwft0uxcc8be8=">
+            <table:column id="c_edu_mit_cci_turksnet_domain_User_firstName" property="firstName" z="+yCV7jMN0z+11kxWY2xlEdGiZao="/>
+            <table:column id="c_edu_mit_cci_turksnet_domain_User_lastName" property="lastName" z="xZrt197GOpoiuuAvUn5yPsYw214="/>
+            <table:column id="c_edu_mit_cci_turksnet_domain_User_emailAddress" property="emailAddress" z="088qj25Nxxe0dNBVWo4WXZL0FTA="/>
+            <table:column id="c_edu_mit_cci_turksnet_domain_User_password" property="password" z="6Zuu0EsYDeMPOaDRKX6jCbB4bdo="/>
+            <table:column id="c_edu_mit_cci_turksnet_domain_User_activationDate" property="activationDate" z="sStLRR7RfOQGmIkuiP83M6iM0bg="/>
+            <table:column id="c_edu_mit_cci_turksnet_domain_User_activationKey" property="activationKey" z="2ZiCReml+oG8ZjDJYRij3mn37rE="/>
+        </table:table>
+    </page:list>
+</div>

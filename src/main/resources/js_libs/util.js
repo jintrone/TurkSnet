@@ -26,11 +26,12 @@ function rethrow(e) {
 }
 
 function test() {
-    var s = java_S3.testAccess();
-    s = s+ java_U.testAccess();
-    s = s + java_WireTap.testAccess();
-    s = s + java_RhinoUtil.testAccess();
-    return s;
+    //var s = Packages.edu.mit.cci.turkit.S3.testAccess();
+//    s = s+ java_S3.testAccess();
+//    s = s+ java_U.testAccess();
+//    s = s + java_WireTap.testAccess();
+//    s = s + java_RhinoUtil.testAccess();
+    return "";
 }
 
 
@@ -97,7 +98,7 @@ function md5(s) {
     @type String
 */
 function json(o) {
-    printp("I am testing "+test())
+
 	return "" + java_RhinoUtil.json(o)
 }
 

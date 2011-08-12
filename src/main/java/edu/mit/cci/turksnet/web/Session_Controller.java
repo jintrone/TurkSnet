@@ -9,12 +9,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.management.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -42,8 +42,10 @@ public class Session_Controller {
     //for the html app
 
     @RequestMapping(value = "/{id}/turk/app", method = RequestMethod.GET)
-    public String getTurkerApp(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("turkerId") String turkerid, Model model) {
+    public String getTurkerApp(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("turkerId") String turkerid, Model model, HttpServletRequest request) {
+        System.err.println("Query: "+ request.getQueryString());
         Session_ s = Session_.findSession_(id);
+
         Node n = s.getNodeForTurker(turkerid);
         if (n == null) {
             throw new IllegalArgumentException("Could not identify turker with id " + turkerid + " in session " + id);//forward to error page
@@ -52,16 +54,22 @@ public class Session_Controller {
         model.addAttribute("node", n);
         NodeForm nf = new NodeForm();
         nf.setAssignmentId(assignmentId);
-        model.addAttribute("nodeForm",nf);
-        model.addAttribute("turkerId",turkerid);
+        model.addAttribute("nodeForm", nf);
+        model.addAttribute("turkerId", turkerid);
         return "session_s/node/app";
     }
 
 
     @RequestMapping(value = "/{id}/turk/{turkerid}", method = RequestMethod.POST)
-    public String postDataForTurker(@Valid NodeForm form, BindingResult result,@PathVariable("id") Long id, @PathVariable("turkerid") String turkerid, Model model) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public String postDataForTurker(@Valid NodeForm form, BindingResult result, @PathVariable("id") Long id, @PathVariable("turkerid") String turkerid, Model model, HttpServletRequest request) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        System.err.println("Query: "+ request.getQueryString());
+
+        for (Object key : request.getParameterMap().keySet()) {
+            String skey = key.toString();
+            System.err.println("Key:" + skey + " , " + "Value:" + request.getParameterValues(skey)[0]);
+        }
         Session_ s = Session_.findSession_(id);
-        s.processNodeResults(turkerid,form);
+        s.processNodeResults(turkerid, form);
         return "redirect:/session_s";
     }
 

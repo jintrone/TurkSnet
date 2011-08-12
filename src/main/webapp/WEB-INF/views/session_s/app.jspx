@@ -1,20 +1,250 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags/form" version="2.0">
-    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page"
+     xmlns:spring="http://www.springframework.org/tags/form" version="2.0">
+    <!--<jsp:directive.page contentType="text/html;charset=UTF-8"/> -->
     <jsp:output omit-xml-declaration="yes"/>
-    <field:display id="private_data" label="private_data" field="privateData_" object="${node}"/>
-    <field:table id="incoming_data" data="${node.incoming}" path="/nodes" create="false" delete="false" update="false">
-       <field:column id="incoming_id" label="node_id" property="id"/>
-       <field:column id="incoming_data" label="node_data" property="publicData_"/>
-    </field:table>
+    <script type="text/javascript">
 
-    <spring:form id="node_results" method="POST" action="/turksnet/session_s/${node.session_.id}/turk/${turkerId}" modelAttribute="nodeForm">
-        <spring:hidden id="assignmentId" path="assignmentId"/>
-        <spring:textarea id="private_data" path="privateData"/>
-        <spring:textarea id="public_data" path="publicData"/>
-        <input type="submit" value="Submit"/>
-    </spring:form>
+        var private_data = "${node.privateData_}";
+        var public_data = "${node.publicData_}";
+        var incoming = { <c:forEach var ="data" items = "${node.incoming}" varStatus = "status" > <c:if test = "${!status.first}">,</c:if>${data.id}:"${data.publicData_}"</c:forEach >}
 
+        var current_nb_selection = "";
+        var nav_idxs = [];
+
+
+        function initPage() {
+            $.each(incoming, function(key, val) {
+
+                var clz = "nb-index-" + key;
+                nav_idxs.push(clz);
+                $("#selection-panel ul").append('<li class="' + clz + '">' + 'Neighbor ' + key + '</li>')
+                $("#display-panel").append('<div class="' + clz + '">' + createList(val, "grid dragsource","draggable neighbor") + '</div>');
+            });
+
+            $("#private").append(createList(private_data, "droptarget sortable",""));
+            $("#public").append(createList(public_data, "droptarget sortable grid",""));
+            $(".draggable").draggable({
+                cancel: ".placed",
+                helper: "clone",
+                appendTo: "body",
+                connectToSortable: ".sortable:not(.full)"
+            });
+            $(".draggable").disableSelection();
+
+            $(".sortable").sortable({
+                receive:
+                    function(event,ui) {
+                        var me = $(this);
+
+                        checkSize(me);
+                        if (ui.sender.hasClass("neighbor")) {
+                            ui.sender.addClass("placed");
+                            var sender = ui.sender;
+                            var newItem = $(this).data().sortable.currentItem;
+                            $('<a class="deletemark">X</a>').click(function() {
+                                newItem.remove();
+                                sender.removeClass("placed");
+                                checkSize(me);
+                            }).appendTo(newItem);
+
+                        }
+
+
+                },
+                remove: function(event, ui) {
+                  checkSize($(this));
+
+                },
+                placeholder: "ui-state-highlight",
+                connectWith:"ul.sortable:not(.full)"});
+            $(".sortable").disableSelection();
+
+
+            initNavIndex();
+            selectNavIndex("", nav_idxs[0]);
+
+        }
+
+
+        function checkSize(elt) {
+            if (elt.parents("div#private")) {
+                if (elt.children("li").size() >= 5) {
+                    elt.addClass("full");
+                } else if (elt.hasClass("full")) {
+                        elt.removeClass("full");
+                }
+            }
+
+        }
+
+        function initNavIndex() {
+            $("#display-panel>div").hide();
+            $("#selection-panel li").click(function() {
+                var clzs = $(this).attr("class").split(" ");
+                for (x in clzs) {
+                    if (clzs[x].indexOf("nb-index") > -1) {
+
+                        selectNavIndex(current_nb_selection, clzs[x]);
+                        break;
+                    }
+                }
+            });
+
+
+        }
+
+        function selectNavIndex(oldclzname, clzname) {
+
+            if (oldclzname) {
+                $("#selection-panel li." + oldclzname).removeClass("nb-selected")
+            }
+            $("#selection-panel li." + clzname).addClass("nb-selected");
+
+
+
+            if (oldclzname) {
+                $("#display-panel>div." + oldclzname).hide()
+            }
+            $("#display-panel>div." + clzname).fadeIn();
+
+            current_nb_selection = clzname;
+
+
+        }
+
+        function createList(str, ulclz, liclz) {
+            var result = '<ul class="' + ulclz + '">';
+            var tiles = str.split(";");
+            for (x in tiles) {
+                var bits = tiles[x].split(":",2);
+
+                result += '<li class="tile '+liclz+'"><span class="hidden">'+bits[0]+'</span>' + bits[1] + '</li>';
+            }
+            result += "</ul>";
+            return result;
+        }
+
+        function extractString(list) {
+            var result="";
+            var sep="";
+            $(list).children("li").each(function(key,val) {
+                result+=sep;
+                result+=$(val).find("span").text()+":"+$(val).clone().children().remove().end().text();
+                sep=";"
+            });
+            return result;
+        }
+
+        function populateForm(list) {
+            $("form#node_results input#private_data").val(extractString($("#private>ul")));
+            $("form#node_results input#public_data").val(extractString($("#public>ul")));
+            return true;
+        }
+
+        function resetLists() {
+            $("#selection>li").remove();
+            $("#display-panel>div").remove();
+            $("#private>ul").remove();
+            $("#public>ul").remove();
+            initPage();
+        }
+
+        function expandInfo() {
+            $(".expandible").slideToggle();
+        }
+
+
+        $(function() {
+            initPage();
+
+
+        });
+
+
+    </script>
+    <div id="header">
+        <span id="round_id">10</span>
+        <span id="rounds_remain">20</span>
+    </div>
+    <div id="intro">
+        <span id="logo"/>
+
+        <div id="intro">Try to forumulate the correct story by dragging phrases from your neighbors
+            and your private area to the public area. You will be scored on the quality of your story at each turn.
+            <a href="javascript:" class="expandible" onclick="expandInfo()">more</a>
+        </div>
+        <div class="hidden expandible" id="extended_help">
+            In each turn, your storyboard is scored according to the number phrases you have minus the number of reorderings required to achieve the correct relative ordering, all divided by the number of words in the complete story.
+            Thus, in each turn, try to use as many of the phrases that you can that have the correct ordering.
+            In any round the maximum score is 1, and minimum score is 0.
+            <a href="javascript:" onclick="expandInfo()">less</a>
+        </div>
+    </div>
+    <table class="layout">
+        <tr>
+            <td class="seventy">
+                <div class="label">Neighbors' stories</div>
+                <table class="layout-inner">
+                    <tr>
+                        <td>
+
+                            <div id="selection-panel">
+                                <ul id="selection">
+
+
+                                </ul>
+                            </div>
+                        </td>
+                        <td  class="hundred">
+                            <div id="display-panel">
+
+
+                            </div>
+
+                        </td>
+                        <!--empty-->
+
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <div class="label">Your private information</div>
+                <div id="private">
+
+                    <!--empty-->
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <div class="label">Publicly visible story</div>
+                <div id="public">
+
+                    <!--empty--></div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div id="buttons">
+                    <button onclick="resetLists();return false;">Reset</button>
+                    <spring:form id="node_results" method="POST"
+                                 action="/turksnet/session_s/${node.session_.id}/turk/${turkerId}"
+                                 modelAttribute="nodeForm">
+                        <spring:hidden id="assignmentId" path="assignmentId"/>
+                        <spring:hidden id="private_data" path="privateData"/>
+                        <spring:hidden id="public_data" path="publicData"/>
+
+
+                        <input type="submit" value="Submit" onclick="populateForm();"/>
+
+                    </spring:form>
+                </div>
+            </td>
+        </tr>
+
+    </table>
 
 
 </div>

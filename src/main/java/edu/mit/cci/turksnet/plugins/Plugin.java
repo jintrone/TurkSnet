@@ -5,7 +5,7 @@ import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.web.NodeForm;
 
-import javax.jms.Session;
+
 import java.util.Map;
 import java.util.Properties;
 
@@ -20,4 +20,6 @@ public interface Plugin {
     public boolean checkDone(Session_ s);
     public String getHitCreation(Session_ session, String rooturl);
     public void processResults(Node n,NodeForm results);
+
+    public void preprocessProperties(Experiment experiment) throws ExperimentCreationException;
 }

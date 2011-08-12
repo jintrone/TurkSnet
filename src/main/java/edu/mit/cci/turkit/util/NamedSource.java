@@ -68,19 +68,19 @@ public interface NamedSource {
 
     public static class StringSource implements NamedSource {
 
-        Reader source;
+        String source;
         String name;
 
         public StringSource(String source, String name) {
             this.name = name;
-            this.source = new StringReader(source);
+            this.source = source;
         }
 
         public String getName() {
             return name;
         }
         public Reader getReader() {
-            return source;
+            return new StringReader(source);
         }
     }
 

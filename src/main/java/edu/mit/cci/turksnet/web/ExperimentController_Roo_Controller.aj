@@ -21,15 +21,7 @@ import org.springframework.web.util.WebUtils;
 
 privileged aspect ExperimentController_Roo_Controller {
     
-    @RequestMapping(method = RequestMethod.POST)
-    public String ExperimentController.create(@Valid Experiment experiment, BindingResult result, Model model, HttpServletRequest request) {
-        if (result.hasErrors()) {
-            model.addAttribute("experiment", experiment);
-            return "experiments/create";
-        }
-        experiment.persist();
-        return "redirect:/experiments/" + encodeUrlPathSegment(experiment.getId().toString(), request);
-    }
+
     
     @RequestMapping(params = "form", method = RequestMethod.GET)
     public String ExperimentController.createForm(Model model) {

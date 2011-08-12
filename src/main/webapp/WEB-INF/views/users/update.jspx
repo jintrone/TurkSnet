@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <form:update id="fu_edu_mit_cci_turksnet_domain_User" modelAttribute="user" path="/users" z="oLFAd0ZFzBwII+Su9Mz5nTBmyTw=">
+        <field:input field="firstName" id="c_edu_mit_cci_turksnet_domain_User_firstName" min="1" required="true" z="f5d/me0siV4uSML3QbSkpynsqlU="/>
+        <field:input field="lastName" id="c_edu_mit_cci_turksnet_domain_User_lastName" min="1" required="true" z="ygI932hyGG9XWDEBUpI5ZYKQb40="/>
+        <field:input field="emailAddress" id="c_edu_mit_cci_turksnet_domain_User_emailAddress" min="1" required="true" validationMessageCode="field_invalid_email" z="6XAsDMePnuyKWhX0gEd45VbKEm0="/>
+        <field:input field="password" id="c_edu_mit_cci_turksnet_domain_User_password" min="1" required="true" z="vohWLQZDCLhRVm5jhoxyiY1lJ/Q="/>
+        <field:datetime dateTimePattern="${user_activationdate_date_format}" field="activationDate" id="c_edu_mit_cci_turksnet_domain_User_activationDate" z="/GL4y7RbWo0xtTK9kCU2gu6aKJo="/>
+        <field:input field="activationKey" id="c_edu_mit_cci_turksnet_domain_User_activationKey" z="ldz1IKlRcP1wyN0IVBLtEcpidRU="/>
+        <field:checkbox field="enabled" id="c_edu_mit_cci_turksnet_domain_User_enabled" z="njsi3oSv/y3+xumA89v1WgxLSZI="/>
+        <field:checkbox field="locked" id="c_edu_mit_cci_turksnet_domain_User_locked" z="FBihf9otm2qujIQ34FI3jY6FHXw="/>
+    </form:update>
+</div>

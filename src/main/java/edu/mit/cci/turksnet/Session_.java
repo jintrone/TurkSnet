@@ -18,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.swing.*;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -63,6 +64,9 @@ public class Session_ {
 
     @Transient
     Map<String, String> propertiesAsMap = null;
+
+    @Transient
+    DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
     @Transient
     HeadlessRunner runner;
@@ -176,11 +180,25 @@ public class Session_ {
     public void run() throws Exception {
         this.active = true;
         this.merge();
-        runner = new HeadlessRunner(new BeanFieldSink());
-        runner.loadScript("Experiment:" + experiment.getId() + "_Session:" + getId(), experiment.getJavaScript(), experiment.getPropsAsMap(), this);
-        runner.run(true);
-        this.active = true;
-        this.merge();
+        SwingUtilities.invokeLater(new Runnable() {
+
+
+            @Override
+            public void run() {
+                {
+                    try {
+                        runner = new HeadlessRunner(new BeanFieldSink());
+                        runner.loadScript("Experiment:" + experiment.getId() + "_Session:" + getId(), experiment.getJavaScript(), experiment.getPropsAsMap(), Session_.this);
+                        runner.run(true);
+                    } catch (Exception e) {
+                        updateLog(e.getMessage());
+                    }
+
+                }
+            }
+        });
+
+
     }
 
     public String getHitCreationString(String baseurl) throws Exception {
@@ -193,15 +211,28 @@ public class Session_ {
         return result;
     }
 
+    private void updateLog(String update) {
+
+        Session_ s = entityManager().find(Session_.class, Session_.this.getId());
+        String e = s.getOutputLog() == null ? "" : getOutputLog();
+        s.setOutputLog(e + stamp() + update);
+        s.merge();
+    }
+
+    private String stamp() {
+        return "\n -- " + format.format(new Date()) + " -- \n";
+    }
+
+
     public class BeanFieldSink implements TurkitOutputSink {
 
         WireTap wireTap;
-        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
         @Override
         public void startCapture() {
             wireTap = new WireTap();
         }
+
 
         @Override
         public void stopCapture() {
@@ -215,15 +246,7 @@ public class Session_ {
 
         }
 
-        private void updateLog(String update) {
-            String e = getOutputLog() == null ? "" : getOutputLog();
-            setOutputLog(e + stamp() + update);
-            Session_.this.merge();
-        }
 
-        private String stamp() {
-            return "\n -- " + format.format(new Date()) + " -- \n";
-        }
     }
 
 }

@@ -20,6 +20,7 @@ privileged aspect Session__Roo_ToString {
         sb.append("AvailableNodes: ").append(getAvailableNodes() == null ? "null" : getAvailableNodes().size()).append(", ");
         sb.append("OutputLog: ").append(getOutputLog()).append(", ");
         sb.append("Properties: ").append(getProperties()).append(", ");
+        sb.append("Format: ").append(getFormat()).append(", ");
         sb.append("Runner: ").append(getRunner());
         return sb.toString();
     }

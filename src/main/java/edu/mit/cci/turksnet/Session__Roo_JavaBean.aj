@@ -8,6 +8,7 @@ import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Node;
 import java.lang.Boolean;
 import java.lang.String;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -97,6 +98,14 @@ privileged aspect Session__Roo_JavaBean {
     
     public void Session_.setPropertiesAsMap(Map<String, String> propertiesAsMap) {
         this.propertiesAsMap = propertiesAsMap;
+    }
+    
+    public DateFormat Session_.getFormat() {
+        return this.format;
+    }
+    
+    public void Session_.setFormat(DateFormat format) {
+        this.format = format;
     }
     
     public HeadlessRunner Session_.getRunner() {

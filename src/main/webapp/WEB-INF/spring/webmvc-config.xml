@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <!-- The controllers are autodetected POJOs labeled with the @Controller annotation. -->
     <context:component-scan base-package="edu.mit.cci.turksnet" use-default-filters="false">
@@ -16,7 +13,7 @@
 
     <!-- ALL OF THE FOLLOWING LINES SUPPORT MARSHALLING TO XML VIA JAXB -->
     <!-- Define the OXM marshaller which is used to convert the Objects <-> XML.  -->
-    <bean id="oxmMarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+    <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller" id="oxmMarshaller">
         <property name="classesToBeBound">
             <list>
                 <value>edu.mit.cci.turksnet.Node</value>
@@ -24,8 +21,7 @@
         </property>
 
     </bean>
-    <bean id="marshallingHttpMessageConverter"
-          class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+    <bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter" id="marshallingHttpMessageConverter">
         <property name="marshaller" ref="oxmMarshaller"/>
         <property name="unmarshaller" ref="oxmMarshaller"/>
     </bean>
@@ -56,6 +52,7 @@
     </mvc:interceptors>
 
     <!-- selects a static view for rendering without the need for an explicit controller -->
+    <mvc:view-controller path="/login"/>
     <mvc:view-controller path="/" view-name="index"/>
     <mvc:view-controller path="/uncaughtException"/>
     <mvc:view-controller path="/resourceNotFound"/>
@@ -64,8 +61,7 @@
     <!-- Resolves localized messages*.properties and application.properties files in the application to	allow for internationalization.
          The messages*.properties files translate Roo generated messages which are part of the admin interface, the application.properties
          resource bundle localizes all application specific messages such as entity names and menu items. -->
-    <bean class="org.springframework.context.support.ReloadableResourceBundleMessageSource" id="messageSource"
-          p:basenames="WEB-INF/i18n/messages,WEB-INF/i18n/application" p:fallbackToSystemLocale="false"/>
+    <bean class="org.springframework.context.support.ReloadableResourceBundleMessageSource" id="messageSource" p:basenames="WEB-INF/i18n/messages,WEB-INF/i18n/application" p:fallbackToSystemLocale="false"/>
 
     <!-- store preferred language configuration in a cookie -->
     <bean class="org.springframework.web.servlet.i18n.CookieLocaleResolver" id="localeResolver" p:cookieName="locale"/>
@@ -74,14 +70,12 @@
     <bean class="org.springframework.ui.context.support.ResourceBundleThemeSource" id="themeSource"/>
 
     <!-- store preferred theme configuration in a cookie -->
-    <bean class="org.springframework.web.servlet.theme.CookieThemeResolver" id="themeResolver" p:cookieName="theme"
-          p:defaultThemeName="standard"/>
+    <bean class="org.springframework.web.servlet.theme.CookieThemeResolver" id="themeResolver" p:cookieName="theme" p:defaultThemeName="standard"/>
 
     <!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views.
           The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet container:
           this will happen - here with all other types of exceptions. -->
-    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver"
-          p:defaultErrorView="uncaughtException">
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver" p:defaultErrorView="uncaughtException">
         <property name="exceptionMappings">
             <props>
                 <prop key=".DataAccessException">dataAccessFailure</prop>

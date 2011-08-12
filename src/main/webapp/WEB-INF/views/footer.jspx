@@ -16,7 +16,9 @@
       <a href="${logout}">
         <spring:message code="security_logout"/>
       </a>
-    </span>
+    <div>|</div>
+            <a href="/turksnet/changepassword/index">password</a>
+        </span>
   </c:if>
 
   <span id="language">

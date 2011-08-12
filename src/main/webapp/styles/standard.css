@@ -115,11 +115,11 @@ label {
 	margin-top: 0px;
 }
 
-input {
+input, button {
 	height:20px;
 }
 
-input, textarea, select {
+input, textarea, select, button {
 	border:1px solid #B3B3B3;
 }
 
@@ -364,3 +364,139 @@ fieldset th {
 	height: 11px;
 	width: 16px;
 }
+
+/* app specific styles */
+
+.dragsource, .sortable { list-style-type: none; margin: 0; padding: 5px; width: 100%;}
+.dragsource li, .sortable li { margin: 3px; padding: 3px; text-align:center  }
+.dragsource li, .sortable li { height: 1.2em; line-height: 1.2em; border: solid thin; background: #F0F0F0;}
+.sortable li.ui-state-highlight { height: 1.2em; border:none; line-height: 1.2em; width:150px; background: #F0F010 }
+.grid li {float:left};
+
+
+li.tile {margin: 3px; padding: 3px; text-align:center; height: 1.2em; line-height: 1.2em; border: solid thin; background: #F0F0F0;}
+
+li.tile.neighbor {
+    background: #99ccff;
+    border-color: black;
+}
+
+li.tile.neighbor.placed {
+    color:gray;
+    border-color: gray;
+}
+
+
+div#neighbors, div#private {
+    background: #F0F0FC;
+    margin: 15px;
+}
+
+div#neighbors {
+    width:500px;
+}
+
+div#private {
+    width:200px;
+}
+
+div#neighbors ul.sortable {
+    list-style: none inside;
+
+}
+
+div#neighbors ul.sortable>li {
+    display: inline;
+
+}
+
+
+
+table.layout {
+    border: none;
+    border-collapse: separate;
+    border-spacing: 5px;
+    background: none;
+
+
+}
+
+
+table.layout tr td {
+    padding: 10px;
+    border: none;
+    background: #F0F0c9;
+    vertical-align: top;
+    height: 100%;
+
+}
+
+table.layout-inner {
+    height:300px;
+}
+
+td.seventy {
+    width:70%;
+}
+
+td.hundred {
+    width:100%;
+}
+
+
+
+
+.clear {
+    float:none;
+}
+
+.hidden {
+    display:none;
+}
+
+
+
+div#selection-panel {
+    width: 110px;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background:  #F0F0F0;
+    border: solid thin gray;
+}
+
+div#public {
+    height: 200px;
+}
+
+ul#selection {
+    list-style: none;
+    padding: 5px;
+    margin-bottom:0;
+    margin-top:0;
+}
+
+ul#selection li {
+    text-align: center;
+    padding: 5px;
+    background: #FCFCFC;
+    margin: 3px;
+}
+
+ul#selection li.nb-selected {
+    background: #E0AAAA;
+
+}
+
+ul#selection li:hover {
+    background: #E0AAAA;
+}
+
+div#display-panel {
+    border: solid thin gray;
+    width:100%;
+    height:100%;
+}
+
+
+

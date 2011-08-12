@@ -3,10 +3,13 @@ package edu.mit.cci.turksnet.web;
 import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.plugins.SessionCreationException;
+
+import org.apache.log4j.Logger;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 
@@ -22,6 +26,8 @@ import java.beans.PropertyEditorSupport;
 @Controller
 public class ExperimentController {
 
+
+    private static Logger log = Logger.getLogger(ExperimentController.class);
 
     private static class NewlineReplacementEditor extends PropertyEditorSupport {
         @Override
@@ -33,6 +39,22 @@ public class ExperimentController {
         public void setAsText(String txt) {
             setValue(txt.replace("\n",";"));
         }
+    }
+
+     @RequestMapping(method = RequestMethod.POST)
+    public String create(@Valid Experiment experiment, BindingResult result, Model model, HttpServletRequest request) {
+        if (result.hasErrors()) {
+            model.addAttribute("experiment", experiment);
+            return "experiments/create";
+        }
+         try {
+         experiment.getActualPlugin().preprocessProperties(experiment);
+         } catch (Exception e) {
+             log.error("Error processing properties file");
+         }
+         experiment.persist();
+
+        return "redirect:/experiments/" + encodeUrlPathSegment(experiment.getId().toString(), request);
     }
 
      @RequestMapping(value = "/{id}/run", method = RequestMethod.POST)

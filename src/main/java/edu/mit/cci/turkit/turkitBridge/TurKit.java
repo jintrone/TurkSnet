@@ -248,6 +248,7 @@ public class TurKit extends TurKitPlaceholder {
                     "if maxMoney or maxHITs is 0, then they must both be 0.");
         }
         try {
+
             Context cx = Context.enter();
             cx.setLanguageVersion(170);
             Scriptable scope = cx.initStandardObjects();

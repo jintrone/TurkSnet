@@ -118,3 +118,44 @@ quit
 // Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-07-26 22:16:40
 exit
 // Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-07-27 09:11:06
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-08-01 21:30:12
+addon list
+version
+osgi start --url http://spring-roo-addon-typical-security.googlecode.com/files/com.xsoftwarelabs.spring.roo.addon.typicalsecurity-0.1.4.BUILD-SNAPSHOT.jar
+entity --class ~.domain.User --testAutomatically --permitReservedWords
+field string --fieldName firstName --sizeMin 1 --notNull
+field string --fieldName lastName --sizeMin 1 --notNull
+field string --fieldName emailAddress --sizeMin 1 --notNull --unique
+field string --fieldName password --sizeMin 1 --notNull
+field date --fieldName activationDate --type java.util.Date 
+field string --fieldName activationKey 
+field boolean --fieldName enabled 
+field boolean --fieldName locked 
+entity --class ~.domain.Role --testAutomatically --permitReservedWords
+field string --fieldName roleName --sizeMin 1 --notNull --unique
+field string --fieldName roleDescription --sizeMin --sizeMax 200 --notNull
+entity --class ~.domain.UserRole --testAutomatically
+field reference --fieldName userEntry --type ~.domain.User --notNull
+field reference --fieldName roleEntry --type ~.domain.Role --notNull
+finder add findUsersByEmailAddress --class ~.domain.User
+finder add findUsersByActivationKeyAndEmailAddress --class ~.domain.User
+finder add findUserRolesByUserEntry --class ~.domain.UserRole
+controller scaffold --class ~.web.UserController --entity ~.domain.User
+controller scaffold --class ~.web.RoleController --entity ~.domain.Role
+controller scaffold --class ~.web.UserRoleController --entity ~.domain.UserRole
+security setup
+email sender setup --hostServer smtp.gmail.com --port 587 --protocol SMTP --username rohitsghatoltest@gmail.com --password password4me
+typicalsecurity setup
+// [failed] finder add findUserModelsByEmailAddress
+focus --class ~.domain.UserModel
+finder add findUserModelsByEmailAddress
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-08-01 21:52:10
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-08-01 21:53:56
+logging setup --level DEBUG
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-08-01 21:54:32
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-08-01 21:56:35
+logging setup --level INFO
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-08-01 21:56:55
