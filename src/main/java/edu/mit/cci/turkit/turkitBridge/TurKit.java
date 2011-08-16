@@ -210,6 +210,8 @@ public class TurKit extends TurKitPlaceholder {
     }
 
     private void loadDatabase() throws Exception {
+
+        System.err.println("Loading database at "+new File(".").getAbsolutePath());
         database = new JavaScriptDatabase(new File(jsFile.getName()
                 + ".database"), new File(jsFile.getName()
                 + ".database.tmp"));
