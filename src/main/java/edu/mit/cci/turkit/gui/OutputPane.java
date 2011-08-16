@@ -1,6 +1,6 @@
 package edu.mit.cci.turkit.gui;
 
-import com.sun.tools.example.debug.gui.OutputSink;
+
 import edu.mit.cci.turkit.util.TurkitOutputSink;
 import edu.mit.cci.turkit.util.WireTap;
 

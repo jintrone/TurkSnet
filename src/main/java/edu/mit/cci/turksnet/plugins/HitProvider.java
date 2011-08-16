@@ -1,8 +1,7 @@
 package edu.mit.cci.turksnet.plugins;
 
-import apple.laf.JRSUIConstants;
 import edu.mit.cci.turksnet.Node;
-import edu.mit.cci.turksnet.Session_;
+
 
 /**
  * User: jintrone
