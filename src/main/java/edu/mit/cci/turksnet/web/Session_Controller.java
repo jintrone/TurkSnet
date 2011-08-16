@@ -42,7 +42,11 @@ public class Session_Controller {
     //for the html app
 
     @RequestMapping(value = "/{id}/turk/app", method = RequestMethod.GET)
-    public String getTurkerApp(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("turkerId") String turkerid, Model model, HttpServletRequest request) {
+    public String getTurkerApp(@PathVariable("id") Long id, Model model, HttpServletRequest request) {
+        //, @RequestParam("assignmentId") String assignmentId, @RequestParam("turkerId") String turkerid\
+        String turkerid = null;
+        String assignmentId = null;
+
         System.err.println("Query: "+ request.getQueryString());
         Session_ s = Session_.findSession_(id);
 
