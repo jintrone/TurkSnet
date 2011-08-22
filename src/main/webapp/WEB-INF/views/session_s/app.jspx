@@ -229,19 +229,19 @@
             <td colspan="2">
                 <div id="buttons">
                     <button onclick="resetLists();return false;">Reset</button>
-                    <spring:form id="node_results" method="POST"
-                                 action="/turksnet/session_s/${node.session_.id}/turk/${turkerId}"
-                                 modelAttribute="nodeForm">
-                        <spring:hidden id="private_data" path="privateData"/>
-                        <spring:hidden id="public_data" path="publicData"/>
-                        <spring:hidden id="assignment_id" path="assignmentId" value="${assignmentId}"/>
-                        <spring:hidden id="hit_id" path="hitId" value="${hitId}"/>
-                        <spring:hidden id="submit_to" path="submitTo" value="${submitTo}"/>
+                    <form id="node_results" method="POST"
+                                 action="${submitTo}">
+                        <input type="hidden" id="private_data" path="privateData"/>
+                        <input type="hidden" id="public_data" path="publicData"/>
+                        <input type="hidden" id="assignment_id" path="assignmentId" value="${assignmentId}"/>
+                        <input type="hidden" id="hit_id" path="hitId" value="${hitId}"/>
+                        <input type="hidden" id="worker_id" path="turkerId" value="${turkerId}"/>
+                        <input type="hidden" id="node_session_id" path="sessionId" value="${node.session_.id}"/>
 
 
                         <input type="submit" value="Submit" onclick="return populateForm();"/>
 
-                    </spring:form>
+                    </form>
                 </div>
             </td>
         </tr>
