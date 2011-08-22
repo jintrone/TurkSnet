@@ -90,27 +90,27 @@ MTurk.prototype.createHITRaw = function(params) {
 		
 	// let them know if they provide param names that are not on the list
 	var badKeys = keys(new Set(keys(params)).remove([
-		"title",
-		"desc",
-		"description",
-		"reward",
-		"assignmentDurationInSeconds",
-		"minApproval",
-		"html",
-		"bucket",
-		"url",
-		"blockWorkers",
-		"height",
-		"question",
-		"lifetimeInSeconds",
-		"assignments",
-		"maxAssignments",
-		"numAssignments",
-		"autoApprovalDelayInSeconds",
-		"requesterAnnotation",
-		"keywords",
-		"qualificationRequirements",
-	]))
+        "title",
+        "desc",
+        "description",
+        "reward",
+        "assignmentDurationInSeconds",
+        "minApproval",
+        "html",
+        "bucket",
+        "url",
+        "blockWorkers",
+        "height",
+        "question",
+        "lifetimeInSeconds",
+        "assignments",
+        "maxAssignments",
+        "numAssignments",
+        "autoApprovalDelayInSeconds",
+        "requesterAnnotation",
+        "keywords",
+        "qualificationRequirements"
+    ]));
 	if (badKeys.length > 0) {
 		throw new java.lang.Exception("some parameters to createHIT are not understood: " + badKeys.join(', '))
 	}
@@ -748,6 +748,10 @@ MTurk.prototype.grantBonusRaw = function(assignment, amount, reason) {
 			+ assignment.assignmentId)
 }
 
+
+/**
+
+
 /**
  * Calls {@link mturk.grantBonusRaw} inside of {@link traceManager.once}.
  */
@@ -818,6 +822,43 @@ MTurk.prototype.rejectAssignment = function(assignment, reason) {
 				return mturk.rejectAssignmentRaw(assignment, reason)
 			})
 }
+
+MTurk.prototype.createQualification = function(qualName,qualDescription) {
+    return once(function() {
+        return mturk.createQualificationRaw(qualName,qualDescription);
+    });
+}
+
+MTurk.prototype.createQualificationRaw = function(qualName,qualDescription) {
+    var params = ["Name",qualName,"Description",qualDescription,"QualificationTypeStatus","Active"];
+    var x = new XML(javaTurKit.soapRequest("CreateQualificationType",XMLtags(params)));
+     if (x..Request.IsValid.toString() != "True") {
+         throw "Create qualification failed: " + x
+     }
+    var id = x..QualificationTypeId;
+	verbosePrint("create qualification " + id);
+    return id;
+
+}
+
+MTurk.prototype.grantQualification = function(qualTypeId,workerId) {
+    return once(function() {
+        return mturk.grantQualificationRaw(qualTypeId,workerId);
+    })
+}
+
+
+MTurk.prototype.grantQualificationRaw = function(qualTypeId,workerId) {
+    var params = ["QualificationTypeId",qualTypeId,"WorkerId",workerId];
+    var x = new XML(javaTurKit.soapRequest("AssignQualification",XMLtags(params)));
+     if (x..Request.IsValid.toString() != "True") {
+         throw "Assign qualification failed: " + x
+     }
+    var id = x..QualificationTypeId;
+	verbosePrint("qualification " + qualTypeId+" assigned to "+workerId);
+    return true;
+}
+
 
 /**
  * Calls {@link mturk.rejectAssignment} for each assignment in the given

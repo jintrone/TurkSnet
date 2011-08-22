@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.management.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -42,36 +41,42 @@ public class Session_Controller {
     //for the html app
 
     @RequestMapping(value = "/{id}/turk/app", method = RequestMethod.GET)
-    public String getTurkerApp(@PathVariable("id") Long id, Model model, HttpServletRequest request) {
-        //, @RequestParam("assignmentId") String assignmentId, @RequestParam("turkerId") String turkerid\
-        String turkerid = null;
-        String assignmentId = null;
+    public String getTurkerApp(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, Model model, HttpServletRequest request) {
+        //, , @RequestParam("turkerId") String turkerid\
+        String turkerid = "" + -1;
+        Node n = null;
+        String submitTo = null;
+        String hitId = request.getParameter("hitId");
+        if ("ASSIGNMENT_ID_NOT_AVAILABLE".equals(assignmentId)) {
+            n = Node.getDummyNode();
 
-        System.err.println("Query: "+ request.getQueryString());
-        Session_ s = Session_.findSession_(id);
+        } else {
+            Session_ s = Session_.findSession_(id);
+            turkerid = request.getParameter("workerId");
+            submitTo = request.getParameter("turkSubmitTo");
+            n = s.getNodeForTurker(turkerid);
+            if (n == null) {
+                throw new IllegalArgumentException("Could not identify turker with id " + turkerid + " in session " + id);//forward to error page
 
-        Node n = s.getNodeForTurker(turkerid);
-        if (n == null) {
-            throw new IllegalArgumentException("Could not identify turker with id " + turkerid + " in session " + id);//forward to error page
-
+            }
         }
+
         model.addAttribute("node", n);
         NodeForm nf = new NodeForm();
-        nf.setAssignmentId(assignmentId);
+//        nf.setAssignmentId(assignmentId);
+//        nf.setSubmitTo(submitTo);
+//        nf.setHitId(hitId);
         model.addAttribute("nodeForm", nf);
         model.addAttribute("turkerId", turkerid);
+        model.addAttribute("assignmentId",assignmentId);
+        model.addAttribute("submitTo",submitTo);
+        model.addAttribute("hitId",hitId);
         return "session_s/node/app";
     }
 
 
     @RequestMapping(value = "/{id}/turk/{turkerid}", method = RequestMethod.POST)
     public String postDataForTurker(@Valid NodeForm form, BindingResult result, @PathVariable("id") Long id, @PathVariable("turkerid") String turkerid, Model model, HttpServletRequest request) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        System.err.println("Query: "+ request.getQueryString());
-
-        for (Object key : request.getParameterMap().keySet()) {
-            String skey = key.toString();
-            System.err.println("Key:" + skey + " , " + "Value:" + request.getParameterValues(skey)[0]);
-        }
         Session_ s = Session_.findSession_(id);
         s.processNodeResults(turkerid, form);
         return "redirect:/session_s";

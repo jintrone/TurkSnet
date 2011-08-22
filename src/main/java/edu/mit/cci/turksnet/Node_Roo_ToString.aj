@@ -10,6 +10,7 @@ privileged aspect Node_Roo_ToString {
     public String Node.toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Id: ").append(getId()).append(", ");
+        sb.append("DummyNode: ").append(getDummyNode()).append(", ");
         sb.append("TurkerId: ").append(getTurkerId()).append(", ");
         sb.append("Session_: ").append(getSession_()).append(", ");
         sb.append("PrivateData_: ").append(getPrivateData_()).append(", ");

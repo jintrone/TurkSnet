@@ -42,11 +42,11 @@ public class HeadlessRunner {
 
     public TurkitOutputSink sink;
 
-    private final ExecutorService service;
+    private static final ExecutorService service =  Executors.newSingleThreadExecutor();;
 
     public HeadlessRunner(TurkitOutputSink sink) throws Exception {
         this.sink = sink;
-        this.service = Executors.newSingleThreadExecutor();
+
         service.submit(new Runnable() {
              public void run() {
                 if (turkitProperties == null) {

@@ -7,13 +7,14 @@
 
         var private_data = "${node.privateData_}";
         var public_data = "${node.publicData_}";
-        var incoming = { <c:forEach var ="data" items = "${node.incoming}" varStatus = "status" > <c:if test = "${!status.first}">,</c:if>${data.id}:"${data.publicData_}"</c:forEach >}
+        var incoming = { <c:forEach var ="data" items = "${node.incoming}" varStatus = "status" > <c:if test = "${!status.first}">,</c:if>${data.id lt 0?data.id*-1:data.id}:"${data.publicData_}"</c:forEach >}
 
         var current_nb_selection = "";
         var nav_idxs = [];
 
 
         function initPage() {
+
             $.each(incoming, function(key, val) {
 
                 var clz = "nb-index-" + key;
@@ -36,7 +37,6 @@
                 receive:
                     function(event,ui) {
                         var me = $(this);
-
                         checkSize(me);
                         if (ui.sender.hasClass("neighbor")) {
                             ui.sender.addClass("placed");
@@ -139,7 +139,7 @@
         function populateForm(list) {
             $("form#node_results input#private_data").val(extractString($("#private>ul")));
             $("form#node_results input#public_data").val(extractString($("#public>ul")));
-            return true;
+            return ${turkerId}>-1;
         }
 
         function resetLists() {
@@ -232,12 +232,14 @@
                     <spring:form id="node_results" method="POST"
                                  action="/turksnet/session_s/${node.session_.id}/turk/${turkerId}"
                                  modelAttribute="nodeForm">
-                        <spring:hidden id="assignmentId" path="assignmentId"/>
                         <spring:hidden id="private_data" path="privateData"/>
                         <spring:hidden id="public_data" path="publicData"/>
+                        <spring:hidden id="assignment_id" path="assignmentId" value="${assignmentId}"/>
+                        <spring:hidden id="hit_id" path="hitId" value="${hitId}"/>
+                        <spring:hidden id="submit_to" path="submitTo" value="${submitTo}"/>
 
 
-                        <input type="submit" value="Submit" onclick="populateForm();"/>
+                        <input type="submit" value="Submit" onclick="return populateForm();"/>
 
                     </spring:form>
                 </div>

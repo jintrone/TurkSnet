@@ -21,7 +21,8 @@ privileged aspect Session__Roo_ToString {
         sb.append("OutputLog: ").append(getOutputLog()).append(", ");
         sb.append("Properties: ").append(getProperties()).append(", ");
         sb.append("Format: ").append(getFormat()).append(", ");
-        sb.append("Runner: ").append(getRunner());
+        sb.append("Runner: ").append(getRunner()).append(", ");
+        sb.append("QualificationRequirements: ").append(getQualificationRequirements());
         return sb.toString();
     }
     

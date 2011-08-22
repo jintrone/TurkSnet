@@ -19,6 +19,7 @@
         <field:input field="properties" id="c_edu_mit_cci_turksnet_Session__properties" z="jEdL8gQ6rw/U9Uqxdfzcaap7tW4="/>
         <field:input field="log" id="c_edu_mit_cci_turksnet_Session__log" z="rbIoCSHo8xjwtHi4ybSO1LP6QjE="/>
     <field:input field="format" id="c_edu_mit_cci_turksnet_Session__format" z="tx5EMO+dHdBhkNV+YuZL0u0ATO8="/>
+    <field:input field="qualificationRequirements" id="c_edu_mit_cci_turksnet_Session__qualificationRequirements" z="TVsTmNVj8H3vFpMxgsaKMvfhcuM="/>
     </form:create>
     <form:dependency dependencies="${dependencies}" id="d_edu_mit_cci_turksnet_Session_" render="${not empty dependencies}" z="FNAHUEF17YlM7XGu/0qBaWLffZU="/>
 </div>

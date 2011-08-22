@@ -21,8 +21,6 @@ import org.springframework.web.util.WebUtils;
 
 privileged aspect ExperimentController_Roo_Controller {
     
-
-    
     @RequestMapping(params = "form", method = RequestMethod.GET)
     public String ExperimentController.createForm(Model model) {
         model.addAttribute("experiment", new Experiment());

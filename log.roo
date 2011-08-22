@@ -159,3 +159,10 @@ exit
 logging setup --level INFO
 exit
 // Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-08-01 21:56:55
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-08-18 09:37:16
+help
+help focus
+focus --class ~.Session_
+field string --fieldName qualificationRequirements
+exit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-08-19 14:14:11

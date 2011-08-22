@@ -116,4 +116,12 @@ privileged aspect Session__Roo_JavaBean {
         this.runner = runner;
     }
     
+    public String Session_.getQualificationRequirements() {
+        return this.qualificationRequirements;
+    }
+    
+    public void Session_.setQualificationRequirements(String qualificationRequirements) {
+        this.qualificationRequirements = qualificationRequirements;
+    }
+    
 }

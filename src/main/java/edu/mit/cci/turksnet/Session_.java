@@ -10,7 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ManyToMany;
@@ -19,6 +18,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.swing.*;
+import java.net.URL;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 
 @RooJavaBean
 @RooToString
@@ -61,7 +60,6 @@ public class Session_ {
     @Column(columnDefinition = "LONGTEXT")
     private String properties;
 
-
     @Transient
     Map<String, String> propertiesAsMap = null;
 
@@ -71,9 +69,9 @@ public class Session_ {
     @Transient
     HeadlessRunner runner;
 
+    private String qualificationRequirements;
+
     public Session_() {
-
-
     }
 
     public Session_(long experimentId) {
@@ -102,7 +100,6 @@ public class Session_ {
         setProperties(buffer.toString());
     }
 
-
     public void updateProperty(String property, Object value) {
         if (propertiesAsMap == null) {
             getPropertiesAsMap();
@@ -111,7 +108,6 @@ public class Session_ {
         storePropertyMap();
         merge();
     }
-
 
     public void processNodeResults(String turkerId, NodeForm results) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Node n = findNodeForTurker(turkerId);
@@ -132,16 +128,29 @@ public class Session_ {
                 }
                 if (doneiteration) {
                     setIteration(getIteration() + 1);
-                    merge();
+
                 }
                 if (experiment.getActualPlugin().checkDone(Session_.this)) {
                     setActive(false);
-
                 }
-                merge();
 
             }
+            persist();
+            postBack(results);
         }
+    }
+
+    public void postBack(NodeForm form) {
+
+        try {
+            U.webPost(new URL(form.getSubmitTo()),"assignmentId",form.getAssignmentId(),"public",form.getPublicData(),"private",form.getPrivateData());
+        } catch (Exception e) {
+
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            log.error("There was a problem posting form data back to amazon",e);
+        }
+
+
     }
 
     public Node findNodeForTurker(String turkerId) {
@@ -174,14 +183,12 @@ public class Session_ {
     }
 
     private void logNodeEvent(Node n, String type) {
-
     }
 
     public void run() throws Exception {
         this.active = true;
         this.merge();
         SwingUtilities.invokeLater(new Runnable() {
-
 
             @Override
             public void run() {
@@ -193,12 +200,9 @@ public class Session_ {
                     } catch (Exception e) {
                         updateLog(e.getMessage());
                     }
-
                 }
             }
         });
-
-
     }
 
     public String getHitCreationString(String baseurl) throws Exception {
@@ -212,7 +216,6 @@ public class Session_ {
     }
 
     private void updateLog(String update) {
-
         Session_ s = entityManager().find(Session_.class, Session_.this.getId());
         String e = s.getOutputLog() == null ? "" : getOutputLog();
         s.setOutputLog(e + stamp() + update);
@@ -223,7 +226,6 @@ public class Session_ {
         return "\n -- " + format.format(new Date()) + " -- \n";
     }
 
-
     public class BeanFieldSink implements TurkitOutputSink {
 
         WireTap wireTap;
@@ -232,7 +234,6 @@ public class Session_ {
         public void startCapture() {
             wireTap = new WireTap();
         }
-
 
         @Override
         public void stopCapture() {
@@ -243,10 +244,6 @@ public class Session_ {
         @Override
         public void setText(String text) {
             updateLog(text);
-
         }
-
-
     }
-
 }

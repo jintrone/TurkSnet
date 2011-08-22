@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 public class LoomPlugin implements Plugin {
 
     public static final String PROP_STORY = "story";
-    private static final String PROP_NODE_COUNT = "node count";
+    private static final String PROP_NODE_COUNT = "node_count";
     private static final String PROP_GRAPH_TYPE = "graph_type";
     private static final String PROP_PRIVATE_TILES = "private_tile_count";
     private static final String PROP_ITERATION_COUNT = "iteration_count";
@@ -57,10 +57,10 @@ public class LoomPlugin implements Plugin {
     public boolean checkDone(Session_ s) {
         for (Node n : s.getAvailableNodes()) {
             if (n.isAcceptingInput()) {
-                return true;
+                return false;
             }
         }
-        return (s.getIteration() >= Integer.getInteger(s.getExperiment().getPropsAsMap().get(PROP_ITERATION_COUNT)));
+        return (s.getIteration() >= Integer.parseInt(s.getExperiment().getPropsAsMap().get(PROP_ITERATION_COUNT)));
 
     }
 
@@ -117,7 +117,12 @@ public class LoomPlugin implements Plugin {
         String graphtype = props.get(PROP_GRAPH_TYPE);
         Integer nodecount = Integer.parseInt(props.get(PROP_NODE_COUNT));
         DefaultJungGraph graph = null;
-        if ("lattice".equals(graphtype)) {
+        if (nodecount == 1) {
+            graph = new DefaultJungGraph();
+            DefaultJungNode node = DefaultJungNode.getFactory().create();
+            graph.addVertex(node);
+        }
+        else if ("lattice".equals(graphtype)) {
             if (Math.floor(Math.sqrt(nodecount.doubleValue())) < Math.sqrt(nodecount.doubleValue())) {
                 log.warn("Requested number of nodes must be a perfect square for lattice networks");
             }
@@ -177,24 +182,37 @@ public class LoomPlugin implements Plugin {
         result.put("reward", ".03");
         result.put("assignments", session.getExperiment().getPropsAsMap().get(PROP_NODE_COUNT));
         result.put("height", "800");
-        return jsonify(result);
+        if (session.getQualificationRequirements()!=null ) {
+            result.put("qualificationRequirements", createQualificationString(session.getQualificationRequirements()));
+        }
+        return "("+jsonify(result)+")";
 
+    }
+
+    private static String createQualificationString(String qual) {
+        Map<String,String> map = new HashMap<String, String>();
+        map.put("QualificationTypeId",qual);
+        map.put("Comparator","Exists");
+        return jsonify(map);
     }
 
     private static String jsonify(Map<String, String> vals) {
         StringBuilder buffer = new StringBuilder();
         String sep = "";
-        buffer.append("({");
+        buffer.append("{");
         for (Map.Entry<String, String> ent : vals.entrySet()) {
             buffer.append(sep).append(ent.getKey()).append(":");
-            if (ent.getValue().contains(" ") || ent.getValue().contains("/")) {
+            if (ent.getValue().startsWith("{") && ent.getValue().endsWith("}")) {
+                buffer.append(ent.getValue());
+            }
+            else if (ent.getValue().contains(" ") || ent.getValue().contains("/")) {
                 buffer.append('"' + ent.getValue() + '"');
             } else {
                 buffer.append(ent.getValue());
             }
             sep = ",";
         }
-        buffer.append("})");
+        buffer.append("}");
         return buffer.toString();
     }
 
