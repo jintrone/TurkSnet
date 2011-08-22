@@ -231,12 +231,12 @@
                     <button onclick="resetLists();return false;">Reset</button>
                     <form id="node_results" method="POST"
                                  action="${submitTo}">
-                        <input type="hidden" id="private_data" path="privateData"/>
-                        <input type="hidden" id="public_data" path="publicData"/>
-                        <input type="hidden" id="assignment_id" path="assignmentId" value="${assignmentId}"/>
-                        <input type="hidden" id="hit_id" path="hitId" value="${hitId}"/>
-                        <input type="hidden" id="worker_id" path="turkerId" value="${turkerId}"/>
-                        <input type="hidden" id="node_session_id" path="sessionId" value="${node.session_.id}"/>
+                        <input type="hidden" id="privateData"/>
+                        <input type="hidden" id="publicData"/>
+                        <input type="hidden" id="assignmentId" value="${assignmentId}"/>
+                        <input type="hidden" id="hitId" value="${hitId}"/>
+                        <input type="hidden" id="workerId" value="${turkerId}"/>
+                        <input type="hidden" id="nodeSessionId" value="${node.session_.id}"/>
 
 
                         <input type="submit" value="Submit" onclick="return populateForm();"/>
