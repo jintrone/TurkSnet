@@ -230,7 +230,7 @@
                 <div id="buttons">
                     <button onclick="resetLists();return false;">Reset</button>
                     <form id="node_results" method="POST"
-                                 action="${submitTo}">
+                                 action="${submitTo}/mturk/externalSubmit">
                         <input type="hidden" id="privateData" name="privateData"/>
                         <input type="hidden" id="publicData" name="publicData"/>
                         <input type="hidden" id="assignmentId" name="assignmentId" value="${assignmentId}"/>
