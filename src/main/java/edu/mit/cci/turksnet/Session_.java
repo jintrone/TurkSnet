@@ -1,7 +1,5 @@
 package edu.mit.cci.turksnet;
 
-import com.apple.laf.AquaTreeUI;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import edu.mit.cci.turkit.gui.HeadlessRunner;
 import edu.mit.cci.turkit.util.NamedSource;
 import edu.mit.cci.turkit.util.TurkitOutputSink;
@@ -153,7 +151,7 @@ public class Session_ {
 
     public void processNodeResults(String turkerId, String results) throws JSONException, ClassNotFoundException, IllegalAccessException, InstantiationException {
         results = results.trim();
-        if (results.startsWith(results)) {
+        if (results.startsWith("(")) {
             results = results.substring(1,results.length()-1);
         }
         System.err.println("Processing results: "+results);
