@@ -271,11 +271,11 @@ var XMLtag = function(parent, child){
 }
 
 var XMLtags = function(paramsList){
-		var x = ""	
-		for (var i = 0; i < arguments.length; i += 2) {
-			x= x+ XMLtag(arguments[i], arguments[i + 1]);
+		var x = ""
+		for (var i = 0; i < paramsList.length; i += 2) {
+			x= x+ XMLtag(paramsList[i], paramsList[i + 1]);
 		}
-		return x	
+		return x
 }
 
 /*
