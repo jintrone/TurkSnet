@@ -151,7 +151,7 @@ public class Session_ {
         }
     }
 
-    public void processNodeResults(String turkerId, String results) throws JSONException {
+    public void processNodeResults(String turkerId, String results) throws JSONException, ClassNotFoundException, IllegalAccessException, InstantiationException {
         results = results.trim();
         if (results.startsWith(results)) {
             results = results.substring(1,results.length()-1);
@@ -159,13 +159,13 @@ public class Session_ {
         System.err.println("Processing results: "+results);
 
         JSONObject obj = new JSONObject(results);
-        Map<String,String> result = new HashMap<String, String>();
+        Map<String,String> map = new HashMap<String, String>();
         for (Iterator<String> i = obj.keys();i.hasNext();) {
             String key = i.next();
-           result.put(i.next(),obj.get(key).toString());
+           map.put(i.next(),obj.get(key).toString());
 
         }
-        processNodeResults(turkerId,results);
+        processNodeResults(turkerId,map);
 
     }
 
