@@ -179,10 +179,14 @@ public class Session_ {
     }
 
     public Node findNodeForTurker(String turkerId) {
+        log.debug("Looking for node for "+turkerId);
         for (Node n : getAvailableNodes()) {
+            log.debug("Looking at node "+n.getId()+" : "+n.getTurkerId()+" ?= "+turkerId);
             if (turkerId.equals(n.getTurkerId())) {
+                log.debug("Yup!");
                 return n;
             }
+            log.debug("Nope :(");
         }
         return null;
     }
@@ -201,8 +205,11 @@ public class Session_ {
 
     public Node getNodeForTurker(String turkerId) {
         Node n = findNodeForTurker(turkerId);
+        log.debug("Cannot find node for turker "+turkerId+" so will assign");
         if (n == null) {
+
             n = assignNodeToTurker(turkerId);
+            log.debug("Turker "+turkerId+" assigned to node "+n.getId()+":"+n.getTurkerId());
         }
         return n;
     }
