@@ -1,11 +1,17 @@
 package edu.mit.cci.turksnet;
 
+import com.apple.laf.AquaTreeUI;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import edu.mit.cci.turkit.gui.HeadlessRunner;
+import edu.mit.cci.turkit.util.NamedSource;
 import edu.mit.cci.turkit.util.TurkitOutputSink;
 import edu.mit.cci.turkit.util.U;
 import edu.mit.cci.turkit.util.WireTap;
 import edu.mit.cci.turksnet.web.NodeForm;
+import flexjson.JSON;
 import org.apache.log4j.Logger;
+import org.apache.sling.commons.json.JSONException;
+import org.apache.sling.commons.json.JSONObject;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
@@ -18,12 +24,14 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.swing.*;
+import javax.swing.text.html.HTMLDocument;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -109,17 +117,20 @@ public class Session_ {
         merge();
     }
 
-    public void processNodeResults(String turkerId, NodeForm results) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+
+
+    public void processNodeResults(String turkerId, Map<String,String> results) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Node n = findNodeForTurker(turkerId);
         if (n == null) {
             log.info("Could not identify node for turker " + turkerId);
             throw new IllegalArgumentException("Could not identify turker " + turkerId);
         } else {
-            logNodeEvent(n, "results");
+            //logNodeEvent(n, "results");
             n.setAcceptingInput(false);
             n.merge();
             synchronized (getClass()) {
                 experiment.getActualPlugin().processResults(n, results);
+                logNodeEvent(n, "results");
                 boolean doneiteration = true;
                 for (Node node : getAvailableNodes()) {
                     if (node.isAcceptingInput()) {
@@ -136,8 +147,21 @@ public class Session_ {
 
             }
             persist();
-            postBack(results);
+
         }
+    }
+
+    public void processNodeResults(String turkerId, String results) throws JSONException {
+       System.err.println("Processing results: "+results);
+        JSONObject obj = new JSONObject(results);
+        Map<String,String> result = new HashMap<String, String>();
+        for (Iterator<String> i = obj.keys();i.hasNext();) {
+            String key = i.next();
+           result.put(i.next(),obj.get(key).toString());
+
+        }
+        processNodeResults(turkerId,results);
+
     }
 
     public void postBack(NodeForm form) {
@@ -183,6 +207,13 @@ public class Session_ {
     }
 
     private void logNodeEvent(Node n, String type) {
+        SessionLog slog = new SessionLog();
+        slog.setDate_(new Date());
+        slog.setNode(n);
+        slog.setSession_(slog.getSession_());
+        slog.setType(type);
+        slog.setNodePublicData(n.getPublicData_());
+        slog.setNodePrivateData(n.getPrivateData_());
     }
 
     public void run() throws Exception {

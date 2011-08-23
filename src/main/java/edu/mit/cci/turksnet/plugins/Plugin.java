@@ -19,7 +19,7 @@ public interface Plugin {
     public Session_ createSession(Experiment exp) throws SessionCreationException;
     public boolean checkDone(Session_ s);
     public String getHitCreation(Session_ session, String rooturl);
-    public void processResults(Node n,NodeForm results);
+    public void processResults(Node n,Map<String,String> results);
 
     public void preprocessProperties(Experiment experiment) throws ExperimentCreationException;
 }
