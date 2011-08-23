@@ -205,7 +205,7 @@ public class LoomPlugin implements Plugin {
             if (ent.getValue().startsWith("{") && ent.getValue().endsWith("}")) {
                 buffer.append(ent.getValue());
             }
-            else if (ent.getValue().contains(" ") || ent.getValue().contains("/")) {
+            else if (!ent.getValue().matches("[\\d\\.]+")) {
                 buffer.append('"' + ent.getValue() + '"');
             } else {
                 buffer.append(ent.getValue());
