@@ -270,10 +270,10 @@ var XMLtag = function(parent, child){
 		return x	
 }
 
-var XMLtags = function(paramsList){
+var XMLtags = function(paramList) {
 		var x = ""
-		for (var i = 0; i < paramsList.length; i += 2) {
-			x= x+ XMLtag(paramsList[i], paramsList[i + 1]);
+		for (var i = 0; i < arguments.length; i += 2) {
+			x= x+ XMLtag(arguments[i], arguments[i + 1]);
 		}
 		return x
 }
@@ -830,8 +830,9 @@ MTurk.prototype.createQualification = function(qualName,qualDescription) {
 }
 
 MTurk.prototype.createQualificationRaw = function(qualName,qualDescription) {
-    var params = ["Name",qualName,"Description",qualDescription,"QualificationTypeStatus","Active"];
-    var x = new XML(javaTurKit.soapRequest("CreateQualificationType",XMLtags(params)));
+
+    var x = new XML(javaTurKit.soapRequest("CreateQualificationType",
+            XMLtags("Name",qualName,"Description",qualDescription,"QualificationTypeStatus","Active")));
      if (x..Request.IsValid.toString() != "True") {
          throw "Create qualification failed: " + x
      }
@@ -849,8 +850,9 @@ MTurk.prototype.grantQualification = function(qualTypeId,workerId) {
 
 
 MTurk.prototype.grantQualificationRaw = function(qualTypeId,workerId) {
-    var params = ["QualificationTypeId",qualTypeId,"WorkerId",workerId];
-    var x = new XML(javaTurKit.soapRequest("AssignQualification",XMLtags(params)));
+
+    var x = new XML(javaTurKit.soapRequest("AssignQualification",
+            XMLtags("QualificationTypeId",qualTypeId,"WorkerId",workerId)));
      if (x..Request.IsValid.toString() != "True") {
          throw "Assign qualification failed: " + x
      }
