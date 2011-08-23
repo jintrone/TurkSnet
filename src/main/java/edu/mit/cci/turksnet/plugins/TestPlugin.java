@@ -34,7 +34,7 @@ public class TestPlugin implements Plugin {
     }
 
     @Override
-    public void processResults(Node n, NodeForm results) {
+    public void processResults(Node n, Map<String,String> results) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
