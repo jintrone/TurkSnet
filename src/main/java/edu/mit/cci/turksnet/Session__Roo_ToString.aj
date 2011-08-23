@@ -16,7 +16,6 @@ privileged aspect Session__Roo_ToString {
         sb.append("Active: ").append(getActive()).append(", ");
         sb.append("Experiment: ").append(getExperiment()).append(", ");
         sb.append("Iteration: ").append(getIteration()).append(", ");
-        sb.append("PendingNodes: ").append(getPendingNodes() == null ? "null" : getPendingNodes().size()).append(", ");
         sb.append("AvailableNodes: ").append(getAvailableNodes() == null ? "null" : getAvailableNodes().size()).append(", ");
         sb.append("OutputLog: ").append(getOutputLog()).append(", ");
         sb.append("Properties: ").append(getProperties()).append(", ");

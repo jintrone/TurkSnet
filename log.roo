@@ -166,3 +166,6 @@ focus --class ~.Session_
 field string --fieldName qualificationRequirements
 exit
 // Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-08-19 14:14:11
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log opened at 2011-08-23 16:22:36
+quit
+// Spring Roo 1.1.1.RELEASE [rev 156ccd6] log closed at 2011-08-23 16:27:07

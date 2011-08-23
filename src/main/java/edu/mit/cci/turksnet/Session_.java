@@ -54,8 +54,6 @@ public class Session_ {
 
     private int iteration;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private Set<Node> pendingNodes = new HashSet<Node>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<Node> availableNodes = new HashSet<Node>();
@@ -181,7 +179,7 @@ public class Session_ {
     }
 
     public Node findNodeForTurker(String turkerId) {
-        for (Node n : availableNodes) {
+        for (Node n : getAvailableNodes()) {
             if (turkerId.equals(n.getTurkerId())) {
                 return n;
             }
@@ -190,7 +188,7 @@ public class Session_ {
     }
 
     public Node assignNodeToTurker(String turkerId) {
-        for (Node n : availableNodes) {
+        for (Node n : getAvailableNodes()) {
             if (n.getTurkerId() == null) {
                 n.setTurkerId(turkerId);
                 n.merge();
@@ -217,6 +215,7 @@ public class Session_ {
         slog.setType(type);
         slog.setNodePublicData(n.getPublicData_());
         slog.setNodePrivateData(n.getPrivateData_());
+        slog.persist();
     }
 
     public void run() throws Exception {

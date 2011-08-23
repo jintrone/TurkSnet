@@ -11,7 +11,7 @@
         <field:input field="iteration" id="c_edu_mit_cci_turksnet_Session__iteration" z="jt5LvtwApVheahJxIO+VxgO4M6o="/>
 
 
-        <field:select field="pendingNodes" id="c_edu_mit_cci_turksnet_Session__pendingNodes" itemValue="id" items="${nodes}" multiple="true" path="/nodes" z="Kklfr4vQQl3dcsE5W54ZKmreEys="/>
+        
         <field:select field="availableNodes" id="c_edu_mit_cci_turksnet_Session__availableNodes" itemValue="id" items="${nodes}" multiple="true" path="/nodes" z="+yebzx5hcYcbAgG5Amk80Cli4RM="/>
         <field:input field="network" id="c_edu_mit_cci_turksnet_Session__network" z="I+9jmUhPLqly4IG7lT38VMv0PZU="/>
         <field:input field="outputLog" id="c_edu_mit_cci_turksnet_Session__outputLog" z="nswrKe3x/4dq8tRMHu9ToLmQF00="/>

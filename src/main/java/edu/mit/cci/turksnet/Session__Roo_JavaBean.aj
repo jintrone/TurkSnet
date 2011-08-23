@@ -64,14 +64,6 @@ privileged aspect Session__Roo_JavaBean {
         this.iteration = iteration;
     }
     
-    public Set<Node> Session_.getPendingNodes() {
-        return this.pendingNodes;
-    }
-    
-    public void Session_.setPendingNodes(Set<Node> pendingNodes) {
-        this.pendingNodes = pendingNodes;
-    }
-    
     public Set<Node> Session_.getAvailableNodes() {
         return this.availableNodes;
     }
