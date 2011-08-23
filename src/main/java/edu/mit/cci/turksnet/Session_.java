@@ -151,7 +151,7 @@ public class Session_ {
 
     public void processNodeResults(String turkerId, String results) throws JSONException {
         results = results.trim();
-        if (results.startsWith(results)) {
+        if (results.startsWith("(")) {
             results = results.substring(1,results.length()-1);
         }
         System.err.println("Processing results: "+results);
