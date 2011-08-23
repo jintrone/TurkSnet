@@ -75,12 +75,7 @@ public class Session_Controller {
     }
 
 
-    @RequestMapping(value = "/{id}/turk/{turkerid}", method = RequestMethod.POST)
-    public String postDataForTurker(@Valid NodeForm form, BindingResult result, @PathVariable("id") Long id, @PathVariable("turkerid") String turkerid, Model model, HttpServletRequest request) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        Session_ s = Session_.findSession_(id);
-        s.processNodeResults(turkerid, form);
-        return "redirect:/session_s";
-    }
+
 
 
 }

@@ -65,10 +65,10 @@ public class LoomPlugin implements Plugin {
     }
 
     @Override
-    public void processResults(Node n, NodeForm results) {
-        n.setPublicData_(results.getPublicData());
-        n.setPrivateData_(results.getPrivateData());
-        n.merge();
+    public void processResults(Node n, Map<String,String> results) {
+        n.setPublicData_(results.get("publicData"));
+        n.setPrivateData_(results.get("privateData"));
+        n.persist();
     }
 
     private static int getNewId(Set<Integer> set) {

@@ -137,8 +137,8 @@
         }
 
         function populateForm(list) {
-            $("form#node_results input#private_data").val(extractString($("#private>ul")));
-            $("form#node_results input#public_data").val(extractString($("#public>ul")));
+            $("form#node_results input#privateData").val(extractString($("#private>ul")));
+            $("form#node_results input#publicData").val(extractString($("#public>ul")));
             return ${turkerId}>-1;
         }
 
