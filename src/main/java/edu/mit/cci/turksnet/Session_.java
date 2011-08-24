@@ -195,7 +195,7 @@ public class Session_ {
         for (Node n : getAvailableNodes()) {
             if (n.getTurkerId() == null) {
                 n.setTurkerId(turkerId);
-                n.merge();
+                n.persist();
                 logNodeEvent(n, "assigned");
                 return n;
             }

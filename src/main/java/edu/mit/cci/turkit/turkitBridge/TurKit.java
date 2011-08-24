@@ -85,7 +85,7 @@ public class TurKit extends TurKitPlaceholder {
     public boolean stopped = false;
 
 
-    public Session_ currentSession = null;
+    public Long currentSession = null;
 
     /**
      * This is the main entry point for creating a TurKit program.
@@ -106,12 +106,12 @@ public class TurKit extends TurKitPlaceholder {
     }
 
     public void setActiveSession(Session_ session) {
-        this.currentSession = session;
+        this.currentSession = session.getId();
 
     }
 
     public Session_ getCurrentSession() {
-        return currentSession;
+        return currentSession == null?null:Session_.findSession_(currentSession);
     }
 
     /**
