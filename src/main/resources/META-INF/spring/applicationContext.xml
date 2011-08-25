@@ -59,6 +59,8 @@
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
     <tx:annotation-driven mode="aspectj" transaction-manager="transactionManager"/>
+    <bean id="applicationContextProvider" class="edu.mit.cci.turksnet.util.HeadlessRunner"/>
+
     <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" id="entityManagerFactory">
         <property name="dataSource" ref="dataSource"/>
     </bean>
