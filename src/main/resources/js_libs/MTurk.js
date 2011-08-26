@@ -132,8 +132,8 @@ MTurk.prototype.createHITRaw = function(params) {
 	if(typeOf(params.qualificationRequirements) == "object"){
 		//the qualification is an object and not an array
 		var temp = params.qualificationRequirements
-		var q = ensure(params, "qualificationRequirements", [])
-        q.push(temp);
+        params.qualificationRequirements = [];
+		params.qualificationRequirements.push(temp);
 
 		
 	}
