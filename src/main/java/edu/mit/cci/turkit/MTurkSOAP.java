@@ -104,8 +104,7 @@ public class MTurkSOAP implements Serializable {
 
 		String soap = x.toString();
 
-        System.out.println("XMLString: "+XMLstring);
-        System.out.println("Making soap request: "+soap);
+
 
 		for (int t = 0; t < 100; t++) {
 			try {

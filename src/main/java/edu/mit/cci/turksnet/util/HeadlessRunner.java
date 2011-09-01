@@ -133,7 +133,7 @@ public class HeadlessRunner implements ApplicationContextAware {
             timer = new Timer((int) Math.max(Math.min(delta, 1000), 0),
                     new ActionListener() {
                         public void actionPerformed(ActionEvent arg0) {
-                            System.err.println("Timer run, context is " + org.mozilla.javascript.Context.getCurrentContext());
+
                             try {
                                 if (runAgainAtThisTime < 0) {
                                     //halt
@@ -169,7 +169,7 @@ public class HeadlessRunner implements ApplicationContextAware {
 
 
     public void run(final boolean repeat) {
-        System.err.println("Submit service");
+
         service.submit(new Runnable() {
             @Override
             @Transactional

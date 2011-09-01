@@ -84,7 +84,7 @@ MTurk.prototype.getAccountBalance = function() {
  * </ul>
  */
 MTurk.prototype.createHITRaw = function(params) {
-	printp("In create hit raw 1");
+
     if (!params)
 		params = {}
 		
@@ -233,7 +233,7 @@ MTurk.prototype.createHITRaw = function(params) {
 	
 	if ('' + x..Request.IsValid != "True") throw "Failed to create HIT: " + XMLstring
 	var hit = x..HIT
-    printp("In create hit raw 2");
+
 
 	var hitId = this.tryToGetHITId(hit)
 	
@@ -361,8 +361,7 @@ function typeOf(obj) {
  */
 MTurk.prototype.createHIT = function(params) {
 	return once(function() {
-                printp("In create hit 1");
-				return mturk.createHITRaw(params)
+               return mturk.createHITRaw(params)
 			})
 }
 
