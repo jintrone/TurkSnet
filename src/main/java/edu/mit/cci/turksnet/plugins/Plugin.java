@@ -22,4 +22,6 @@ public interface Plugin {
     public void processResults(Node n,Map<String,String> results);
 
     public void preprocessProperties(Experiment experiment) throws ExperimentCreationException;
+
+    Map<String,String> getBonus(Node n);
 }

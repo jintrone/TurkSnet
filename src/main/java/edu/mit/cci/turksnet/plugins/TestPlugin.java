@@ -5,6 +5,7 @@ import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.web.NodeForm;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
@@ -41,6 +42,11 @@ public class TestPlugin implements Plugin {
     @Override
     public void preprocessProperties(Experiment experiment) {
         //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Map<String, String> getBonus(Node n) {
+        return Collections.emptyMap();
     }
 
 

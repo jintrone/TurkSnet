@@ -114,6 +114,7 @@ public class Session_ {
 
     public void processNodeResults(String turkerId, Map<String,String> results) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Node n = findNodeForTurker(turkerId);
+
         if (n == null) {
             log.info("Could not identify node for turker " + turkerId);
             throw new IllegalArgumentException("Could not identify turker " + turkerId);
@@ -136,12 +137,16 @@ public class Session_ {
                 }
                 if (experiment.getActualPlugin().checkDone(Session_.this)) {
                     setActive(false);
+
+
                 }
 
             }
             persist();
 
         }
+
+
     }
 
     public void processNodeResults(String turkerId, String results) throws JSONException, ClassNotFoundException, IllegalAccessException, InstantiationException {
@@ -162,18 +167,7 @@ public class Session_ {
 
     }
 
-    public void postBack(NodeForm form) {
 
-        try {
-            U.webPost(new URL(form.getSubmitTo()),"assignmentId",form.getAssignmentId(),"public",form.getPublicData(),"private",form.getPrivateData());
-        } catch (Exception e) {
-
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            log.error("There was a problem posting form data back to amazon",e);
-        }
-
-
-    }
 
     public Node findNodeForTurker(String turkerId) {
         log.debug("Looking for node for "+turkerId);

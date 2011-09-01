@@ -6,6 +6,7 @@ import edu.mit.cci.snatools.util.jung.DefaultJungGraph;
 import edu.mit.cci.snatools.util.jung.DefaultJungNode;
 import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Node;
+import edu.mit.cci.turksnet.SessionLog;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.web.NodeForm;
 import edu.uci.ics.jung.algorithms.generators.Lattice2DGenerator;
@@ -33,6 +34,9 @@ public class LoomPlugin implements Plugin {
     private static final String PROP_GRAPH_TYPE = "graph_type";
     private static final String PROP_PRIVATE_TILES = "private_tile_count";
     private static final String PROP_ITERATION_COUNT = "iteration_count";
+    private static final String PROP_SESSION_BONUS_VALUE = "sessionBonusValue";
+    private static final String PROP_SESSION_BONUS_COUNT = "sessionBonusCount";
+    private static final String PROP_SESSION_BONUS_CORRECT = "sessionBonusCorrect";
 
 
     private static Logger log = Logger.getLogger(LoomPlugin.class);
@@ -206,7 +210,7 @@ public class LoomPlugin implements Plugin {
                 buffer.append(ent.getValue());
             }
             else if (!ent.getValue().matches("[\\d\\.]+")) {
-                buffer.append('"' + ent.getValue() + '"');
+                buffer.append('"').append(ent.getValue()).append('"');
             } else {
                 buffer.append(ent.getValue());
             }
@@ -215,5 +219,92 @@ public class LoomPlugin implements Plugin {
         buffer.append("}");
         return buffer.toString();
     }
+
+    public static List<Float> getSessionScores(Experiment experiment, List<SessionLog> logs) {
+        List<Float> result = new ArrayList<Float>();
+        List<Integer> truth = getStoryOrder(experiment.getPropsAsMap().get(PROP_STORY));
+        for (SessionLog log:logs) {
+            result.add(score(truth,getStoryOrder(log.getNodePublicData())));
+        }
+
+        return result;
+    }
+
+
+    public Map<String,String> getBonus(Node n) {
+        List<SessionLog> logs = new ArrayList<SessionLog>();
+        for (SessionLog log :SessionLog.findAllSessionLogs()) {
+            if (n.equals(log.getNode()) && log.getType().equals("RESULTS")) {
+                logs.add(log);
+            }
+        }
+        Experiment e = n.getSession_().getExperiment();
+
+        List<Float> scores = getSessionScores(n.getSession_().getExperiment(),logs);
+        Float lastscore = scores.get(scores.size()-1);
+        Collections.sort(scores,new Comparator<Float>() {
+            @Override
+            public int compare(Float aFloat, Float aFloat1) {
+                return -1 * (aFloat.compareTo(aFloat1));
+            }
+        });
+        scores.subList(0,Integer.parseInt(e.getPropsAsMap().get(PROP_SESSION_BONUS_COUNT)));
+        StringBuilder builder = new StringBuilder();
+        builder.append("Your ten best session scores were: ");
+        float total = 0;
+        for (Float f:scores) {
+            builder.append(String.format("%.2f",f)).append(" ");
+           total+=f*Float.parseFloat(e.getPropsAsMap().get(PROP_SESSION_BONUS_VALUE));
+        }
+        builder.append("\n").append("Your final session score was: ").append(String.format("%.2f",lastscore));
+        if (lastscore == 1.0f) {
+           total +=Float.parseFloat(e.getPropsAsMap().get(PROP_SESSION_BONUS_CORRECT));
+        }
+        Map<String,String> result = new HashMap<String,String>();
+        result.put("Description",builder.toString());
+        result.put("Bonus",String.format("%.2f",total));
+        return result;
+    }
+
+    private static List<Integer> getStoryOrder(String story) {
+      List<Integer> result = new ArrayList<Integer>();
+
+        Pattern pat = Pattern.compile("(\\d+):\\w+");
+        for (String p : story.split(";")) {
+            p = p.trim();
+            Matcher m = pat.matcher(p);
+            if (m.matches()) {
+                result.add(Integer.parseInt(m.group(1)));
+            }
+        }
+        return result;
+   }
+
+    public static Float score(List<Integer> truth, List<Integer> sample) {
+        Map<Integer,Integer> tmap = new HashMap<Integer,Integer>();
+        int i = 0;
+        for (Integer t:truth) {
+            tmap.put(t,i++);
+        }
+        tmap.keySet().retainAll(sample);
+
+        Set<Pair> pset = new HashSet<Pair>();
+        int last = -1;
+        int accountedFor = 0;
+        for (Integer s:sample) {
+            if (last > -1) {
+                if (tmap.get(last) > tmap.get(s)) {
+                    accountedFor++;
+                }
+            }
+            last= s;
+
+        }
+        return accountedFor / (float)(truth.size()-1);
+
+
+    }
+
+
 
 }
