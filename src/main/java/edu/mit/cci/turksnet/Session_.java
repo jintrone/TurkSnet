@@ -114,7 +114,7 @@ public class Session_ {
 
     public void processNodeResults(String turkerId, Map<String,String> results) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Node n = findNodeForTurker(turkerId);
-
+        log.debug("Am I active? "+getActive());
         if (n == null) {
             log.info("Could not identify node for turker " + turkerId);
             throw new IllegalArgumentException("Could not identify turker " + turkerId);
@@ -142,7 +142,9 @@ public class Session_ {
                     setIteration(getIteration() + 1);
 
                 }
+                log.debug("Checking for session doneness");
                 if (experiment.getActualPlugin().checkDone(Session_.this)) {
+                    log.debug("I am DONE");
                     setActive(false);
 
 
