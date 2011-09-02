@@ -121,15 +121,22 @@ public class Session_ {
         } else {
             //logNodeEvent(n, "results");
             n.setAcceptingInput(false);
-            n.merge();
+            n.persist();
+            log.debug("Set node "+n.getId()+" to not accept");
             synchronized (getClass()) {
                 experiment.getActualPlugin().processResults(n, results);
                 logNodeEvent(n, "results");
                 boolean doneiteration = true;
                 for (Node node : getAvailableNodes()) {
+                    log.debug("Making sure "+n.getId()+" is up to date");
+                    node.merge();
+                    log.debug("Checking node for doneness "+node.getId());
                     if (node.isAcceptingInput()) {
+                        log.debug("Node is accepting input!");
                         doneiteration = false;
-                    }
+                    } else {
+
+                    }   log.debug("Node is NOT accepting input!");
                 }
                 if (doneiteration) {
                     setIteration(getIteration() + 1);
