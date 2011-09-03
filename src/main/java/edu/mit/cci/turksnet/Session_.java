@@ -1,5 +1,6 @@
 package edu.mit.cci.turksnet;
 
+import com.sun.org.apache.xpath.internal.NodeSet;
 import edu.mit.cci.turksnet.util.HeadlessRunner;
 import edu.mit.cci.turkit.util.TurkitOutputSink;
 import edu.mit.cci.turkit.util.U;
@@ -20,15 +21,10 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.swing.*;
+import javax.xml.bind.annotation.XmlTransient;
 import java.net.URL;
 import java.text.DateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RooJavaBean
 @RooToString
@@ -50,6 +46,14 @@ public class Session_ {
     private Experiment experiment;
 
     private int iteration;
+
+
+
+     @Transient
+    @XmlTransient
+    public List<String> test = Arrays.asList("one", "two", "three");
+
+
 
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -79,6 +83,7 @@ public class Session_ {
         setExperiment(Experiment.findExperiment(experimentId));
         setIteration(0);
         setActive(true);
+
     }
 
     public void addNode(Node n) {
@@ -109,6 +114,11 @@ public class Session_ {
         storePropertyMap();
         merge();
     }
+
+    public List<Node>  getNodesAsList() {
+        return new ArrayList<Node>(getAvailableNodes());
+    }
+
 
 
 
@@ -212,6 +222,11 @@ public class Session_ {
             log.debug("Turker "+turkerId+" assigned to node "+n.getId()+":"+n.getTurkerId());
         }
         return n;
+    }
+
+     public Map<String,String> getBonus(String turkerid) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Node n =getNodeForTurker(turkerid);
+        return getExperiment().getActualPlugin().getBonus(n);
     }
 
     private void logNodeEvent(Node n, String type) {

@@ -11,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import javax.persistence.ManyToMany;
@@ -71,6 +73,8 @@ public class Node {
 
     @XmlElement(name = "public")
     private String publicData_;
+
+
 
     @XmlElement(name = "neighbor")
      @XmlJavaTypeAdapter(NodeAdapter.class)
