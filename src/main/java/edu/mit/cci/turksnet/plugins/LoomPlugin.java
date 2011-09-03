@@ -256,9 +256,9 @@ public class LoomPlugin implements Plugin {
             }
         });
 
-        scores.subList(0,Integer.parseInt(e.getPropsAsMap().get(PROP_SESSION_BONUS_COUNT)));
+        scores.subList(0,Math.min(scores.size(),Integer.parseInt(e.getPropsAsMap().get(PROP_SESSION_BONUS_COUNT))));
         StringBuilder builder = new StringBuilder();
-        builder.append("Your ten best session scores were: ");
+        builder.append("Your best session scores were: ");
         float total = 0;
         for (Float f:scores) {
             builder.append(String.format("%.2f",f)).append(" ");
