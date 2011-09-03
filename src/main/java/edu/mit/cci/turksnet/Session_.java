@@ -215,9 +215,9 @@ public class Session_ {
 
     public Node getNodeForTurker(String turkerId) {
         Node n = findNodeForTurker(turkerId);
-        log.debug("Cannot find node for turker "+turkerId+" so will assign");
-        if (n == null) {
 
+        if (n == null) {
+            log.debug("Cannot find node for turker "+turkerId+" so will assign");
             n = assignNodeToTurker(turkerId);
             log.debug("Turker "+turkerId+" assigned to node "+n.getId()+":"+n.getTurkerId());
         }

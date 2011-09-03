@@ -234,13 +234,20 @@ public class LoomPlugin implements Plugin {
     public Map<String,String> getBonus(Node n) {
         List<SessionLog> logs = new ArrayList<SessionLog>();
         for (SessionLog log :SessionLog.findAllSessionLogs()) {
-            if (n.equals(log.getNode()) && log.getType().equals("RESULTS")) {
+            if (n.equals(log.getNode()) && log.getType().equals("results")) {
                 logs.add(log);
             }
         }
         Experiment e = n.getSession_().getExperiment();
 
         List<Float> scores = getSessionScores(n.getSession_().getExperiment(),logs);
+        String description = "No score could be obtained";
+        String bonus = "0.0f";
+        if (scores.isEmpty()) {
+           return Collections.emptyMap();
+
+
+        }
         Float lastscore = scores.get(scores.size()-1);
         Collections.sort(scores,new Comparator<Float>() {
             @Override
@@ -248,6 +255,7 @@ public class LoomPlugin implements Plugin {
                 return -1 * (aFloat.compareTo(aFloat1));
             }
         });
+
         scores.subList(0,Integer.parseInt(e.getPropsAsMap().get(PROP_SESSION_BONUS_COUNT)));
         StringBuilder builder = new StringBuilder();
         builder.append("Your ten best session scores were: ");
@@ -260,6 +268,7 @@ public class LoomPlugin implements Plugin {
         if (lastscore == 1.0f) {
            total +=Float.parseFloat(e.getPropsAsMap().get(PROP_SESSION_BONUS_CORRECT));
         }
+
         Map<String,String> result = new HashMap<String,String>();
         result.put("Description",builder.toString());
         result.put("Bonus",String.format("%.2f",total));
@@ -270,11 +279,13 @@ public class LoomPlugin implements Plugin {
       List<Integer> result = new ArrayList<Integer>();
 
         Pattern pat = Pattern.compile("(\\d+):\\w+");
-        for (String p : story.split(";")) {
-            p = p.trim();
-            Matcher m = pat.matcher(p);
-            if (m.matches()) {
-                result.add(Integer.parseInt(m.group(1)));
+        if (story!=null) {
+            for (String p : story.split(";")) {
+                p = p.trim();
+                Matcher m = pat.matcher(p);
+                if (m.matches()) {
+                    result.add(Integer.parseInt(m.group(1)));
+                }
             }
         }
         return result;
@@ -288,7 +299,7 @@ public class LoomPlugin implements Plugin {
         }
         tmap.keySet().retainAll(sample);
 
-        Set<Pair> pset = new HashSet<Pair>();
+
         int last = -1;
         int accountedFor = 0;
         for (Integer s:sample) {
