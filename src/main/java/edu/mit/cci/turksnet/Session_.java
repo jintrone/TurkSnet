@@ -169,7 +169,14 @@ public class Session_ {
     }
 
     public void processNodeResults(String turkerId, String results) throws JSONException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        results = results.trim();
+        processNodeResults(turkerId,mapifyJSON(results));
+
+    }
+
+
+    public Map<String,String> mapifyJSON(String s) throws JSONException {
+
+        String results = s.trim();
         if (results.startsWith("(")) {
             results = results.substring(1,results.length()-1);
         }
@@ -179,11 +186,11 @@ public class Session_ {
         Map<String,String> map = new HashMap<String, String>();
         for (Iterator<String> i = obj.keys();i.hasNext();) {
             String key = i.next();
-           map.put(i.next(),obj.get(key).toString());
+           map.put(key,obj.get(key).toString());
 
         }
-        processNodeResults(turkerId,map);
 
+        return map;
     }
 
 
