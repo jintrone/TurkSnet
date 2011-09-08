@@ -11,6 +11,8 @@
 
         var current_nb_selection = "";
         var nav_idxs = [];
+        var post_target='./feedback?workerId=${turkerId}&amp;'+
+                'assignmentId=${assignmentId}';
 
 
         function initPage() {
@@ -20,7 +22,7 @@
                 var clz = "nb-index-" + key;
                 nav_idxs.push(clz);
                 $("#selection-panel ul").append('<li class="' + clz + '">' + 'Neighbor ' + key + '</li>')
-                $("#display-panel").append('<div class="' + clz + '">' + createList(val, "grid dragsource","draggable neighbor") + '</div>');
+                $("#display-panel").append('<div class="' + clz + ' neighborview">' + createList(val, "grid dragsource","draggable neighbor") + '</div>');
             });
 
             $("#private").append(createList(private_data, "droptarget sortable",""));
@@ -42,11 +44,11 @@
                             ui.sender.addClass("placed");
                             var sender = ui.sender;
                             var newItem = $(this).data().sortable.currentItem;
-                            $('<a class="deletemark">X</a>').click(function() {
+                            $('<div class="deletemark"><a>X</a></div>').click(function() {
                                 newItem.remove();
                                 sender.removeClass("placed");
                                 checkSize(me);
-                            }).appendTo(newItem);
+                            }).prependTo(newItem);
 
                         }
 
@@ -60,7 +62,7 @@
                 connectWith:"ul.sortable:not(.full)"});
             $(".sortable").disableSelection();
 
-
+            checkSize($("#private>ul"));
             initNavIndex();
             selectNavIndex("", nav_idxs[0]);
 
@@ -68,7 +70,7 @@
 
 
         function checkSize(elt) {
-            if (elt.parents("div#private")) {
+            if (elt.parents("#private").size() > 0) {
                 if (elt.children("li").size() >= 5) {
                     elt.addClass("full");
                 } else if (elt.hasClass("full")) {
@@ -118,9 +120,10 @@
             var tiles = str.split(";");
             for (x in tiles) {
                 if (tiles[x]) {
+                    var placed =  (private_data.indexOf(tiles[x])> 0 || public_data.indexOf(tiles[x])> 0)?"placed":"";
                 var bits = tiles[x].split(":",2);
 
-                result += '<li class="tile '+liclz+'"><span class="hidden">'+bits[0]+'</span>' + bits[1] + '</li>';
+                result += '<li class="tile '+liclz+' '+placed+'"><span class="hidden">'+bits[0]+'</span>' + bits[1] + '</li>';
             }
             }
             result += "</ul>";
@@ -153,11 +156,14 @@
         }
 
         function expandInfo() {
+             $("span.expandlink").toggle();
             $(".expandible").slideToggle();
+
         }
 
 
         $(function() {
+            $("a#feedbackLink").attr("href",post_target);
             initPage();
 
 
@@ -166,43 +172,66 @@
 
     </script>
     <div id="header">
-        <span id="round_id">10</span>
-        <span id="rounds_remain">20</span>
+        <span id="rounds">Round: ${round} of ${rounds}</span><span id="title">LOOM Story Builder</span><span id="feedback"><a id="feedbackLink" href="" target="_blank">Feedback? Problems?</a></span>
     </div>
-    <div id="intro">
-        <span id="logo"/>
 
-        <div id="intro">Try to forumulate the correct story by dragging phrases from your neighbors
-            and your private area to the public area. You will be scored on the quality of your story at each turn.
-            <a href="javascript:" class="expandible" onclick="expandInfo()">more</a>
+
+        <div id="intro">Try to forumulate the correct story by dragging phrases from your neighbors' stories
+            and your private area to the public area. You have ${rounds} turns, and will be awarded a bonus based on the quality of your story at each turn.
+            <span class="hidden expandible" id="extended_help">
+                <h3>Objective</h3>
+                <p>
+                Your goal is to recreate the correct story from pieces of information you and other players have. You will have twenty turns. You are not competing with the other players. You need them, and they need you, because you all have different pieces of information.</p>
+                <h3>Play</h3>
+                <p>
+                Each player has a screen that looks just like yours.  Your "private information area" contains information that only you can see; it can hold up to five pieces of information.  Your "public information area" can be seen by your neighbors.  The "neighbors public stories" display the contents of your neighbors' public areas at the end of the previous turn.
+                </p>
+                <p>
+                You can drag tiles between your "public" and "private" areas.  You can drag data from your neighbors to either your public or private area.
+                </p>
+                <p>
+                Use the "public story area" to create the best story you can. You are scored on the information in your public story area on each turn, and your ten best turns will be used to determine your bonus.
+                </p>
+                 <p>
+                Please note that turns proceed only when each player has submitted their results, so please submit your results as quickly as possible. Please do not discuss the
+                story outside of the game.
+                </p>
+                <p>
+                If you need to reset your screen (or encounter some unexplained oddness) click the "reset" button at the bottom of the screen. When you are satisfied with your turn, click the "submit" button. If you encounter
+                problems, or would like to provide other feedback, please use this <a id="feedbackLink" href="" target="_blank">form</a>.
+                </p>
+
+                <h3>Bonus</h3>
+                <p>
+                Your score is determined by the number tiles you have in your public area minus the number of reorderings required to achieve the correct relative ordering, divided by the number of words in the complete story.
+                Thus, your should try to use as many information elements as you can in your public space, but only if they are in the correct order. In any round the maximum score is 1, and minimum score is 0.
+                </p>
+                <p>
+                Your your maximum bonus for a given turn is $.20. You will receive a $.50 bonus if you have the correct story in your public area at the end of the last turn.
+                Therefore, you are eligible for up to $2.50 bonus.  Bonuses are awarded only if you complete all 20 turns.
+                </p>
+            </span>
+            <a href="javascript:" onclick="expandInfo()"><span class="expandlink">more</span><span class="expandlink hidden">less</span></a>
         </div>
-        <div class="hidden expandible" id="extended_help">
-            In each turn, your storyboard is scored according to the number phrases you have minus the number of reorderings required to achieve the correct relative ordering, all divided by the number of words in the complete story.
-            Thus, in each turn, try to use as many of the phrases that you can that have the correct ordering.
-            In any round the maximum score is 1, and minimum score is 0.
-            <a href="javascript:" onclick="expandInfo()">less</a>
-        </div>
-    </div>
+
+
     <table class="layout">
-        <tr>
+        <tr class="content">
             <td class="seventy">
-                <div class="label">Neighbors' stories</div>
+                <div class="label">Neighbors' public stories</div>
                 <table class="layout-inner">
                     <tr>
-                        <td>
+                        <td id="selection-panel">
 
-                            <div id="selection-panel">
+
                                 <ul id="selection">
 
 
                                 </ul>
-                            </div>
+
                         </td>
-                        <td  class="hundred">
-                            <div id="display-panel">
+                        <td id="display-panel" class="hundred">
 
-
-                            </div>
 
                         </td>
                         <!--empty-->
@@ -210,21 +239,16 @@
                     </tr>
                 </table>
             </td>
-            <td>
+            <td id="private">
                 <div class="label">Your private information</div>
-                <div id="private">
 
-                    <!--empty-->
-                </div>
             </td>
         </tr>
 
-        <tr>
-            <td colspan="2">
+        <tr class="content">
+            <td id="public" colspan="2">
                 <div class="label">Publicly visible story</div>
-                <div id="public">
 
-                    <!--empty--></div>
             </td>
         </tr>
         <tr>

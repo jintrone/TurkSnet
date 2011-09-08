@@ -16,5 +16,9 @@
  <definition extends="stripped" name="session_s/node/app">
         <put-attribute name="body" value="/WEB-INF/views/session_s/app.jspx"/>
     </definition>
+ <definition extends="stripped" name="session_s/node/feedback">
+        <put-attribute name="body" value="/WEB-INF/views/session_s/form.jspx"/>
+    </definition>
+
 
 </tiles-definitions>
