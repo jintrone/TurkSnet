@@ -386,6 +386,13 @@ li.tile.neighbor.placed {
     color: #999999;
 }
 
+div#checkingBrowser, div#noBrowserSupport {
+    text-align: center;
+    font-size:40px;
+    margin: 40px;
+
+}
+
 
 div#turksnet ul {
 
@@ -488,6 +495,8 @@ div#buttons button, div#buttons input {
 
 div#thanks {
     text-align: center;
+    font-size:18px;
+    margin: 40px;
 }
 
 div#buttons button:hover, div#buttons input:hover {

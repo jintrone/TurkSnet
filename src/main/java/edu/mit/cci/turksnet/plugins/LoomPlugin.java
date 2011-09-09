@@ -184,7 +184,8 @@ public class LoomPlugin implements Plugin {
         Map<String, String> result = new HashMap<String, String>();
         result.put("title", "Work with others to solve a puzzle.");
         result.put("desc", "Combine your information with 24 other players to figure out the correct story. There will be 20 turns, and a new HIT is made available" +
-                "to you at each turn. You will receive a bonus after 20 turns are completed, based on your performance.");
+                "to you at each turn. You will receive a bonus after 20 turns are completed, based on your performance. This game requires javascript, and will not work"+
+                "with Internet Explorer 7 or less");
         result.put("url", rooturl + "/session_s/" + session.getId() + "/turk/app");
         result.put("reward", val);
         result.put("assignments", session.getExperiment().getPropsAsMap().get(PROP_NODE_COUNT));
