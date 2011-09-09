@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page"
+<div id="turksnet" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page"
      xmlns:spring="http://www.springframework.org/tags/form" version="2.0">
     <!--<jsp:directive.page contentType="text/html;charset=UTF-8"/> -->
     <jsp:output omit-xml-declaration="yes"/>
@@ -25,9 +25,11 @@
                 $("#display-panel").append('<div class="' + clz + ' neighborview">' + createList(val, "grid dragsource","draggable neighbor") + '</div>');
             });
 
+             initNavIndex();
             $("#private").append(createList(private_data, "droptarget sortable",""));
             $("#public").append(createList(public_data, "droptarget sortable grid",""));
             $(".draggable").draggable({
+
                 cancel: ".placed",
                 helper: "clone",
                 appendTo: "body",
@@ -36,6 +38,8 @@
             $(".draggable").disableSelection();
 
             $(".sortable").sortable({
+
+
                 receive:
                     function(event,ui) {
                         var me = $(this);
@@ -62,8 +66,8 @@
                 connectWith:"ul.sortable:not(.full)"});
             $(".sortable").disableSelection();
 
-            checkSize($("#private>ul"));
-            initNavIndex();
+            //checkSize($("#private>ul"));
+
             selectNavIndex("", nav_idxs[0]);
 
         }
@@ -156,8 +160,10 @@
         }
 
         function expandInfo() {
-             $("span.expandlink").toggle();
-            $(".expandible").slideToggle();
+
+            $("span.expandible").toggleClass("hidden");
+            $("span.expandlink").toggleClass("hidden");
+
 
         }
 
@@ -178,7 +184,7 @@
 
         <div id="intro">Try to forumulate the correct story by dragging phrases from your neighbors' stories
             and your private area to the public area. You have ${rounds} turns, and will be awarded a bonus based on the quality of your story at each turn.
-            <span class="hidden expandible" id="extended_help">
+            <span class="expandible hidden" id="extended_help">
                 <h3>Objective</h3>
                 <p>
                 Your goal is to recreate the correct story from pieces of information you and other players have. You will have twenty turns. You are not competing with the other players. You need them, and they need you, because you all have different pieces of information.</p>

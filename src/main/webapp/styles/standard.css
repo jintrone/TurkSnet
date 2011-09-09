@@ -367,10 +367,10 @@ fieldset th {
 }
 
 /* app specific styles */
-
+li.ui-draggable-dragging {list-style-type: none}
 .dragsource, .sortable { list-style-type: none; margin: 0; padding: 5px; height:86%; background: white}
-.dragsource li, .sortable li { margin: 3px; padding: 6px; text-align:center  }
-.dragsource li, .sortable li { background: #666655; color: #DDDDDD; font-size:14px; cursor:move }
+li.draggable, .dragsource li, .sortable li { margin: 3px; padding: 6px; text-align:center  }
+li.draggable, .dragsource li, .sortable li { background: #666655; color: #DDDDDD; font-size:14px; cursor:move }
 .sortable li.ui-state-highlight { height: 1.0em; border:none; width:150px; background: #F0F010 }
 .grid li {float:left};
 
@@ -384,6 +384,12 @@ li.tile.neighbor {
 li.tile.neighbor.placed {
     background: none repeat scroll 0 0 #CCCCCC;
     color: #999999;
+}
+
+
+div#turksnet ul {
+
+    overflow-y: auto;
 }
 
 
@@ -490,6 +496,7 @@ div#buttons button:hover, div#buttons input:hover {
 
 div#buttons form {
     display:inline;
+    vertical-align: top;
 }
 
 div#intro h3 {
@@ -518,7 +525,7 @@ table.layout {
     background: #446644;
 }
 
-table.layout tr.content {
+table.layout tr.content>td {
     height: 300px;
 }
 
@@ -604,7 +611,7 @@ ul#selection {
     padding: 5px;
     margin-bottom:0;
     margin-top:0;
-    width:100%;
+    width:90px;
     height:96%;
     background: #CCCCCC;
 }
