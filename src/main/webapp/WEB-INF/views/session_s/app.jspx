@@ -169,8 +169,8 @@
         }
         <![CDATA[
         function browserCheck() {
-           // if ($.browser.msie && $.browser.version<8) {
-             if (true) {
+           if ($.browser.msie && $.browser.version<8) {
+
 		            $("#checkingBrowser").hide();
                     $("#noBrowserSupport").show();
                     return false;
