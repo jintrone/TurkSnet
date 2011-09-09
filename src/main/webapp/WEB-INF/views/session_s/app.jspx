@@ -17,6 +17,7 @@
 
         function initPage() {
 
+
             $.each(incoming, function(key, val) {
 
                 var clz = "nb-index-" + key;
@@ -166,17 +167,43 @@
 
 
         }
+        <![CDATA[
+        function browserCheck() {
+           // if ($.browser.msie && $.browser.version<8) {
+             if (true) {
+		            $("#checkingBrowser").hide();
+                    $("#noBrowserSupport").show();
+                    return false;
+		         } else {
+
+                $("#checkingBrowser").hide();
+                $("#acceptBrowser").show();
+                return true;
+
+            }
+
+        }
+        ]]>
 
 
         $(function() {
+            if (browserCheck()) {
             $("a#feedbackLink").attr("href",post_target);
             initPage();
+            }
 
 
         });
 
 
     </script>
+    <div id="checkingBrowser">
+        Checking browser... javascript must be enabled for this application to work.
+    </div>
+    <div id="noBrowserSupport" style="display:none;">
+        This application only supports Firefox, Chrome, Opera, Safari, and IE 8 and up.  Please return the HIT if you have accepted it, or use a more recent browser.
+    </div>
+    <div id="acceptBrowser" style="display:none;">
     <div id="header">
         <span id="rounds">Round: ${round} of ${rounds}</span><span id="title">LOOM Story Builder</span><span id="feedback"><a id="feedbackLink" href="" target="_blank">Feedback? Problems?</a></span>
     </div>
@@ -279,6 +306,7 @@
         </tr>
 
     </table>
-
+    </div>
 
 </div>
+
