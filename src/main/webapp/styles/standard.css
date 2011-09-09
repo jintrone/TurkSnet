@@ -7,7 +7,7 @@ body,div,td {
 }
 
 body {
-	background-color: #fff;
+	background-color:#F0F0F3;
 	text-align: center;
 }
 
@@ -204,6 +204,7 @@ a:link {
 
 a:hover {
 	color: #456314;
+    cursor: pointer;
 }
 
 a:active {
@@ -234,7 +235,7 @@ table {
 }
 
 table table {
-	margin: -5px 0;
+	margin: 0px 0;
 	border: 0px solid #e0e7d3;
 	width: 100%;
 }
@@ -367,23 +368,22 @@ fieldset th {
 
 /* app specific styles */
 
-.dragsource, .sortable { list-style-type: none; margin: 0; padding: 5px; width: 100%;}
-.dragsource li, .sortable li { margin: 3px; padding: 3px; text-align:center  }
-.dragsource li, .sortable li { height: 1.2em; line-height: 1.2em; border: solid thin; background: #F0F0F0;}
-.sortable li.ui-state-highlight { height: 1.2em; border:none; line-height: 1.2em; width:150px; background: #F0F010 }
+.dragsource, .sortable { list-style-type: none; margin: 0; padding: 5px; height:86%; background: white}
+.dragsource li, .sortable li { margin: 3px; padding: 6px; text-align:center  }
+.dragsource li, .sortable li { background: #666655; color: #DDDDDD; font-size:14px; cursor:move }
+.sortable li.ui-state-highlight { height: 1.0em; border:none; width:150px; background: #F0F010 }
 .grid li {float:left};
 
 
-li.tile {margin: 3px; padding: 3px; text-align:center; height: 1.2em; line-height: 1.2em; border: solid thin; background: #F0F0F0;}
+li.tile {margin: 3px; padding: 3px; text-align:center; height: 1.2em; line-height: 1.2em; border: none; background: #F0F0F0;}
 
 li.tile.neighbor {
-    background: #99ccff;
-    border-color: black;
+    background: none repeat scroll 0 0 #3377BB;
 }
 
 li.tile.neighbor.placed {
-    color:gray;
-    border-color: gray;
+    background: none repeat scroll 0 0 #CCCCCC;
+    color: #999999;
 }
 
 
@@ -394,6 +394,63 @@ div#neighbors, div#private {
 
 div#neighbors {
     width:500px;
+}
+
+div#header {
+   font-style: italic;
+    font-weight:bold;
+    font-size:14px;
+   text-align: center;
+
+}
+
+div#header a#feedbackLink {
+    font-size: 14px;
+}
+
+span#rounds {
+    float:left;
+}
+
+span#feedback {
+    float:right;
+
+}
+
+a#feedbackLink {
+    color:#DDAA00;
+}
+
+a#feedbackLink:visited {
+    color:#BB7700;
+}
+
+div.deletemark {
+    float:right;
+    margin-left: 5px;
+    margin-right: -3px;
+    margin-top: -3px;
+    padding: 1px 2px;
+    border: thin solid black;
+    background: white;
+
+}
+
+span.expandlink {
+    color: #555555;
+    float: right;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: bold;
+    margin-right: 24px;
+    text-decoration: underline;
+
+}
+
+div.deletemark a {
+    font-size: 11px;
+    font-weight:bold;
+    text-decoration: none;
 }
 
 div#private {
@@ -410,29 +467,75 @@ div#neighbors ul.sortable>li {
 
 }
 
+div#buttons {
+    text-align: center;
+}
 
+div#buttons button, div#buttons input {
+    font-size: 18px;
+    border-width: 3px;
+    margin-left:10px;
+    margin-right:10px;
+    display:inline;
+    height:auto;
+}
+
+div#thanks {
+    text-align: center;
+}
+
+div#buttons button:hover, div#buttons input:hover {
+    background: #F0F010;
+}
+
+div#buttons form {
+    display:inline;
+}
+
+div#intro h3 {
+    margin-right:100px;
+    margin-left:100px;
+    border-bottom:  thin solid;
+    text-align: center;
+}
+
+div#intro a {
+   font-size:14px;
+}
+
+
+
+
+
+
+table.layout tr td.buttonrow {
+    background: #446644;
+}
 
 table.layout {
+    margin-top:54px;
     border: none;
-    border-collapse: separate;
-    border-spacing: 5px;
-    background: none;
+    background: #446644;
+}
 
-
+table.layout tr.content {
+    height: 300px;
 }
 
 
 table.layout tr td {
     padding: 10px;
-    border: none;
-    background: #F0F0c9;
+    background: #EEEEEE;
+    border: 10px solid #446644;
     vertical-align: top;
     height: 100%;
 
 }
 
-table.layout-inner {
+table.layout-inner tr td {
     height:300px;
+    border: none;
+
 }
 
 td.seventy {
@@ -455,6 +558,31 @@ td.hundred {
 }
 
 
+div.label {
+    font-family: Helvetica, sans-serif;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 14px;
+    border: thin solid gray;
+    padding: 6px;
+    background: #CCCCCC;
+
+}
+
+div.neighborview {
+    height:100%;
+    background: #FFFFFF;
+}
+
+div#intro {
+    background: none repeat scroll 0 0 #FFFD99;
+    border: thin solid #887700;
+    font-size: 14px;
+    padding: 5px;
+    position: absolute;
+    width: 788px;
+}
+
 
 div#selection-panel {
     width: 110px;
@@ -467,6 +595,8 @@ div#selection-panel {
 
 div#public {
     height: 200px;
+    margin: 10px;
+    background:#F9F9F9;
 }
 
 ul#selection {
@@ -474,26 +604,34 @@ ul#selection {
     padding: 5px;
     margin-bottom:0;
     margin-top:0;
+    width:100%;
+    height:96%;
+    background: #CCCCCC;
 }
 
 ul#selection li {
     text-align: center;
     padding: 5px;
     background: #FCFCFC;
-    margin: 3px;
+    margin-bottom: 0px;
+    margin-top:0px;
+    margin-left:0px;
+    margin-right:0px;
+
 }
 
 ul#selection li.nb-selected {
-    background: #E0AAAA;
+    background: #ffff00;
 
 }
 
 ul#selection li:hover {
-    background: #E0AAAA;
+    background:  #ffff00;
+    cursor: pointer;
 }
 
 div#display-panel {
-    border: solid thin gray;
+    background:  #F9F9F9;
     width:100%;
     height:100%;
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page"
+     xmlns:spring="http://www.springframework.org/tags/form" version="2.0">
+    <!--<jsp:directive.page contentType="text/html;charset=UTF-8"/> -->
+    <jsp:output omit-xml-declaration="yes"/>
+    <c:if test="${submission}">
+     <div id="thanks">Thanks for your feedback! If you reported a bug, someone may be in touch via your mechanical turk account.</div>
+    </c:if>
+    <c:if test="${!submission}">
+    <div>
+        Please use this form to provide any feedback about or report problems with the Amazon Mechanical Turk enabled LOOM story game. The administrator will receive your message
+        and respond to it in a timely fashion.
+        <br/>
+                <br/>
+        <i><b>Note</b>: if you did not come here by way of a hit that you accepted, I have no way of contacting you.</i>
+        <br/>
+        <br/>
+        Please enter your message here:
+        <br/>
+
+        <form action="" method="POST" id="post">
+
+            <input type="hidden" id="workerId" value="${workerId}"/>
+            <input type="hidden" id="assignmentId" value="${assignmentId}"/>
+
+            <textarea name="feedback" cols="100" rows="20"><!--- nothing --> </textarea>
+            <br/>
+
+            <input type="submit" value="Submit"/>
+
+
+        </form>
+
+    </div>
+    </c:if>
+
+ </div>

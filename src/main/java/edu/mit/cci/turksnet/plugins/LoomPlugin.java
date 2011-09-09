@@ -30,10 +30,11 @@ import java.util.regex.Pattern;
 public class LoomPlugin implements Plugin {
 
     public static final String PROP_STORY = "story";
+    public static final String PROP_ASSIGNMENT_VALUE="assignment_value";
     private static final String PROP_NODE_COUNT = "node_count";
     private static final String PROP_GRAPH_TYPE = "graph_type";
     private static final String PROP_PRIVATE_TILES = "private_tile_count";
-    private static final String PROP_ITERATION_COUNT = "iteration_count";
+    public static final String PROP_ITERATION_COUNT = "iteration_count";
     private static final String PROP_SESSION_BONUS_VALUE = "sessionBonusValue";
     private static final String PROP_SESSION_BONUS_COUNT = "sessionBonusCount";
     private static final String PROP_SESSION_BONUS_CORRECT = "sessionBonusCorrect";
@@ -179,13 +180,14 @@ public class LoomPlugin implements Plugin {
 
     @Override
     public String getHitCreation(Session_ session, String rooturl) {
+        String val = session.getExperiment().getPropsAsMap().get(PROP_ASSIGNMENT_VALUE);
         Map<String, String> result = new HashMap<String, String>();
         result.put("title", "Figure out the story");
         result.put("desc", "Combine your story pieces with your neighbors to create the best story you can");
         result.put("url", rooturl + "/session_s/" + session.getId() + "/turk/app");
-        result.put("reward", ".03");
+        result.put("reward", val);
         result.put("assignments", session.getExperiment().getPropsAsMap().get(PROP_NODE_COUNT));
-        result.put("height", "800");
+        result.put("height", "1000");
         if (session.getQualificationRequirements()!=null ) {
             result.put("qualificationRequirements", createQualificationString(session.getQualificationRequirements()));
         }

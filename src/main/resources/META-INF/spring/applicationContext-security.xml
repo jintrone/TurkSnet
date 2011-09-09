@@ -8,6 +8,7 @@
         
         <!-- Configure these elements to secure URIs in your application -->
         <intercept-url access="permitAll" pattern="/session_s/*/turk/app"/>
+        <intercept-url access="permitAll" pattern="/session_s/*/turk/feedback"/>
         <intercept-url access="permitAll" method="POST" pattern="/session_s/*/turk/*"/>
         <intercept-url access="permitAll" pattern="/resources/**"/>
         <intercept-url access="permitAll" pattern="/login"/>

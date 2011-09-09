@@ -3,19 +3,24 @@ package edu.mit.cci.turksnet.web;
 
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
+import edu.mit.cci.turksnet.plugins.LoomPlugin;
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.ContextLoader;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import java.util.Date;
 
 
 @RooWebScaffold(path = "session_s", formBackingObject = Session_.class)
@@ -40,6 +45,40 @@ public class Session_Controller {
 
     //for the html app
 
+    @RequestMapping(value = "/{id}/turk/feedback", method = RequestMethod.GET)
+    public String getForm(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("workerId") String workerId, Model model) {
+        model.addAttribute("workerId", workerId);
+        model.addAttribute("assignmentId", assignmentId);
+        model.addAttribute("submission",false);
+
+        return "session_s/node/feedback";
+    }
+
+
+    @RequestMapping(value = "/{id}/turk/feedback", method = RequestMethod.POST)
+    public String postFeedback(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("workerId") String workerId, @RequestParam("feedback") String feedback, Model model) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Worker: ").append(workerId).append("\n");
+        builder.append("Session: ").append(id).append("\n");
+        builder.append("Assignment: ").append(assignmentId).append("\n");
+        builder.append("Message:\n\n");
+        builder.append(feedback);
+
+
+
+        ApplicationContext context =  ContextLoader.getCurrentWebApplicationContext();
+        SimpleMailMessage tmpl = context.getBean("mailMessage",SimpleMailMessage.class);
+        JavaMailSender sender = context.getBean("mailSender", JavaMailSenderImpl.class);
+        SimpleMailMessage message = new SimpleMailMessage(tmpl);
+        message.setSentDate(new Date());
+        message.setText(builder.toString());
+        sender.send(message);
+        model.addAttribute("submission",true);
+
+        return "session_s/node/feedback";
+    }
+
+
     @RequestMapping(value = "/{id}/turk/app", method = RequestMethod.GET)
     public String getTurkerApp(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, Model model, HttpServletRequest request) {
         //, , @RequestParam("turkerId") String turkerid\
@@ -47,11 +86,12 @@ public class Session_Controller {
         Node n = null;
         String submitTo = null;
         String hitId = request.getParameter("hitId");
+        Session_ s = null;
         if ("ASSIGNMENT_ID_NOT_AVAILABLE".equals(assignmentId)) {
             n = Node.getDummyNode();
 
         } else {
-            Session_ s = Session_.findSession_(id);
+            s = Session_.findSession_(id);
             turkerid = request.getParameter("workerId");
             submitTo = request.getParameter("turkSubmitTo");
             n = s.getNodeForTurker(turkerid);
@@ -66,16 +106,16 @@ public class Session_Controller {
 //        nf.setAssignmentId(assignmentId);
 //        nf.setSubmitTo(submitTo);
 //        nf.setHitId(hitId);
+
+        model.addAttribute("round", s == null ? 0 : s.getIteration());
+        model.addAttribute("rounds", s == null ? 0 : s.getExperiment().getPropsAsMap().get(LoomPlugin.PROP_ITERATION_COUNT));
         model.addAttribute("nodeForm", nf);
         model.addAttribute("turkerId", turkerid);
-        model.addAttribute("assignmentId",assignmentId);
-        model.addAttribute("submitTo",submitTo);
-        model.addAttribute("hitId",hitId);
+        model.addAttribute("assignmentId", assignmentId);
+        model.addAttribute("submitTo", submitTo);
+        model.addAttribute("hitId", hitId);
         return "session_s/node/app";
     }
-
-
-
 
 
 }
