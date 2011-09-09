@@ -182,11 +182,13 @@ public class LoomPlugin implements Plugin {
     public String getHitCreation(Session_ session, String rooturl) {
         String val = session.getExperiment().getPropsAsMap().get(PROP_ASSIGNMENT_VALUE);
         Map<String, String> result = new HashMap<String, String>();
-        result.put("title", "Figure out the story");
-        result.put("desc", "Combine your story pieces with your neighbors to create the best story you can");
+        result.put("title", "Work with others to solve a puzzle.");
+        result.put("desc", "Combine your information with 24 other players to figure out the correct story. There will be 20 turns, and a new HIT is made available" +
+                "to you at each turn. You will receive a bonus after 20 turns are completed, based on your performance.");
         result.put("url", rooturl + "/session_s/" + session.getId() + "/turk/app");
         result.put("reward", val);
         result.put("assignments", session.getExperiment().getPropsAsMap().get(PROP_NODE_COUNT));
+        result.put("keywords","game,experiment,study,collaborate,loom");
         result.put("height", "1000");
         if (session.getQualificationRequirements()!=null ) {
             result.put("qualificationRequirements", createQualificationString(session.getQualificationRequirements()));
