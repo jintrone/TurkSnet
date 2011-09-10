@@ -1,6 +1,7 @@
 package edu.mit.cci.turksnet.web;
 
 
+import com.sun.xml.internal.ws.server.StatefulInstanceResolver;
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.plugins.LoomPlugin;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.ContextLoader;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
@@ -107,7 +110,7 @@ public class Session_Controller {
 //        nf.setAssignmentId(assignmentId);
 //        nf.setSubmitTo(submitTo);
 //        nf.setHitId(hitId);
-        Map<String,String> bonus = s.getExperiment().getActualPlugin().getBonus(n);
+        Map<String,String> bonus = s==null? Collections.<String,String>emptyMap():s.getExperiment().getActualPlugin().getBonus(n);
 
         model.addAttribute("currentbonus",bonus.containsKey("CumulativeBonus")?bonus.get("CumulativeBonus"):"0.0");
         model.addAttribute("round", s == null ? 0 : s.getIteration());
