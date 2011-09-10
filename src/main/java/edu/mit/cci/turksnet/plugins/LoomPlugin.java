@@ -91,7 +91,7 @@ public class LoomPlugin implements Plugin {
         StringBuilder builder = new StringBuilder();
         Map<String, String> props = experiment.getPropsAsMap();
         String story = props.get(PROP_STORY);
-        Pattern pat = Pattern.compile("(\\d+):(\\w+)");
+        Pattern pat = Pattern.compile("(\\d+):([\\w\\s]+)");
         if (story == null) throw new ExperimentCreationException("No story associated with Loom Experiment");
         String sep = "";
         Set<Integer> ids = new HashSet<Integer>();
@@ -289,7 +289,7 @@ public class LoomPlugin implements Plugin {
     private static List<Integer> getStoryOrder(String story) {
       List<Integer> result = new ArrayList<Integer>();
         logger.debug("Extracting story from "+story);
-        Pattern pat = Pattern.compile("(\\d+):\\w+");
+        Pattern pat = Pattern.compile("(\\d+):[\\w\\s]+");
         if (story!=null) {
             for (String p : story.split(";")) {
                 p = p.trim();
@@ -317,7 +317,7 @@ public class LoomPlugin implements Plugin {
         int accountedFor = 0;
         for (Integer s:sample) {
             if (last > -1) {
-                if (tmap.get(last) > tmap.get(s)) {
+                if (tmap.get(last) < tmap.get(s)) {
                     accountedFor++;
                 }
             }
@@ -326,6 +326,13 @@ public class LoomPlugin implements Plugin {
         }
         return accountedFor / (float)(truth.size()-1);
 
+
+    }
+
+    public static void main(String[] args) {
+        String truth = "3:there was a fox and a bear;209:who were friends;87:one day they decided to catch a chicken for supper;262:they decided to go together;849:because neither one wanted to be left alone;369:and they both liked fried chicken;";
+        String sample = "262:they decided to go together;849:because neither one wanted to be left alone;369:and they both liked fried chicken;3:there was a fox and a bear;209:who were friends;";
+        System.err.println(score(getStoryOrder(truth),getStoryOrder(sample)));
 
     }
 
