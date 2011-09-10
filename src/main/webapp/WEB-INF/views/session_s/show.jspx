@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" version="2.0">
+<div xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" version="2.0">
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <page:show id="ps_edu_mit_cci_turksnet_Session_" object="${session_}" path="/session_s" z="PIQOHTzCkXMIbJIFauFKf8LWC/Q=">
@@ -21,5 +21,9 @@
     <!--<field:display field="format" id="s_edu_mit_cci_turksnet_Session__format" object="${session_}" z="l6G/LT/Db5lziAukTNnyJmGRlbw="/>  -->
     <field:display field="format" id="s_edu_mit_cci_turksnet_Session__format" object="${session_}" render="false" z="user-managed"/>
     <field:display field="qualificationRequirements" id="s_edu_mit_cci_turksnet_Session__qualificationRequirements" object="${session_}" z="DhFkwrPBqi9IC9cppBH+7Lb3N2o="/>
+
     </page:show>
+    <form:run id="run_this_experiment" label="Run the experiment" path="/session_s/${session_.id}/run">
+
+    </form:run>
 </div>
