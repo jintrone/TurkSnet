@@ -2,6 +2,7 @@ package edu.mit.cci.turksnet.web;
 
 
 import com.sun.xml.internal.ws.server.StatefulInstanceResolver;
+import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.plugins.LoomPlugin;
@@ -123,5 +124,21 @@ public class Session_Controller {
         return "session_s/node/app";
     }
 
+    @RequestMapping(value = "/{id}/run", method = RequestMethod.POST)
+    public String run(@PathVariable("id") Long id, Model model, HttpServletRequest request) {
+
+         Session_ session = Session_.findSession_(id);
+         try {
+
+             session.run();
+         } catch (Exception e1) {
+             e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+             System.err.println("Could not run session!");
+             return "redirect:/session_s/" + encodeUrlPathSegment(id.toString(), request);
+
+         }
+
+        return "redirect:/session_s/" + encodeUrlPathSegment(session.getId().toString(), request);
+    }
 
 }
