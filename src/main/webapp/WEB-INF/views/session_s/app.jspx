@@ -205,7 +205,7 @@
     </div>
     <div id="acceptBrowser" style="display:none;">
     <div id="header">
-        <span id="rounds">Round: ${round} of ${rounds}</span><span id="title">LOOM Story Builder</span><span id="feedback"><a id="feedbackLink" href="" target="_blank">Feedback? Problems?</a></span>
+        <span id="rounds">Turn: ${round} of ${rounds}</span><span id="title">LOOM Story Builder</span><span id="feedback"><a id="feedbackLink" href="" target="_blank">Feedback? Problems?</a></span>
     </div>
 
 
@@ -220,13 +220,14 @@
                 Each player has a screen that looks just like yours.  Your "private information area" contains information that only you can see; it can hold up to five pieces of information.  Your "public information area" can be seen by your neighbors.  The "neighbors public stories" display the contents of your neighbors' public areas at the end of the previous turn.
                 </p>
                 <p>
-                You can drag tiles between your "public" and "private" areas.  You can drag data from your neighbors to either your public or private area.
-                </p>
-                <p>
                 Use the "public story area" to create the best story you can. You are scored on the information in your public story area on each turn, and your ten best turns will be used to determine your bonus.
                 </p>
+                <p>
+                You can drag tiles between your "public" and "private" areas.  You can drag data from your neighbors to either your public or private area. Use the "X" on a tile to remove it from your public or private area.
+                </p>
+
                  <p>
-                Please note that turns proceed only when each player has submitted their results, so please submit your results as quickly as possible. Please do not discuss the
+                Please note that turns proceed only when each player has submitted their results, so new HITs may not be available immediately. Please submit your results as quickly as possible. Please do not discuss the
                 story outside of the game.
                 </p>
                 <p>
@@ -240,8 +241,8 @@
                 Thus, your should try to use as many information elements as you can in your public space, but only if they are in the correct order. In any round the maximum score is 1, and minimum score is 0.
                 </p>
                 <p>
-                Your your maximum bonus for a given turn is $.20. You will receive a $.50 bonus if you have the correct story in your public area at the end of the last turn.
-                Therefore, you are eligible for up to $2.50 bonus.  Bonuses are awarded only if you complete all 20 turns.
+                The maximum bonus for a given turn is $.20. You will receive a $.50 bonus if you have the correct story in your public area at the end of the last turn.
+                Your bonus is determined based on your 10 best turns, so you are eligible for up to $2.50 bonus.  Bonuses are awarded only if you complete all ${rounds} turns.
                 </p>
             </span>
             <a href="javascript:" onclick="expandInfo()"><span class="expandlink">more</span><span class="expandlink hidden">less</span></a>
