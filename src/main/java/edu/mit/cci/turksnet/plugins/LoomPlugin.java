@@ -8,7 +8,6 @@ import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.SessionLog;
 import edu.mit.cci.turksnet.Session_;
-import edu.mit.cci.turksnet.web.NodeForm;
 import edu.uci.ics.jung.algorithms.generators.Lattice2DGenerator;
 import edu.uci.ics.jung.graph.util.Pair;
 import org.apache.log4j.Logger;
@@ -40,7 +39,7 @@ public class LoomPlugin implements Plugin {
     private static final String PROP_SESSION_BONUS_CORRECT = "sessionBonusCorrect";
 
 
-    private static Logger log = Logger.getLogger(LoomPlugin.class);
+    private static Logger logger = Logger.getLogger(LoomPlugin.class);
 
 
     public Session_ createSession(Experiment experiment) throws SessionCreationException {
@@ -129,7 +128,7 @@ public class LoomPlugin implements Plugin {
         }
         else if ("lattice".equals(graphtype)) {
             if (Math.floor(Math.sqrt(nodecount.doubleValue())) < Math.sqrt(nodecount.doubleValue())) {
-                log.warn("Requested number of nodes must be a perfect square for lattice networks");
+                logger.warn("Requested number of nodes must be a perfect square for lattice networks");
             }
             Lattice2DGenerator<DefaultJungNode, DefaultJungEdge> generator = new Lattice2DGenerator<DefaultJungNode, DefaultJungEdge>(
                     DefaultJungGraph.getFactory(),
@@ -233,7 +232,7 @@ public class LoomPlugin implements Plugin {
         for (SessionLog log:logs) {
             result.add(score(truth,getStoryOrder(log.getNodePublicData())));
         }
-
+        logger.debug("Resulting scores are: "+result);
         return result;
     }
 
@@ -241,7 +240,8 @@ public class LoomPlugin implements Plugin {
     public Map<String,String> getBonus(Node n) {
         List<SessionLog> logs = new ArrayList<SessionLog>();
         for (SessionLog log :SessionLog.findAllSessionLogs()) {
-            if (n.equals(log.getNode()) && log.getType().equals("results")) {
+            if (n.getId().equals(log.getNode().getId()) && log.getType().equals("results")) {
+                logger.debug("Adding session log ");
                 logs.add(log);
             }
         }
@@ -251,6 +251,7 @@ public class LoomPlugin implements Plugin {
         String description = "No score could be obtained";
         String bonus = "0.0";
         if (scores.isEmpty()) {
+            logger.debug("No scores found");
            return Collections.emptyMap();
 
 
@@ -279,7 +280,9 @@ public class LoomPlugin implements Plugin {
         Map<String,String> result = new HashMap<String,String>();
         result.put("Description",builder.toString());
         result.put("Bonus",String.format("%.2f",total));
-        result.put("CumulativeBonus",String.format("%.2f",total));
+        result.put("CumulativeBonus",String.format("%.2f",subtotal));
+
+        logger.debug("Bonus structure: "+result);
         return result;
     }
 
@@ -300,6 +303,7 @@ public class LoomPlugin implements Plugin {
    }
 
     public static Float score(List<Integer> truth, List<Integer> sample) {
+        logger.debug("Checking truth:"+truth+" against sample:"+sample);
         Map<Integer,Integer> tmap = new HashMap<Integer,Integer>();
         int i = 0;
         for (Integer t:truth) {
