@@ -205,7 +205,7 @@
     </div>
     <div id="acceptBrowser" style="display:none;">
     <div id="header">
-        <span id="rounds">Turn: ${round} of ${rounds}</span><span id="title">LOOM Story Builder</span><span id="feedback"><a id="feedbackLink" href="" target="_blank">Feedback? Problems?</a></span>
+        <span id="rounds">Turn: ${round} of ${rounds}, Earned Bonus: ${currentbonus}</span><span id="title">LOOM Story Builder</span><span id="feedback"><a id="feedbackLink" href="" target="_blank">Feedback? Problems?</a></span>
     </div>
 
 

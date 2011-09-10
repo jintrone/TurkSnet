@@ -237,6 +237,7 @@ public class Session_ {
     }
 
     private void logNodeEvent(Node n, String type) {
+        log.debug("Logging results ");
         SessionLog slog = new SessionLog();
         slog.setDate_(new Date());
         slog.setNode(n);
