@@ -183,9 +183,9 @@ public class LoomPlugin implements Plugin {
         String val = session.getExperiment().getPropsAsMap().get(PROP_ASSIGNMENT_VALUE);
         Map<String, String> result = new HashMap<String, String>();
         result.put("title", "Work with others to solve a puzzle.");
-        result.put("desc", "Combine your information with 24 other players to figure out the correct story. There will be 20 turns, and a new HIT is made available" +
-                "to you at each turn. You will receive a bonus after 20 turns are completed, based on your performance. This game requires javascript, and will not work"+
-                "with Internet Explorer 7 or less");
+        result.put("desc", "Combine your information with 24 other players to figure out the correct story. This game requires javascript, and will not work "+
+                "with Internet Explorer 7 or less. There will be 20 turns, and a new HIT is made available " +
+                "to you at each turn. You will receive a bonus after 20 turns are completed based on your performance. Details available in the assignment preview.");
         result.put("url", rooturl + "/session_s/" + session.getId() + "/turk/app");
         result.put("autoApprovalDelayInSeconds","30");
         result.put("assignmentDurationInSeconds","1200");
@@ -249,7 +249,7 @@ public class LoomPlugin implements Plugin {
 
         List<Float> scores = getSessionScores(n.getSession_().getExperiment(),logs);
         String description = "No score could be obtained";
-        String bonus = "0.0f";
+        String bonus = "0.0";
         if (scores.isEmpty()) {
            return Collections.emptyMap();
 
@@ -266,19 +266,20 @@ public class LoomPlugin implements Plugin {
         scores.subList(0,Math.min(scores.size(),Integer.parseInt(e.getPropsAsMap().get(PROP_SESSION_BONUS_COUNT))));
         StringBuilder builder = new StringBuilder();
         builder.append("Your best session scores were: ");
+        float subtotal = 0;
         float total = 0;
         for (Float f:scores) {
             builder.append(String.format("%.2f",f)).append(" ");
-           total+=f*Float.parseFloat(e.getPropsAsMap().get(PROP_SESSION_BONUS_VALUE));
+           subtotal+=f*Float.parseFloat(e.getPropsAsMap().get(PROP_SESSION_BONUS_VALUE));
         }
         builder.append("\n").append("Your final session score was: ").append(String.format("%.2f",lastscore));
-        if (lastscore == 1.0f) {
-           total +=Float.parseFloat(e.getPropsAsMap().get(PROP_SESSION_BONUS_CORRECT));
-        }
+        total =subtotal + (lastscore == 1.0f?Float.parseFloat(e.getPropsAsMap().get(PROP_SESSION_BONUS_CORRECT)):0.0f);
+
 
         Map<String,String> result = new HashMap<String,String>();
         result.put("Description",builder.toString());
         result.put("Bonus",String.format("%.2f",total));
+        result.put("CumulativeBonus",String.format("%.2f",total));
         return result;
     }
 

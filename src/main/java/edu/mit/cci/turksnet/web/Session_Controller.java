@@ -21,6 +21,7 @@ import org.springframework.web.context.ContextLoader;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Map;
 
 
 @RooWebScaffold(path = "session_s", formBackingObject = Session_.class)
@@ -80,7 +81,7 @@ public class Session_Controller {
 
 
     @RequestMapping(value = "/{id}/turk/app", method = RequestMethod.GET)
-    public String getTurkerApp(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, Model model, HttpServletRequest request) {
+    public String getTurkerApp(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, Model model, HttpServletRequest request) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         //, , @RequestParam("turkerId") String turkerid\
         String turkerid = "" + -1;
         Node n = null;
@@ -106,7 +107,9 @@ public class Session_Controller {
 //        nf.setAssignmentId(assignmentId);
 //        nf.setSubmitTo(submitTo);
 //        nf.setHitId(hitId);
+        Map<String,String> bonus = s.getExperiment().getActualPlugin().getBonus(n);
 
+        model.addAttribute("currentbonus",bonus.containsKey("CumulativeBonus")?bonus.get("CumulativeBonus"):"0.0");
         model.addAttribute("round", s == null ? 0 : s.getIteration());
         model.addAttribute("rounds", s == null ? 0 : s.getExperiment().getPropsAsMap().get(LoomPlugin.PROP_ITERATION_COUNT));
         model.addAttribute("nodeForm", nf);
