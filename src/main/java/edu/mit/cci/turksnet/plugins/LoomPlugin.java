@@ -241,7 +241,7 @@ public class LoomPlugin implements Plugin {
         List<SessionLog> logs = new ArrayList<SessionLog>();
         for (SessionLog log :SessionLog.findAllSessionLogs()) {
             if (n.getId().equals(log.getNode().getId()) && log.getType().equals("results")) {
-                logger.debug("Adding session log ");
+                logger.debug("Adding session log "+log.getNodePublicData());
                 logs.add(log);
             }
         }
@@ -288,7 +288,7 @@ public class LoomPlugin implements Plugin {
 
     private static List<Integer> getStoryOrder(String story) {
       List<Integer> result = new ArrayList<Integer>();
-
+        logger.debug("Extracting story from "+story);
         Pattern pat = Pattern.compile("(\\d+):\\w+");
         if (story!=null) {
             for (String p : story.split(";")) {
@@ -299,6 +299,7 @@ public class LoomPlugin implements Plugin {
                 }
             }
         }
+        logger.debug("Got story order: "+result);
         return result;
    }
 
