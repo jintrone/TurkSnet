@@ -76,7 +76,7 @@ privileged aspect ApplicationConversionServiceFactoryBean_Roo_ConversionService 
     Converter<Session_, String> ApplicationConversionServiceFactoryBean.getSession_Converter() {
         return new Converter<Session_, String>() {
             public String convert(Session_ source) {
-                return new StringBuilder().append(source.getLog()).append(" ").append(source.getNetwork()).append(" ").append(source.getCreated()).toString();
+                return new StringBuilder().append(source.getPropertiesAsMap()).append(" ").append(source.getLog()).append(" ").append(source.getNetwork()).toString();
             }
         };
     }

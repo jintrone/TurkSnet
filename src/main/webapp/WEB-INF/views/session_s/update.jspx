@@ -5,20 +5,22 @@
     <form:update id="fu_edu_mit_cci_turksnet_Session_" modelAttribute="session_" path="/session_s" z="uPNBtEF4+bWx4PXHNzpJElOOAKs=">
         
         
-        <field:datetime dateTimePattern="${session__created_date_format}" field="created" id="c_edu_mit_cci_turksnet_Session__created" z="UY2EpeGHzjAjtNLsFThCjkyAOHc="/>
+        <field:input field="created" id="c_edu_mit_cci_turksnet_Session__created" z="8PlVwQr+eHHFcfpOT+M1ZKqtk54="/>
     <field:checkbox field="active" id="c_edu_mit_cci_turksnet_Session__active" z="BjWFZE2shwxRFrrqqYQ3SgBW/Fw="/>
     <field:select field="experiment" id="c_edu_mit_cci_turksnet_Session__experiment" itemValue="id" items="${experiments}" path="/experiments" z="EV4rno05FlhE4HRqWvUxd3OU60E="/>
     <field:input field="iteration" id="c_edu_mit_cci_turksnet_Session__iteration" z="jt5LvtwApVheahJxIO+VxgO4M6o="/>
         
         
     
-    <field:select field="availableNodes" id="c_edu_mit_cci_turksnet_Session__availableNodes" itemValue="id" items="${nodes}" multiple="true" path="/nodes" z="+yebzx5hcYcbAgG5Amk80Cli4RM="/>
+    <field:input field="availableNodes" id="c_edu_mit_cci_turksnet_Session__availableNodes" z="eu9r11+CFwNqC8+RYu31P70J8JY="/>
     <field:input field="network" id="c_edu_mit_cci_turksnet_Session__network" z="I+9jmUhPLqly4IG7lT38VMv0PZU="/>
     <field:input field="outputLog" id="c_edu_mit_cci_turksnet_Session__outputLog" z="nswrKe3x/4dq8tRMHu9ToLmQF00="/>
-        <field:input field="runner" id="c_edu_mit_cci_turksnet_Session__runner" z="iFfrLvOtv9GuqLrOKvuthuC9t94="/>
+        
     <field:input field="properties" id="c_edu_mit_cci_turksnet_Session__properties" z="jEdL8gQ6rw/U9Uqxdfzcaap7tW4="/>
     <field:input field="log" id="c_edu_mit_cci_turksnet_Session__log" z="rbIoCSHo8xjwtHi4ybSO1LP6QjE="/>
     <field:input field="format" id="c_edu_mit_cci_turksnet_Session__format" z="tx5EMO+dHdBhkNV+YuZL0u0ATO8="/>
     <field:input field="qualificationRequirements" id="c_edu_mit_cci_turksnet_Session__qualificationRequirements" z="TVsTmNVj8H3vFpMxgsaKMvfhcuM="/>
+    <field:input field="propertiesAsMap" id="c_edu_mit_cci_turksnet_Session__propertiesAsMap" z="hGaGweSegYDRo1NatqIwBOYzmqo="/>
+        <field:input field="test" id="c_edu_mit_cci_turksnet_Session__test" z="jq2M9ceVY1HN62fVyoVqIWakPkA="/>
     </form:update>
 </div>

@@ -3,14 +3,10 @@
 
 package edu.mit.cci.turksnet;
 
-import edu.mit.cci.turksnet.util.HeadlessRunner;
-
+import java.util.*;
 import java.lang.Boolean;
 import java.lang.String;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
 import org.apache.log4j.Logger;
 
 privileged aspect Session__Roo_JavaBean {
@@ -63,6 +59,14 @@ privileged aspect Session__Roo_JavaBean {
         this.iteration = iteration;
     }
     
+    public List<String> Session_.getTest() {
+        return this.test;
+    }
+    
+    public void Session_.setTest(List<String> test) {
+        this.test = test;
+    }
+    
     public Set<Node> Session_.getAvailableNodes() {
         return this.availableNodes;
     }
@@ -97,14 +101,6 @@ privileged aspect Session__Roo_JavaBean {
     
     public void Session_.setFormat(DateFormat format) {
         this.format = format;
-    }
-    
-    public HeadlessRunner Session_.getRunner() {
-        return this.runner;
-    }
-    
-    public void Session_.setRunner(HeadlessRunner runner) {
-        this.runner = runner;
     }
     
     public String Session_.getQualificationRequirements() {

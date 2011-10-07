@@ -111,6 +111,7 @@ public class Session_Controller {
 //        nf.setAssignmentId(assignmentId);
 //        nf.setSubmitTo(submitTo);
 //        nf.setHitId(hitId);
+        Map<String,String> props = s==null?Collections.<String, String>emptyMap():s.getExperiment().getPropsAsMap();
         Map<String,String> bonus = s==null? Collections.<String,String>emptyMap():s.getExperiment().getActualPlugin().getBonus(n);
 
         model.addAttribute("currentbonus",bonus.containsKey("CumulativeBonus")?bonus.get("CumulativeBonus"):"0.0");
@@ -121,6 +122,31 @@ public class Session_Controller {
         model.addAttribute("assignmentId", assignmentId);
         model.addAttribute("submitTo", submitTo);
         model.addAttribute("hitId", hitId);
+        model.addAttribute("sessionturnbonus",props.get(LoomPlugin.PROP_SESSION_BONUS_VALUE));
+        model.addAttribute("sessionbonuscount",props.get(LoomPlugin.PROP_SESSION_BONUS_COUNT));
+        model.addAttribute("sessionfinalbonus",props.get(LoomPlugin.PROP_SESSION_BONUS_CORRECT));
+
+
+
+        int nrounds = props.containsKey(LoomPlugin.PROP_ITERATION_COUNT)?Integer.parseInt(props.get(LoomPlugin.PROP_ITERATION_COUNT)):0;
+        float val = props.containsKey(LoomPlugin.PROP_ASSIGNMENT_VALUE)?Float.parseFloat(props.get(LoomPlugin.PROP_ASSIGNMENT_VALUE)):0f;
+
+        float max = val*nrounds;
+
+
+        if (props.size()>0) {
+            float turnval = Float.parseFloat(props.get(LoomPlugin.PROP_SESSION_BONUS_VALUE));
+            int numturns = Integer.parseInt(props.get(LoomPlugin.PROP_SESSION_BONUS_COUNT));
+            float finalbonus = Float.parseFloat(props.get(LoomPlugin.PROP_SESSION_BONUS_CORRECT));
+            float maxvalue = numturns*turnval+finalbonus;
+            model.addAttribute("finalbonus",String.format("$%.2f",maxvalue));
+            max+=maxvalue;
+            model.addAttribute("maxpayout",String.format("$%.2f",max));
+        } else {
+            model.addAttribute("finalbonus","$0.00");
+             model.addAttribute("maxpayout",String.format("$%.2f",max));
+        }
+
         return "session_s/node/app";
     }
 
@@ -134,6 +160,23 @@ public class Session_Controller {
          } catch (Exception e1) {
              e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
              System.err.println("Could not run session!");
+             return "redirect:/session_s/" + encodeUrlPathSegment(id.toString(), request);
+
+         }
+
+        return "redirect:/session_s/" + encodeUrlPathSegment(session.getId().toString(), request);
+    }
+
+    @RequestMapping(value = "/{id}/halt", method = RequestMethod.POST)
+    public String halt(@PathVariable("id") Long id, Model model, HttpServletRequest request) {
+
+         Session_ session = Session_.findSession_(id);
+         try {
+
+             session.halt();
+         } catch (Exception e1) {
+             e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+             System.err.println("Could not halt session!");
              return "redirect:/session_s/" + encodeUrlPathSegment(id.toString(), request);
 
          }
