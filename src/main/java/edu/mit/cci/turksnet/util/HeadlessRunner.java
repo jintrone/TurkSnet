@@ -55,7 +55,11 @@ public class HeadlessRunner implements ApplicationContextAware {
 
     public TurkitOutputSink sink;
 
-    private static final ExecutorService service =  Executors.newSingleThreadExecutor();;
+    public boolean forceStop = false;
+
+
+
+    private static final ExecutorService service =  Executors.newSingleThreadExecutor();
 
     public HeadlessRunner() {
 
@@ -181,10 +185,16 @@ public class HeadlessRunner implements ApplicationContextAware {
 
                 } catch (Throwable t) {
                     t.printStackTrace();
+                } finally {
+
                 }
 
             }
         });
+    }
+
+    public void haltOnNext() {
+        this.forceStop = true;
     }
 
     public void _run(boolean repeat) {
@@ -205,7 +215,7 @@ public class HeadlessRunner implements ApplicationContextAware {
         }
 
 
-        if (repeat && !done) {
+        if (repeat && !done && !forceStop) {
             Double o = Double.valueOf(properties.get("repeatInterval"));
             int delay = o != null ? (int) Math.ceil((Double) o) : 60;
             runInABit(delay);
@@ -225,6 +235,7 @@ public class HeadlessRunner implements ApplicationContextAware {
 
     public void stop() {
         runAgainAtThisTime = -1;
+        forceStop = false;
         deferRun();
     }
 
@@ -232,5 +243,9 @@ public class HeadlessRunner implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.context = applicationContext;
+    }
+
+    public boolean isRunning() {
+        return runAgainAtThisTime>-1;
     }
 }

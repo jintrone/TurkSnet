@@ -4,7 +4,6 @@
 package edu.mit.cci.turksnet.web;
 
 import edu.mit.cci.turksnet.Experiment;
-import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
 import java.io.UnsupportedEncodingException;
 import java.lang.Integer;
@@ -13,8 +12,6 @@ import java.lang.String;
 import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import org.joda.time.format.DateTimeFormat;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -31,7 +28,6 @@ privileged aspect Session_Controller_Roo_Controller {
     public String Session_Controller.create(@Valid Session_ session_, BindingResult result, Model model, HttpServletRequest request) {
         if (result.hasErrors()) {
             model.addAttribute("session_", session_);
-            addDateTimeFormatPatterns(model);
             return "session_s/create";
         }
         session_.persist();
@@ -41,13 +37,11 @@ privileged aspect Session_Controller_Roo_Controller {
     @RequestMapping(params = "form", method = RequestMethod.GET)
     public String Session_Controller.createForm(Model model) {
         model.addAttribute("session_", new Session_());
-        addDateTimeFormatPatterns(model);
         return "session_s/create";
     }
     
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public String Session_Controller.show(@PathVariable("id") Long id, Model model) {
-        addDateTimeFormatPatterns(model);
         model.addAttribute("session_", Session_.findSession_(id));
         model.addAttribute("itemId", id);
         return "session_s/show";
@@ -63,7 +57,6 @@ privileged aspect Session_Controller_Roo_Controller {
         } else {
             model.addAttribute("session_s", Session_.findAllSession_s());
         }
-        addDateTimeFormatPatterns(model);
         return "session_s/list";
     }
     
@@ -71,7 +64,6 @@ privileged aspect Session_Controller_Roo_Controller {
     public String Session_Controller.update(@Valid Session_ session_, BindingResult result, Model model, HttpServletRequest request) {
         if (result.hasErrors()) {
             model.addAttribute("session_", session_);
-            addDateTimeFormatPatterns(model);
             return "session_s/update";
         }
         session_.merge();
@@ -81,7 +73,6 @@ privileged aspect Session_Controller_Roo_Controller {
     @RequestMapping(value = "/{id}", params = "form", method = RequestMethod.GET)
     public String Session_Controller.updateForm(@PathVariable("id") Long id, Model model) {
         model.addAttribute("session_", Session_.findSession_(id));
-        addDateTimeFormatPatterns(model);
         return "session_s/update";
     }
     
@@ -96,15 +87,6 @@ privileged aspect Session_Controller_Roo_Controller {
     @ModelAttribute("experiments")
     public Collection<Experiment> Session_Controller.populateExperiments() {
         return Experiment.findAllExperiments();
-    }
-    
-    @ModelAttribute("nodes")
-    public Collection<Node> Session_Controller.populateNodes() {
-        return Node.findAllNodes();
-    }
-    
-    void Session_Controller.addDateTimeFormatPatterns(Model model) {
-        model.addAttribute("session__created_date_format", DateTimeFormat.patternForStyle("S-", LocaleContextHolder.getLocale()));
     }
     
     String Session_Controller.encodeUrlPathSegment(String pathSegment, HttpServletRequest request) {

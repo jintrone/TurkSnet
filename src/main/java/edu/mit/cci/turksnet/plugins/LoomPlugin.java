@@ -12,6 +12,7 @@ import edu.uci.ics.jung.algorithms.generators.Lattice2DGenerator;
 import edu.uci.ics.jung.graph.util.Pair;
 import org.apache.log4j.Logger;
 
+import javax.mail.Session;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,10 +35,17 @@ public class LoomPlugin implements Plugin {
     private static final String PROP_GRAPH_TYPE = "graph_type";
     private static final String PROP_PRIVATE_TILES = "private_tile_count";
     public static final String PROP_ITERATION_COUNT = "iteration_count";
-    private static final String PROP_SESSION_BONUS_VALUE = "sessionBonusValue";
-    private static final String PROP_SESSION_BONUS_COUNT = "sessionBonusCount";
-    private static final String PROP_SESSION_BONUS_CORRECT = "sessionBonusCorrect";
+    public static final String PROP_SESSION_BONUS_VALUE = "sessionBonusValue";
+    public static final String PROP_SESSION_BONUS_COUNT = "sessionBonusCount";
+    public static final String PROP_SESSION_BONUS_CORRECT = "sessionBonusCorrect";
 
+
+    private static final String PROP_HIT_TITLE = "title";
+    private static final String PROP_HIT_DESCRIPTION = "description";
+    private static final String PROP_HIT_AUTO_APPROVAL_DELAY="autoApprovalDelayInSeconds";
+    private static final String PROP_HIT_ASSIGNMENT_DURATION="assignmentDurationInSeconds";
+    private static final String PROP_HIT_KEYWORDS="keyword";
+    private static final String PROP_HIT_HEIGHT="height";
 
     private static Logger logger = Logger.getLogger(LoomPlugin.class);
 
@@ -56,6 +64,8 @@ public class LoomPlugin implements Plugin {
         session.merge();
         return session;
     }
+
+
 
     @Override
     public boolean checkDone(Session_ s) {
@@ -179,19 +189,18 @@ public class LoomPlugin implements Plugin {
 
     @Override
     public String getHitCreation(Session_ session, String rooturl) {
-        String val = session.getExperiment().getPropsAsMap().get(PROP_ASSIGNMENT_VALUE);
+        Map<String,String> props = session.getExperiment().getPropsAsMap();
+        String val = props.get(PROP_ASSIGNMENT_VALUE);
         Map<String, String> result = new HashMap<String, String>();
-        result.put("title", "Work with others to solve a puzzle.");
-        result.put("desc", "Combine your information with 24 other players to figure out the correct story. This game requires javascript, and will not work "+
-                "with Internet Explorer 7 or less. There will be 20 turns, and a new HIT is made available " +
-                "to you at each turn. You will receive a bonus after 20 turns are completed based on your performance. Details available in the assignment preview.");
+        result.put("title", props.get(PROP_HIT_TITLE));
+        result.put("desc", props.get(PROP_HIT_DESCRIPTION));
         result.put("url", rooturl + "/session_s/" + session.getId() + "/turk/app");
-        result.put("autoApprovalDelayInSeconds","30");
-        result.put("assignmentDurationInSeconds","1200");
+        result.put("autoApprovalDelayInSeconds",props.get(PROP_HIT_AUTO_APPROVAL_DELAY));
+        result.put("assignmentDurationInSeconds",props.get(PROP_HIT_ASSIGNMENT_DURATION));
         result.put("reward", val);
-        result.put("assignments", session.getExperiment().getPropsAsMap().get(PROP_NODE_COUNT));
-        result.put("keywords","game,experiment,study,collaborate,loom");
-        result.put("height", "1000");
+        result.put("assignments", props.get(PROP_NODE_COUNT));
+        result.put("keywords",props.get(PROP_HIT_KEYWORDS));
+        result.put("height", props.get(PROP_HIT_HEIGHT));
         if (session.getQualificationRequirements()!=null ) {
             result.put("qualificationRequirements", createQualificationString(session.getQualificationRequirements()));
         }

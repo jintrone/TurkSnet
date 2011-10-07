@@ -214,10 +214,10 @@
             <span class="expandible hidden" id="extended_help">
                 <h3>Objective</h3>
                 <p>
-                Your goal is to recreate the correct story from pieces of information you and other players have. You will have twenty turns. You are not competing with the other players. You need them, and they need you, because you all have different pieces of information.</p>
+                Your goal is to recreate the correct story from pieces of information you and other players have. You will have ${rounds} turns. You are not competing with the other players. You need them, and they need you, because you all have different pieces of information.</p>
                 <h3>Play</h3>
                 <p>
-                Each player has a screen that looks just like yours.  Your "private information area" contains information that only you can see; it can hold up to three pieces of information.  Your "public information area" can be seen by your neighbors.  The "neighbors public stories" display the contents of your neighbors' public areas at the end of the previous turn.
+                Each player has a screen that looks just like yours.  Your "private information area" contains information that only you can see; it can hold up to three pieces of information.  Your "public information area" can be seen by your neighbors.  The "neighbors public stories" display the contents of your neighbors' public areas at the end of the previous turn. At the beginning of the game, all players only have private information, so you will not see any information in your neighbors' spaces in the first turn.
                 </p>
                 <p>
                 Use the "public story area" to create the best story you can. You are scored on the information in your public story area on each turn, and your ten best turns will be used to determine your bonus.
@@ -241,8 +241,8 @@
                 Thus, your should try to use as many information elements as you can in your public space, but only if they are in the correct order. In any round the maximum score is 1, and minimum score is 0.
                 </p>
                 <p>
-                The maximum bonus for a given turn is $.20. You will receive a $.50 bonus if you have the correct story in your public area at the end of the last turn.
-                Your bonus is determined based on your 10 best turns, so you are eligible for up to $2.50 bonus.  Bonuses are awarded only if you complete all ${rounds} turns.
+                The maximum bonus for a given turn is ${sessionturnbonus}. You will receive a ${sessionfinalbonus} bonus if you have the correct story in your public area at the end of the last turn.
+                Your bonus is determined based on your ${sessionbonuscount} best turns, so you are eligible for up to ${finalbonus} bonus, with a maximum payout of ${maxpayout}.  Bonuses are awarded only if you complete all ${rounds} turns.
                 </p>
             </span>
             <a href="javascript:" onclick="expandInfo()"><span class="expandlink">more</span><span class="expandlink hidden">less</span></a>

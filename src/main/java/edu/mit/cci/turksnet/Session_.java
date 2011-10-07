@@ -53,8 +53,8 @@ public class Session_ {
     @XmlTransient
     public List<String> test = Arrays.asList("one", "two", "three");
 
-
-
+      @Transient
+      private static Map<Long,HeadlessRunner> runners = new HashMap<Long, HeadlessRunner>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<Node> availableNodes = new HashSet<Node>();
@@ -71,13 +71,13 @@ public class Session_ {
     @Transient
     DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
-    @Transient
-    HeadlessRunner runner;
 
     private String qualificationRequirements;
 
     public Session_() {
     }
+
+
 
     public Session_(long experimentId) {
         setExperiment(Experiment.findExperiment(experimentId));
@@ -115,8 +115,14 @@ public class Session_ {
         merge();
     }
 
+
+
     public List<Node>  getNodesAsList() {
         return new ArrayList<Node>(getAvailableNodes());
+    }
+
+    private boolean isRunning() {
+        return (getRunner()!=null && getRunner().isRunning());
     }
 
 
@@ -257,15 +263,33 @@ public class Session_ {
             public void run() {
                 {
                     try {
-                        runner = new HeadlessRunner(new BeanFieldSink());
-                        runner.loadScript("Experiment:" + experiment.getId() + "_Session:" + getId(), experiment.getJavaScript(), experiment.getPropsAsMap(), Session_.this);
-                        runner.run(true);
+                        setRunner( new HeadlessRunner(new BeanFieldSink()));
+                        getRunner().loadScript("Experiment:" + experiment.getId() + "_Session:" + getId(), experiment.getJavaScript(), experiment.getPropsAsMap(), Session_.this);
+                        getRunner().run(true);
                     } catch (Exception e) {
                         updateLog(e.getMessage());
                     }
                 }
             }
         });
+    }
+
+
+
+    public HeadlessRunner getRunner() {
+        return runners.get(this.getId());
+    }
+
+    public void setRunner(HeadlessRunner runner) {
+        runners.put(this.getId(),runner);
+    }
+
+    public void halt() throws Exception {
+        if (getRunner()!=null)  {
+            getRunner().haltOnNext();
+        } else {
+            log.warn("Requested runner to halt, but no runner available");
+        }
     }
 
     public String getHitCreationString(String baseurl) throws Exception {

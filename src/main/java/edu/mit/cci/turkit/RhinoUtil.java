@@ -252,9 +252,15 @@ public class RhinoUtil {
 			result.append("null");
 		} else if (o instanceof NativeJavaObject) {
 			NativeJavaObject a = (NativeJavaObject) o;
+            String value = a.getDefaultValue(null).toString();
+            if (a.unwrap() instanceof Class) {
+
+                result.append("Packages.").append(((Class)a.unwrap()).getName());
+            } else {
 			result.append("\"");
 			U.escapeString(result, a.getDefaultValue(null).toString());
 			result.append("\"");
+            }
 		} else if (o instanceof NativeObject || o instanceof NativeArray) {
 			String prevPath = objToPath.get(o);
 			if (prevPath != null) {

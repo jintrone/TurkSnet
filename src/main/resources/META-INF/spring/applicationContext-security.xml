@@ -22,8 +22,10 @@
 
 	<!-- Configure Authentication mechanism -->
     <beans:bean class="edu.mit.cci.turksnet.provider.DatabaseAuthenticationProvider" id="databaseAuthenticationProvider">
-        <beans:property name="adminUser" value="admin"/>
-        <beans:property name="adminPassword" value="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"/>
+        <beans:property name="adminUser" value="jintrone"/>
+        <beans:property name="adminPassword" value="3695b024976d05131e6f6fc912a353f2cc5358d13f303c86ffc137467b5c2f37"/>
+
+       <!-- <beans:property name="adminPassword" value="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"/> -->
     </beans:bean>
     <authentication-manager alias="authenticationManager">
     	<!-- SHA-256 values can be produced using 'echo -n your_desired_password | sha256sum' (using normal *nix environments) -->
