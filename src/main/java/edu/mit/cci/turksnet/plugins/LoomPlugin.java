@@ -172,14 +172,16 @@ public class LoomPlugin implements Plugin {
         List<Node> rndnodes = new ArrayList<Node>(nodes);
         List<String> rndstory = new ArrayList<String>(Arrays.asList(story));
         Collections.shuffle(rndnodes);
+        Collections.shuffle(rndstory);
         int i = 0;
         for (Node n : rndnodes) {
-            for (int elt = 0; elt < numtiles; elt++) {
-                i = (i + elt) % story.length;
-                if (i == 0) {
-                    Collections.shuffle(rndstory);
+            for (int elt = 0; elt < numtiles;i++) {
+                i %= story.length;
+                if (n.getPrivateData_()!=null && n.getPrivateData_().contains(rndstory.get(i))) {
+                    continue;
                 }
                 n.setPrivateData_((n.getPrivateData_() == null ? "" : n.getPrivateData_() + ";") + rndstory.get(i));
+                elt++;
             }
             n.persist();
         }
