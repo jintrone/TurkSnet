@@ -18,6 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.beans.PropertyEditorSupport;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +74,7 @@ public class ExperimentController {
     @RequestMapping(value = "/{id}/join", method = RequestMethod.GET)
     public String wait(@PathVariable("id") Long id, Model model, HttpServletRequest request) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Experiment e = Experiment.findExperiment(id);
-        model.addAttribute("experimentid",e.getId());
+        model.addAttribute("experimentid", e.getId());
         if (!e.getRunning()) {
             return "experiments/notavailable";
         }
@@ -79,12 +82,32 @@ public class ExperimentController {
 
     }
 
+    @RequestMapping(value = "/current", method = RequestMethod.GET)
+    public String goToLatest(Model model, HttpServletRequest request) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        List<Experiment> e = new ArrayList<Experiment>(Experiment.findAllExperiments());
+        Collections.sort(e, new Comparator<Experiment>() {
+            @Override
+            public int compare(Experiment experiment, Experiment experiment1) {
+                return -1 * experiment.getId().compareTo(experiment1.getId());
+            }
+        });
+        for (Experiment ex : e) {
+            if (ex.getRunning()) {
+                return "redirect:/experiments/" + ex.getId() + "/join";
+            }
+        }
+        return "experiments/notavailable";
+
+
+    }
+
+
     @RequestMapping(value = "/{id}/register", method = RequestMethod.POST)
     @ResponseBody
     public String register(@RequestParam("login") String login, @RequestParam("password") String password, Model model, HttpSession session) {
         Map<String, Object> result = new HashMap<String, Object>();
         List<Worker> wlist = Worker.findWorkersByUsername(login).getResultList();
-        Worker w = wlist.size() ==0?null:wlist.get(0);
+        Worker w = wlist.size() == 0 ? null : wlist.get(0);
         if (w != null) {
             result.put("status", "username_exists");
             String nlogin = login;
@@ -111,7 +134,7 @@ public class ExperimentController {
     }
 
     @RequestMapping(value = "/{id}/login", method = RequestMethod.POST)
-     @ResponseBody
+    @ResponseBody
     public String login(@RequestParam("login") String login, @RequestParam("password") String password, Model model, HttpSession session) {
         List<Worker> ws = Worker.findWorkersByUsernameAndPassword(login, password).getResultList();
         Map<String, Object> result = new HashMap<String, Object>();
@@ -143,7 +166,7 @@ public class ExperimentController {
         } else if (w.getCurrentAssignment() != null) {
             log.warn("Worker " + w.getUsername() + " checking in but not waiting; ignoring");
             result.put("status", "worker_assigned");
-            result.put("session_url", "session_s/" + w.getCurrentAssignment().getId()+"/application");
+            result.put("session_url", "session_s/" + w.getCurrentAssignment().getId() + "/application");
 
 
         } else if (!e.getRunning()) {

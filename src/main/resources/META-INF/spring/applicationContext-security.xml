@@ -7,7 +7,7 @@
         <logout logout-url="/resources/j_spring_security_logout"/>
         
         <!-- Configure these elements to secure URIs in your application -->
-
+         <intercept-url access="permitAll" pattern="/experiments/current"/>
         <intercept-url access="permitAll" pattern="/experiments/*/join"/>
         <intercept-url access="permitAll" pattern="/experiments/*/register"/>
         <intercept-url access="permitAll" pattern="/experiments/*/login"/>

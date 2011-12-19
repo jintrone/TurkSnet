@@ -36,6 +36,7 @@ public class LoomStandalonePlugin implements Plugin {
 
     public static final String PROP_STORY = "story";
     private static final String PROP_PRIVATE_TILES = "private_tile_count";
+    private static final String PROP_NET_DEGREE = "network_degree";
 
 
     private static Logger logger = Logger.getLogger(LoomStandalonePlugin.class);
@@ -211,6 +212,23 @@ public class LoomStandalonePlugin implements Plugin {
             }
 
 
+        } else if ("ring".equals(graphtype)) {
+            graph = DefaultJungGraph.getFactory().create();
+            Factory<DefaultJungNode> nfact = DefaultJungNode.getFactory();
+            Factory<DefaultJungEdge> efact = DefaultJungEdge.getFactory();
+            int degree = Math.min(Integer.parseInt(props.get(PROP_NET_DEGREE)), nodecount - 1);
+            for (int i = 0; i < nodecount; i++) {
+                graph.addVertex(nfact.create());
+            }
+
+            List<DefaultJungNode> nodes = new ArrayList<DefaultJungNode>(graph.getVertices());
+            for (int i = 0; i < nodes.size(); i++) {
+                for (int j = 1; j <= degree; j++) {
+                    graph.addEdge(efact.create(), nodes.get(i), nodes.get((i + j) % nodecount));
+                }
+            }
+
+
         } else {
             throw new GraphCreationException("Graph type not supported");
         }
@@ -254,7 +272,8 @@ public class LoomStandalonePlugin implements Plugin {
                 n.setPublicData_((n.getPublicData_() == null ? "" : n.getPublicData_() + "&") + rndstory.get(i));
                 elt++;
             }
-            n.persist();
+            logger.debug("Node "+n.getId()+":"+n.getPublicData_());
+           // n.persist();
         }
 
 
@@ -299,7 +318,7 @@ public class LoomStandalonePlugin implements Plugin {
 
         Map<String, Object> scoreinfo = new HashMap<String, Object>();
 
-        JSONArray storylist= new JSONArray();
+        JSONArray storylist = new JSONArray();
         String story = e.getPropsAsMap().get(PROP_STORY);
         Map<String, String> storymap = getStoryMap(story);
         for (Integer i : getStoryOrder(story)) {
@@ -317,13 +336,13 @@ public class LoomStandalonePlugin implements Plugin {
 
         List<Float> scores = getSessionScores(n.getSession_().getExperiment(), logs);
 
-        scoreinfo.put("final_round",Math.floor(100*(scores.get(scores.size()-1))));
+        scoreinfo.put("final_round", Math.floor(100 * (scores.get(scores.size() - 1))));
         float total = 0;
-        for (float f:scores) {
-            total+=f;
+        for (float f : scores) {
+            total += f;
         }
 
-        scoreinfo.put("average",Math.floor(100*(total/(scores.size()))));
+        scoreinfo.put("average", Math.floor(100 * (total / (scores.size()))));
 
         return scoreinfo;
     }
