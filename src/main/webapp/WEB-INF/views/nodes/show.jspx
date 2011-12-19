@@ -3,11 +3,14 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <page:show id="ps_edu_mit_cci_turksnet_Node" object="${node}" path="/nodes" z="wnDhJksATMAhjH4RezzXtfOdVJ8=">
-        <field:display field="turkerId" id="s_edu_mit_cci_turksnet_Node_turkerId" object="${node}" z="Y5S9yzK7PpvhKrhCcPWjLFBrduY="/>
+        
         <field:display field="session_" id="s_edu_mit_cci_turksnet_Node_session_" object="${node}" z="kBqa+WpHmFToYDNyQkc5to2CBjM="/>
         <field:display field="privateData_" id="s_edu_mit_cci_turksnet_Node_privateData_" object="${node}" z="9j1uAL5goC1Lze6Y4B2ECZUpzZo="/>
         <field:display field="publicData_" id="s_edu_mit_cci_turksnet_Node_publicData_" object="${node}" z="2KLlIYzseeEkCCop0EX3oRU9FuM="/>
         <field:display field="incoming" id="s_edu_mit_cci_turksnet_Node_incoming" object="${node}" z="zwubOEHHAypkX/Z4ozicvtUjFKg="/>
-    <field:display field="acceptingInput" id="s_edu_mit_cci_turksnet_Node_acceptingInput" object="${node}" z="NCCrt0YxW/QPRzZp9XgmHS81Ku4="/>
+    
+    <field:display field="status" id="s_edu_mit_cci_turksnet_Node_status" object="${node}" z="0f8IHZ3z+djLEM0iHA2ug0KeN2k="/>
+        <field:display field="metaData" id="s_edu_mit_cci_turksnet_Node_metaData" object="${node}" z="QLGtLW4huen+R1pfLZwwDt2XA4g="/>
+    <field:display field="worker" id="s_edu_mit_cci_turksnet_Node_worker" object="${node}" z="0MHoYWblzNxYMhq4LdjApDXPEsY="/>
     </page:show>
 </div>

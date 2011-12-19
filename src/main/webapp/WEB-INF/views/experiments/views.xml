@@ -13,4 +13,11 @@
 <definition extends="default" name="experiments/update">
         <put-attribute name="body" value="/WEB-INF/views/experiments/update.jspx"/>
     </definition>
+<definition extends="stripped" name="experiments/waiting">
+        <put-attribute name="body" value="/WEB-INF/views/experiments/waiting.jspx"/>
+    </definition>
+<definition extends="stripped" name="experiments/notavailable">
+        <put-attribute name="body" value="/WEB-INF/views/experiments/notavailable.jspx"/>
+</definition>
+
 </tiles-definitions>

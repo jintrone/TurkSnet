@@ -3,11 +3,14 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <form:update id="fu_edu_mit_cci_turksnet_Node" modelAttribute="node" path="/nodes" z="QFguikagmRkTRaqsZXvR9FDrv6U=">
-        <field:input field="turkerId" id="c_edu_mit_cci_turksnet_Node_turkerId" z="CnjVYDqW4/YzWke7d8Y936/Sm2k="/>
+        
         <field:select field="session_" id="c_edu_mit_cci_turksnet_Node_session_" itemValue="id" items="${session_s}" path="/session_s" z="bOBz/97Ej+QfFNwVqMCjVzNLOeQ="/>
         <field:input field="privateData_" id="c_edu_mit_cci_turksnet_Node_privateData_" z="QYgmVe7jF91kBkHlh5c4Rw9/KtA="/>
         <field:input field="publicData_" id="c_edu_mit_cci_turksnet_Node_publicData_" z="4W4Q+ugBIfP/RjxJFL/p09bFq1Y="/>
         <field:select field="incoming" id="c_edu_mit_cci_turksnet_Node_incoming" itemValue="id" items="${nodes}" multiple="true" path="/nodes" z="1QEJRENaCoyuN/33F4mBMmJKSdg="/>
-    <field:checkbox field="acceptingInput" id="c_edu_mit_cci_turksnet_Node_acceptingInput" z="FmNFuTH4EcNbQ7EqQe5C4zkGd9o="/>
+    
+    <field:input field="status" id="c_edu_mit_cci_turksnet_Node_status" z="ruLdH2FhR3AwT8JHIZJra08Dey0="/>
+        <field:input field="metaData" id="c_edu_mit_cci_turksnet_Node_metaData" z="ux4e4BHpZG4rV+tg48iWRIU9WKg="/>
+    <field:select field="worker" id="c_edu_mit_cci_turksnet_Node_worker" itemValue="id" items="${workers}" path="/workers" z="sVCNo90fFizq/8J1ZRFvpnKlYxg="/>
     </form:update>
 </div>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <form:find finderName="ByWorkerAndSession_" id="ff_edu_mit_cci_turksnet_Node" path="/nodes" z="uzrDREZUyvlhvE41VKhtCKAH7iM=">
+        <field:select disableFormBinding="true" field="worker" id="f_edu_mit_cci_turksnet_Node_worker" itemValue="id" items="${workers}" path="/workers" z="d1GXD4FeinJMJ374vSMyqglA+EY="/>
+        <field:select disableFormBinding="true" field="session_" id="f_edu_mit_cci_turksnet_Node_session_" itemValue="id" items="${session_s}" path="/session_s" z="TxUPwqC7Ps1+s97UUSP9gJdJM6g="/>
+    </form:find>
+</div>

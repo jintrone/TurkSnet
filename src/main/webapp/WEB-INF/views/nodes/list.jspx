@@ -4,12 +4,14 @@
     <jsp:output omit-xml-declaration="yes"/>
     <page:list id="pl_edu_mit_cci_turksnet_Node" items="${nodes}" z="28q2pmuRRHZuxWy6x6DAhCMYZJE=">
         <table:table data="${nodes}" id="l_edu_mit_cci_turksnet_Node" path="/nodes" z="rYtdjUjaTjebggh0Bz8Roxw/PPY=">
-            <table:column id="c_edu_mit_cci_turksnet_Node_turkerId" property="turkerId" z="fyVRXGvSPZHGQk2DTlGu3JTK2Xs="/>
+            
             <table:column id="c_edu_mit_cci_turksnet_Node_session_" property="session_" z="EOiKEfECX68LK46HEkjX3SUKXLw="/>
             <table:column id="c_edu_mit_cci_turksnet_Node_privateData_" property="privateData_" z="lBBfFCaQd6y4ezZj+0KoTvrOFo4="/>
             <table:column id="c_edu_mit_cci_turksnet_Node_publicData_" property="publicData_" z="0bcz1boX6Q3M+KKTpHV1J43a4OY="/>
             <table:column id="c_edu_mit_cci_turksnet_Node_incoming" property="incoming" z="ZwF6GliD2AADCzFuBmnDZiSlNNY="/>
-        <table:column id="c_edu_mit_cci_turksnet_Node_acceptingInput" property="acceptingInput" z="pU7nug27HlvikibxNNM36BGY89U="/>
+        
+        <table:column id="c_edu_mit_cci_turksnet_Node_status" property="status" z="D+1L3acjakHiX+Z+aQ0qiFso/dk="/>
+        <table:column id="c_edu_mit_cci_turksnet_Node_metaData" property="metaData" z="JHevlFNTSzHLCROXbqSFtfffGPk="/>
         </table:table>
     </page:list>
 </div>

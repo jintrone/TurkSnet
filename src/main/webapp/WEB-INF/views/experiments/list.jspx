@@ -9,6 +9,7 @@
             <table:column id="c_edu_mit_cci_turksnet_Experiment_pluginClazz" property="pluginClazz" z="M27PiTsZ0T1KeQ0SX1xBLJIQH+E="/>
         <table:column id="c_edu_mit_cci_turksnet_Experiment_propsAsMap" property="propsAsMap" z="+fz5l1QBwgpxPwgTYVDyx3LF/ns="/>
         <table:column id="c_edu_mit_cci_turksnet_Experiment_javaScript" property="javaScript" z="qXZeCLl1qq67OzbBMxFMdqUWvTk="/>
+        <table:column id="c_edu_mit_cci_turksnet_Experiment_running" property="running" z="piNdmgBGxuCiVxdqblFadDzyFkI="/>
         </table:table>
     </page:list>
 </div>

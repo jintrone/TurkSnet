@@ -8,11 +8,15 @@ import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.SessionLog;
 import edu.mit.cci.turksnet.Session_;
+import edu.mit.cci.turksnet.Worker;
+import edu.mit.cci.turksnet.util.NodeStatus;
+import edu.mit.cci.turksnet.util.U;
 import edu.uci.ics.jung.algorithms.generators.Lattice2DGenerator;
 import edu.uci.ics.jung.graph.util.Pair;
 import org.apache.log4j.Logger;
+import org.apache.sling.commons.json.JSONException;
 
-import javax.mail.Session;
+import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,12 +31,12 @@ import java.util.regex.Pattern;
 //an experiment maintains settings
 //a session is run within an expriment.  it is a case.
 
-public class LoomPlugin implements Plugin {
+public class LoomTurkPlugin implements Plugin {
 
     public static final String PROP_STORY = "story";
     public static final String PROP_ASSIGNMENT_VALUE="assignment_value";
-    private static final String PROP_NODE_COUNT = "node_count";
-    private static final String PROP_GRAPH_TYPE = "graph_type";
+
+
     private static final String PROP_PRIVATE_TILES = "private_tile_count";
     public static final String PROP_ITERATION_COUNT = "iteration_count";
     public static final String PROP_SESSION_BONUS_VALUE = "sessionBonusValue";
@@ -47,10 +51,10 @@ public class LoomPlugin implements Plugin {
     private static final String PROP_HIT_KEYWORDS="keyword";
     private static final String PROP_HIT_HEIGHT="height";
 
-    private static Logger logger = Logger.getLogger(LoomPlugin.class);
+    private static Logger logger = Logger.getLogger(LoomTurkPlugin.class);
 
 
-    public Session_ createSession(Experiment experiment) throws SessionCreationException {
+    public Session_ createSession(Experiment experiment,List<Worker> workers) throws SessionCreationException {
         Map<String, String> props = experiment.getPropsAsMap();
         Session_ session = new Session_(experiment.getId());
         session.setCreated(new Date());
@@ -70,7 +74,7 @@ public class LoomPlugin implements Plugin {
     @Override
     public boolean checkDone(Session_ s) {
         for (Node n : s.getAvailableNodes()) {
-            if (n.isAcceptingInput()) {
+            if (NodeStatus.valueOf(n.getStatus())==NodeStatus.ACCEPTING_INPUT) {
                 return false;
             }
         }
@@ -79,7 +83,15 @@ public class LoomPlugin implements Plugin {
     }
 
     @Override
-    public void processResults(Node n, Map<String,String> results) {
+    public void processResults(Node n, String data) {
+        Map<String,String> results;
+        try {
+            results = U.mapifyJSON(data);
+        } catch (JSONException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } finally {
+            results = Collections.emptyMap();
+        }
         n.setPublicData_(results.get("publicData"));
         n.setPrivateData_(results.get("privateData"));
         n.persist();
@@ -248,7 +260,7 @@ public class LoomPlugin implements Plugin {
     }
 
 
-    public Map<String,String> getBonus(Node n) {
+    public Map<String,Object> getScoreInformation(Node n) {
         List<SessionLog> logs = new ArrayList<SessionLog>();
         for (SessionLog log :SessionLog.findAllSessionLogs()) {
             if (n.getId().equals(log.getNode().getId()) && log.getType().equals("results")) {
@@ -288,7 +300,7 @@ public class LoomPlugin implements Plugin {
         total =subtotal + (lastscore == 1.0f?Float.parseFloat(e.getPropsAsMap().get(PROP_SESSION_BONUS_CORRECT)):0.0f);
 
 
-        Map<String,String> result = new HashMap<String,String>();
+        Map<String,Object> result = new HashMap<String,Object>();
         result.put("Description",builder.toString());
         result.put("Bonus",String.format("%.2f",total));
         result.put("CumulativeBonus",String.format("%.2f",subtotal));
@@ -337,8 +349,62 @@ public class LoomPlugin implements Plugin {
         }
         return accountedFor / (float)(truth.size()-1);
 
-
     }
+
+    public String getTurnJson(Node n) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        Session_ s = n.getSession_();
+        Map<String,Object> result = new HashMap<String, Object>();
+        Map<String, String> props = s == null ? Collections.<String, String>emptyMap() : s.getExperiment().getPropsAsMap();
+        Map<String, Object> bonus = s == null ? Collections.<String, Object>emptyMap() : s.getExperiment().getActualPlugin().getScoreInformation(n);
+
+        result.put("currentbonus", bonus.containsKey("CumulativeBonus") ? bonus.get("CumulativeBonus") : "0.0");
+        result.put("round", s == null ? 0 : s.getIteration());
+        result.put("rounds", s == null ? 0 : s.getExperiment().getPropsAsMap().get(LoomTurkPlugin.PROP_ITERATION_COUNT));
+
+        result.put("sessionturnbonus", props.get(LoomTurkPlugin.PROP_SESSION_BONUS_VALUE));
+        result.put("sessionbonuscount", props.get(LoomTurkPlugin.PROP_SESSION_BONUS_COUNT));
+        result.put("sessionfinalbonus", props.get(LoomTurkPlugin.PROP_SESSION_BONUS_CORRECT));
+
+
+        int nrounds = props.containsKey(LoomTurkPlugin.PROP_ITERATION_COUNT) ? Integer.parseInt(props.get(LoomTurkPlugin.PROP_ITERATION_COUNT)) : 0;
+        float val = props.containsKey(LoomTurkPlugin.PROP_ASSIGNMENT_VALUE) ? Float.parseFloat(props.get(LoomTurkPlugin.PROP_ASSIGNMENT_VALUE)) : 0f;
+
+        float max = val * nrounds;
+
+
+        if (props.size() > 0) {
+            float turnval = Float.parseFloat(props.get(LoomTurkPlugin.PROP_SESSION_BONUS_VALUE));
+            int numturns = Integer.parseInt(props.get(LoomTurkPlugin.PROP_SESSION_BONUS_COUNT));
+            float finalbonus = Float.parseFloat(props.get(LoomTurkPlugin.PROP_SESSION_BONUS_CORRECT));
+            float maxvalue = numturns * turnval + finalbonus;
+            result.put("finalbonus", String.format("$%.2f", maxvalue));
+            max += maxvalue;
+            result.put("maxpayout", String.format("$%.2f", max));
+        } else {
+            result.put("finalbonus", "$0.00");
+            result.put("maxpayout", String.format("$%.2f", max));
+        }
+        return U.jsonify(result);
+    }
+
+    @Override
+    public String getApplicationBody(Node n) throws Exception {
+        InputStream stream = getClass().getResourceAsStream("/loomTurk.fragment.html");
+        return edu.mit.cci.turkit.util.U.slurp(stream,"UTF8");
+    }
+
+    @Override
+    public void automateNodeTurn(Node n) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public long getTurnLength(Experiment experiment) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+
 
     public static void main(String[] args) {
         String truth = "3:there was a fox and a bear;209:who were friends;87:one day they decided to catch a chicken for supper;262:they decided to go together;849:because neither one wanted to be left alone;369:and they both liked fried chicken;";

@@ -19,6 +19,8 @@
     <menu:category id="c_node" z="1BfWzBbme8JY4GYylULnesTcaFI=">
             <menu:item id="i_node_new" messageCode="global_menu_new" url="/nodes?form" z="tj1P1wqQRAko39Fvin6hdqOR79o="/>
         <menu:item id="i_node_list" messageCode="global_menu_list" url="/nodes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="AKlbqIMfx8JbSW5mVXqyCUncYdw="/>
+        <menu:item id="fi_node_worker" messageCode="global_menu_find" url="/nodes?find=ByWorker&amp;form" z="nIcPMqsmaJIkLLhSTslG9inxeQk="/>
+        <menu:item id="fi_node_workerandsession_" messageCode="global_menu_find" url="/nodes?find=ByWorkerAndSession_&amp;form" z="ockJeAdxlZ/9vINQXhUE1ASQhbI="/>
         </menu:category>
     <menu:category id="c_sessionlog" z="8ib3Q1RpR+V7GhM8+OboGaXXqkQ=">
             <menu:item id="i_sessionlog_new" messageCode="global_menu_new" url="/sessionlogs?form" z="mJ5Y9xD6PH3HolXxPV+gAT38bpY="/>

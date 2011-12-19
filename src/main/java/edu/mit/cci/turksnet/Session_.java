@@ -1,33 +1,40 @@
 package edu.mit.cci.turksnet;
 
-import com.sun.org.apache.xpath.internal.NodeSet;
-import edu.mit.cci.turksnet.util.HeadlessRunner;
 import edu.mit.cci.turkit.util.TurkitOutputSink;
 import edu.mit.cci.turkit.util.U;
 import edu.mit.cci.turkit.util.WireTap;
-import edu.mit.cci.turksnet.web.NodeForm;
+import edu.mit.cci.turksnet.util.NodeStatus;
+import edu.mit.cci.turksnet.util.RunStrategy;
 import org.apache.log4j.Logger;
 import org.apache.sling.commons.json.JSONException;
-import org.apache.sling.commons.json.JSONObject;
+import org.hibernate.LockMode;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.orm.hibernate3.SpringSessionContext;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.LockModeType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import javax.swing.*;
 import javax.xml.bind.annotation.XmlTransient;
-import java.net.URL;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RooJavaBean
-@RooToString
 @RooEntity
 public class Session_ {
 
@@ -45,16 +52,15 @@ public class Session_ {
     @ManyToOne
     private Experiment experiment;
 
-    private int iteration;
+    private int iteration = -1;
 
 
-
-     @Transient
+    @Transient
     @XmlTransient
     public List<String> test = Arrays.asList("one", "two", "three");
 
-      @Transient
-      private static Map<Long,HeadlessRunner> runners = new HashMap<Long, HeadlessRunner>();
+    @Transient
+    private static Map<Long, RunStrategy> runners = new HashMap<Long, RunStrategy>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<Node> availableNodes = new HashSet<Node>();
@@ -76,7 +82,6 @@ public class Session_ {
 
     public Session_() {
     }
-
 
 
     public Session_(long experimentId) {
@@ -116,109 +121,42 @@ public class Session_ {
     }
 
 
-
-    public List<Node>  getNodesAsList() {
+    public List<Node> getNodesAsList() {
         return new ArrayList<Node>(getAvailableNodes());
     }
 
     private boolean isRunning() {
-        return (getRunner()!=null && getRunner().isRunning());
+        return (getRunner() != null && getRunner().isRunning());
     }
 
+    public List<Node> getUnassignedNodes() {
+        return Node.findNodesByWorker(null).getResultList();
+    }
 
-
-
-    public void processNodeResults(String turkerId, Map<String,String> results) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Node n = findNodeForTurker(turkerId);
-        log.debug("Am I active? "+getActive());
+    public void processNodeResults(Worker worker, String results) throws JSONException, ClassNotFoundException, IllegalAccessException, InstantiationException {
+        log.debug("Am I active? " + getActive());
+        Node n = Node.findNodesByWorker(worker).getSingleResult();
         if (n == null) {
-            log.info("Could not identify node for turker " + turkerId);
-            throw new IllegalArgumentException("Could not identify turker " + turkerId);
+            log.info("Could not identify node for turker " + worker.getUsername());
+            throw new IllegalArgumentException("Could not identify turker " + worker.getUsername());
         } else {
-            //logNodeEvent(n, "results");
-            n.setAcceptingInput(false);
-            n.persist();
-            log.debug("Set node "+n.getId()+" to not accept");
-            synchronized (getClass()) {
-                experiment.getActualPlugin().processResults(n, results);
-                logNodeEvent(n, "results");
-                boolean doneiteration = true;
-                for (Node node : getAvailableNodes()) {
-                    log.debug("Making sure "+n.getId()+" is up to date");
-                    node.merge();
-                    log.debug("Checking node for doneness "+node.getId());
-                    if (node.isAcceptingInput()) {
-                        log.debug("Node is accepting input!");
-                        doneiteration = false;
-                    } else {
-
-                    }   log.debug("Node is NOT accepting input!");
-                }
-                if (doneiteration) {
-                    setIteration(getIteration() + 1);
-
-                }
-                log.debug("Checking for session doneness");
-                if (experiment.getActualPlugin().checkDone(Session_.this)) {
-                    log.debug("I am DONE");
-                    setActive(false);
-
-
-                }
-
-            }
-            persist();
+            getRunner().updateNode(n, results);
 
         }
-
-
-    }
-
-    public void processNodeResults(String turkerId, String results) throws JSONException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        processNodeResults(turkerId,mapifyJSON(results));
 
     }
 
 
-    public Map<String,String> mapifyJSON(String s) throws JSONException {
-
-        String results = s.trim();
-        if (results.startsWith("(")) {
-            results = results.substring(1,results.length()-1);
-        }
-        System.err.println("Processing results: "+results);
-
-        JSONObject obj = new JSONObject(results);
-        Map<String,String> map = new HashMap<String, String>();
-        for (Iterator<String> i = obj.keys();i.hasNext();) {
-            String key = i.next();
-           map.put(key,obj.get(key).toString());
-
-        }
-
-        return map;
-    }
-
-
-
-    public Node findNodeForTurker(String turkerId) {
-        log.debug("Looking for node for "+turkerId);
+    public Node assignNodeToTurker(Worker worker) {
         for (Node n : getAvailableNodes()) {
-            log.debug("Looking at node "+n.getId()+" : "+n.getTurkerId()+" ?= "+turkerId);
-            if (turkerId.equals(n.getTurkerId())) {
-                log.debug("Yup!");
-                return n;
-            }
-            log.debug("Nope :(");
-        }
-        return null;
-    }
-
-    public Node assignNodeToTurker(String turkerId) {
-        for (Node n : getAvailableNodes()) {
-            if (n.getTurkerId() == null) {
-                n.setTurkerId(turkerId);
-                n.persist();
+            if (n.getWorker() == null) {
+                n.setWorker(worker);
+                n.setStatus(NodeStatus.ASSIGNED.name());
+                //n.persist();
+                worker.entityManager.refresh(worker,LockModeType.PESSIMISTIC_WRITE);
+                worker.setCurrentAssignment(this);
+                //worker.flush();
+                //worker.persist();
                 logNodeEvent(n, "assigned");
                 return n;
             }
@@ -226,23 +164,7 @@ public class Session_ {
         return null;
     }
 
-    public Node getNodeForTurker(String turkerId) {
-        Node n = findNodeForTurker(turkerId);
-
-        if (n == null) {
-            log.debug("Cannot find node for turker "+turkerId+" so will assign");
-            n = assignNodeToTurker(turkerId);
-            log.debug("Turker "+turkerId+" assigned to node "+n.getId()+":"+n.getTurkerId());
-        }
-        return n;
-    }
-
-     public Map<String,String> getBonus(String turkerid) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Node n =getNodeForTurker(turkerid);
-        return getExperiment().getActualPlugin().getBonus(n);
-    }
-
-    private void logNodeEvent(Node n, String type) {
+    public void logNodeEvent(Node n, String type) {
         log.debug("Logging results ");
         SessionLog slog = new SessionLog();
         slog.setDate_(new Date());
@@ -256,36 +178,30 @@ public class Session_ {
 
     public void run() throws Exception {
         this.active = true;
-        this.merge();
-        SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
-            public void run() {
-                {
-                    try {
-                        setRunner( new HeadlessRunner(new BeanFieldSink()));
-                        getRunner().loadScript("Experiment:" + experiment.getId() + "_Session:" + getId(), experiment.getJavaScript(), experiment.getPropsAsMap(), Session_.this);
-                        getRunner().run(true);
-                    } catch (Exception e) {
-                        updateLog(e.getMessage());
-                    }
-                }
-            }
-        });
+
+        try {
+            setRunner(experiment.getStrategyInstance());
+            getRunner().run(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            updateLog(e.getMessage());
+        }
     }
 
 
-
-    public HeadlessRunner getRunner() {
+    public RunStrategy getRunner() {
         return runners.get(this.getId());
     }
 
-    public void setRunner(HeadlessRunner runner) {
-        runners.put(this.getId(),runner);
+    public void setRunner(RunStrategy runner) throws Exception {
+
+        runner.init(this, new BeanFieldSink());
+        runners.put(this.getId(), runner);
     }
 
     public void halt() throws Exception {
-        if (getRunner()!=null)  {
+        if (getRunner() != null) {
             getRunner().haltOnNext();
         } else {
             log.warn("Requested runner to halt, but no runner available");
@@ -306,7 +222,7 @@ public class Session_ {
         Session_ s = entityManager().find(Session_.class, Session_.this.getId());
         String e = s.getOutputLog() == null ? "" : getOutputLog();
         s.setOutputLog(e + stamp() + update);
-        s.merge();
+
     }
 
     private String stamp() {

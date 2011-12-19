@@ -7,9 +7,18 @@
         <logout logout-url="/resources/j_spring_security_logout"/>
         
         <!-- Configure these elements to secure URIs in your application -->
-        <intercept-url access="permitAll" pattern="/session_s/*/turk/app"/>
-        <intercept-url access="permitAll" pattern="/session_s/*/turk/feedback"/>
-        <intercept-url access="permitAll" method="POST" pattern="/session_s/*/turk/*"/>
+         <intercept-url access="permitAll" pattern="/experiments/current"/>
+        <intercept-url access="permitAll" pattern="/experiments/*/join"/>
+        <intercept-url access="permitAll" pattern="/experiments/*/register"/>
+        <intercept-url access="permitAll" pattern="/experiments/*/login"/>
+        <intercept-url access="permitAll" pattern="/experiments/*/ping"/>
+
+        <intercept-url access="permitAll" pattern="/session_s/*/application"/>
+        <intercept-url access="permitAll" pattern="/session_s/*/nodedata"/>
+        <intercept-url access="permitAll" pattern="/session_s/*/ping"/>
+        <intercept-url access="permitAll" pattern="/session_s/*/score"/>
+        <intercept-url access="permitAll" pattern="/session_s/*/feedback"/>
+
         <intercept-url access="permitAll" pattern="/resources/**"/>
         <intercept-url access="permitAll" pattern="/login"/>
 

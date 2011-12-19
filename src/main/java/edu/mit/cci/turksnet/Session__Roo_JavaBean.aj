@@ -3,10 +3,12 @@
 
 package edu.mit.cci.turksnet;
 
-import java.util.*;
+
 import java.lang.Boolean;
 import java.lang.String;
 import java.text.DateFormat;
+import java.util.*;
+
 import org.apache.log4j.Logger;
 
 privileged aspect Session__Roo_JavaBean {

@@ -9,21 +9,22 @@ privileged aspect Session__Roo_ToString {
     
     public String Session_.toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("PropertiesAsMap: ").append(getPropertiesAsMap()).append(", ");
-  //      sb.append("NodesAsList: ").append(getNodesAsList()).append(", ");
-    //    sb.append("Runner: ").append(getRunner()).append(", ");
-        sb.append("Log: ").append(getLog()).append(", ");
-    //    sb.append("Network: ").append(getNetwork()).append(", ");
+       // sb.append("PropertiesAsMap: ").append(getPropertiesAsMap()).append(", ");
+       // sb.append("NodesAsList: ").append(getNodesAsList()).append(", ");
+       // sb.append("UnassignedNodes: ").append(getUnassignedNodes()).append(", ");
+       // sb.append("Runner: ").append(getRunner()).append(", ");
+       // sb.append("Log: ").append(getLog()).append(", ");
+       // sb.append("Network: ").append(getNetwork()).append(", ");
         sb.append("Created: ").append(getCreated()).append(", ");
         sb.append("Active: ").append(getActive()).append(", ");
-        sb.append("Experiment: ").append(getExperiment()).append(", ");
+        sb.append("Experiment: ").append(getExperiment().getId()).append(", ");
         sb.append("Iteration: ").append(getIteration()).append(", ");
-    //    sb.append("Test: ").append(getTest()).append(", ");
-     //   sb.append("AvailableNodes: ").append(getAvailableNodes()).append(", ");
-        sb.append("OutputLog: ").append(getOutputLog()).append(", ");
-    //    sb.append("Properties: ").append(getProperties()).append(", ");
-    //    sb.append("Format: ").append(getFormat()).append(", ");
-        sb.append("QualificationRequirements: ").append(getQualificationRequirements());
+       // sb.append("Test: ").append(getTest()).append(", ");
+       /// sb.append("AvailableNodes: ").append(getAvailableNodes()).append(", ");
+       // sb.append("OutputLog: ").append(getOutputLog()).append(", ");
+       // sb.append("Properties: ").append(getProperties()).append(", ");
+       // sb.append("Format: ").append(getFormat()).append(", ");
+       // sb.append("QualificationRequirements: ").append(getQualificationRequirements());
         return sb.toString();
     }
     
