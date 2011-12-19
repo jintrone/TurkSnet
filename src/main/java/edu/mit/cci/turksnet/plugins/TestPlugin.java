@@ -3,10 +3,10 @@ package edu.mit.cci.turksnet.plugins;
 import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
-import edu.mit.cci.turksnet.web.NodeForm;
+import edu.mit.cci.turksnet.Worker;
 
 import java.util.Collections;
-import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,13 +15,11 @@ import java.util.Map;
  * Time: 3:42 PM
  */
 public class TestPlugin implements Plugin {
+
+
     @Override
-    public Session_ createSession(Experiment exp) throws SessionCreationException {
-        Session_ s = new Session_();
-        s.setCreated(new Date());
-        s.setExperiment(exp);
-        s.persist();
-        return s;
+    public Session_ createSession(Experiment exp, List<Worker> workers) throws SessionCreationException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -35,7 +33,7 @@ public class TestPlugin implements Plugin {
     }
 
     @Override
-    public void processResults(Node n, Map<String,String> results) {
+    public void processResults(Node n,String results) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -44,8 +42,24 @@ public class TestPlugin implements Plugin {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+
     @Override
-    public Map<String, String> getBonus(Node n) {
+    public String getApplicationBody(Node n) throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void automateNodeTurn(Node n) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public long getTurnLength(Experiment experiment) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Map<String, Object> getScoreInformation(Node n) {
         return Collections.emptyMap();
     }
 

@@ -12,7 +12,7 @@
         
         
     
-    <field:display render="false" field="availableNodes" id="s_edu_mit_cci_turksnet_Session__availableNodes" object="${session_}" z="yB7NIE3FDf9dXoNWE84fB+uQZ2M="/>
+    <field:display field="availableNodes" id="s_edu_mit_cci_turksnet_Session__availableNodes" object="${session_}" render="false" z="user-managed"/>
     <field:display field="network" id="s_edu_mit_cci_turksnet_Session__network" object="${session_}" render="false" z="user-managed"/>
     <field:display field="outputLog" id="s_edu_mit_cci_turksnet_Session__outputLog" object="${session_}" z="Fj70sfnyN9x2C5eUrKSvLwBKoMA="/>
      <field:display field="runner" id="s_edu_mit_cci_turksnet_Session__runner" object="${session_}" render="false" z="user-managed"/>

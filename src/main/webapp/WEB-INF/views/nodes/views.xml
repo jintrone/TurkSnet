@@ -13,4 +13,10 @@
 <definition extends="default" name="nodes/update">
         <put-attribute name="body" value="/WEB-INF/views/nodes/update.jspx"/>
     </definition>
+<definition extends="default" name="nodes/findNodesByWorker">
+        <put-attribute name="body" value="/WEB-INF/views/nodes/findNodesByWorker.jspx"/>
+    </definition>
+<definition extends="default" name="nodes/findNodesByWorkerAndSession_">
+        <put-attribute name="body" value="/WEB-INF/views/nodes/findNodesByWorkerAndSession_.jspx"/>
+    </definition>
 </tiles-definitions>

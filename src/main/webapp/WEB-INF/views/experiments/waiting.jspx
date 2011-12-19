@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+   <![CDATA[
+    <script language="JavaScript" type="text/javascript">
+
+    function updateLocation(url) {
+        window.location = url;
+    }
+
+    function getBaseUrl() {
+        return "http://"+window.location.host+"${app_root}"
+    }
+
+    function getExperimentId() {
+        return ${experimentid}
+    }
+
+// -----------------------------------------------------------------------------
+// Globals
+// Major version of Flash required
+var requiredMajorVersion = 10;
+// Minor version of Flash required
+var requiredMinorVersion = 0;
+// Minor version of Flash required
+var requiredRevision = 0;
+// -----------------------------------------------------------------------------
+
+
+// Version check based upon the values entered above in "Globals"
+var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
+
+
+// Check to see if the version meets the requirements for playback
+if (hasRequestedVersion) {  // if we've detected an acceptable version
+    	// if we've detected an acceptable version
+		// embed the Flash Content SWF when all tests are passed
+		AC_FL_RunContent(
+					"src", "${flash_lib_dir}/WaitingRoom",
+					"width", "100%",
+					"height", "100%",
+					"align", "middle",
+					"id", "WaitingRoom",
+					"quality", "high",
+					"bgcolor", "#FFFFFF",
+					"name", "WaitingRoom",
+					"allowScriptAccess","sameDomain",
+					"type", "application/x-shockwave-flash",
+					"pluginspage", "http://www.adobe.com/go/getflashplayer"
+	);
+  } else {  // flash is too old or we can't detect the plugin
+    var alternateContent = 'Alternate HTML content should be placed here. '
+  	+ 'This content requires the Adobe Flash Player. '
+   	+ '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
+    document.write(alternateContent);  // insert non-flash content
+  }
+
+</script>
+]]>
+<noscript>
+  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="WaitingRoom" width="100%" height="100%"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="${flash_lib_dir}/WaitingRoom.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#FFFFFF" />
+			<param name="allowScriptAccess" value="sameDomain" />
+			<embed src="WaitingRoom.swf" quality="high" bgcolor="#FFFFFF"
+				width="100%" height="100%" name="WaitingRoom" align="middle"
+				play="true"
+				loop="false"
+				allowScriptAccess="sameDomain"
+				type="application/x-shockwave-flash"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+	</object>
+</noscript>
+</div>

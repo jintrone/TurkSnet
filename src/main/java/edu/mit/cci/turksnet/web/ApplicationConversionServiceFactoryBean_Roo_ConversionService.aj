@@ -8,6 +8,7 @@ import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Results;
 import edu.mit.cci.turksnet.SessionLog;
 import edu.mit.cci.turksnet.Session_;
+import edu.mit.cci.turksnet.Worker;
 import edu.mit.cci.turksnet.domain.Role;
 import edu.mit.cci.turksnet.domain.User;
 import edu.mit.cci.turksnet.domain.UserRole;
@@ -28,7 +29,7 @@ privileged aspect ApplicationConversionServiceFactoryBean_Roo_ConversionService 
     Converter<Node, String> ApplicationConversionServiceFactoryBean.getNodeConverter() {
         return new Converter<Node, String>() {
             public String convert(Node source) {
-                return new StringBuilder().append(source.getTurkerId()).append(" ").append(source.getPrivateData_()).append(" ").append(source.getPublicData_()).toString();
+                return new StringBuilder().append(source.getPrivateData_()).append(" ").append(source.getPublicData_()).append(" ").append(source.getStatus()).toString();
             }
         };
     }
@@ -44,7 +45,7 @@ privileged aspect ApplicationConversionServiceFactoryBean_Roo_ConversionService 
     Converter<Experiment, String> ApplicationConversionServiceFactoryBean.getExperimentConverter() {
         return new Converter<Experiment, String>() {
             public String convert(Experiment source) {
-                return new StringBuilder().append(source.getProperties()).append(" ").append(source.getNetwork()).append(" ").append(source.getJavaScript()).toString();
+                return new StringBuilder().append(source.getWaitingRoomManager()).append(" ").append(source.getProperties()).append(" ").append(source.getNetwork()).toString();
             }
         };
     }
@@ -81,6 +82,14 @@ privileged aspect ApplicationConversionServiceFactoryBean_Roo_ConversionService 
         };
     }
     
+    Converter<Worker, String> ApplicationConversionServiceFactoryBean.getWorkerConverter() {
+        return new Converter<Worker, String>() {
+            public String convert(Worker source) {
+                return new StringBuilder().append(source.getUsername()).append(" ").append(source.getPassword()).append(" ").append(source.getLastCheckin()).toString();
+            }
+        };
+    }
+    
     public void ApplicationConversionServiceFactoryBean.installLabelConverters(FormatterRegistry registry) {
         registry.addConverter(getRoleConverter());
         registry.addConverter(getNodeConverter());
@@ -90,6 +99,7 @@ privileged aspect ApplicationConversionServiceFactoryBean_Roo_ConversionService 
         registry.addConverter(getUserConverter());
         registry.addConverter(getUserRoleConverter());
         registry.addConverter(getSession_Converter());
+        registry.addConverter(getWorkerConverter());
     }
     
     public void ApplicationConversionServiceFactoryBean.afterPropertiesSet() {

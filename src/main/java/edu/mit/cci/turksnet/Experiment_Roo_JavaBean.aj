@@ -3,6 +3,7 @@
 
 package edu.mit.cci.turksnet;
 
+import java.lang.Boolean;
 import java.lang.String;
 import java.util.Map;
 
@@ -42,6 +43,14 @@ privileged aspect Experiment_Roo_JavaBean {
     
     public void Experiment.setPropsAsMap(Map<String, String> propsAsMap) {
         this.propsAsMap = propsAsMap;
+    }
+    
+    public Boolean Experiment.getRunning() {
+        return this.running;
+    }
+    
+    public void Experiment.setRunning(Boolean running) {
+        this.running = running;
     }
     
 }

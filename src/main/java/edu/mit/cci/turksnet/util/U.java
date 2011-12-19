@@ -1,10 +1,18 @@
 package edu.mit.cci.turksnet.util;
 
+import flexjson.JSON;
+import flexjson.JSONSerializer;
+import org.apache.sling.commons.json.JSONArray;
+import org.apache.sling.commons.json.JSONException;
+import org.apache.sling.commons.json.JSONObject;
+
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -104,4 +112,97 @@ public class U {
         return result;
     }
 
+    public static Map<String,String> mapifyJSON(String s) throws JSONException {
+
+        String results = s.trim();
+        if (results.startsWith("(")) {
+            results = results.substring(1,results.length()-1);
+        }
+        System.err.println("Processing results: "+results);
+
+        JSONObject obj = new JSONObject(results);
+        Map<String,String> map = new HashMap<String, String>();
+        for (Iterator<String> i = obj.keys();i.hasNext();) {
+            String key = i.next();
+           map.put(key,obj.get(key).toString());
+
+        }
+
+        return map;
+    }
+
+//    public static Map<String,Object> mapifyJSON2Obj(String s) throws JSONException {
+//
+//        String results = s.trim();
+//        if (results.startsWith("(")) {
+//            results = results.substring(1,results.length()-1);
+//        }
+//        System.err.println("Processing results: "+results);
+//
+//        JSONObject obj = new JSONObject(results);
+//        Map<String,String> map = new HashMap<String, String>();
+//        for (Iterator<String> i = obj.keys();i.hasNext();) {
+//            String key = i.next();
+//            Object v = obj.get(key);
+//            if (v instanceof JSONArray) {
+//                JSONArray a = (JSONArray)v;
+//                List<String> result = new ArrayList<String>();
+//                for (int j=0;j<a.length();j++) {
+//                    result.add(a.getString(j));
+////                }
+//            }
+//
+//           map.put(key,obj.get(key).toString());
+//
+//        }
+//
+//        return map;
+//    }
+//
+
+    public static String jsonify(Map<String, Object> vals) {
+
+
+        StringBuilder buffer = new StringBuilder();
+        String sep = "";
+        buffer.append("{");
+        for (Map.Entry<String, Object> ent : vals.entrySet()) {
+
+            Object rep = ent.getValue();
+            String reps = rep.toString();
+            buffer.append(sep).append("\"").append(ent.getKey()).append("\":");
+            if (rep instanceof Map) {
+               buffer.append(jsonify(((Map<String,Object>)ent)));
+            } else if (reps.startsWith("{") && reps.endsWith("}")) {
+                buffer.append(rep);
+            }
+            else if (!reps.matches("[\\d\\.]+")) {
+                buffer.append('"').append(ent.getValue()).append('"');
+            } else {
+                buffer.append(ent.getValue());
+            }
+            sep = ",";
+        }
+        buffer.append("}");
+        return buffer.toString();
+    }
+
+    public static String safejson(Object o) {
+        String result = "";
+        try {
+            result = JSONObject.valueToString(o);
+        } catch (JSONException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        if (result.startsWith("\"") && result.endsWith("\"")) {
+            result =  result.substring(1,result.length()-1);
+        }
+        return result;
+    }
+
+    public static void main(String[] arg) throws JSONException {
+        Map<String,String> result = mapifyJSON("{\"foo\":[1,3,4,5],\"bar\":\"whatever\"}");
+        System.err.println(result.get("foo"));
+
+    }
 }

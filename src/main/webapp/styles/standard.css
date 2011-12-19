@@ -9,6 +9,7 @@ body,div,td {
 body {
 	background-color:#F0F0F3;
 	text-align: center;
+    margin: 0px;
 }
 
 #header {
@@ -21,6 +22,7 @@ body {
 	max-width: 800px;
 	margin-right: auto;
 	margin-left: auto;
+    height:100%;
 
 	/* fix max-width incompatibility in IE6 */
 	width:expression(document.body.clientWidth > 800? "800px": "auto" );

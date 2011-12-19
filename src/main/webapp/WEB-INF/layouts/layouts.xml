@@ -19,4 +19,6 @@
   <definition name="stripped" template="/WEB-INF/layouts/stripped.jspx">
   </definition>
 
+
+
 </tiles-definitions>

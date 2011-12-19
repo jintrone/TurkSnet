@@ -5,6 +5,7 @@ package edu.mit.cci.turksnet;
 
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
+import edu.mit.cci.turksnet.Worker;
 import java.lang.Long;
 import java.lang.String;
 import java.util.Set;
@@ -13,14 +14,6 @@ privileged aspect Node_Roo_JavaBean {
     
     public void Node.setId(Long id) {
         this.id = id;
-    }
-    
-    public String Node.getTurkerId() {
-        return this.turkerId;
-    }
-    
-    public void Node.setTurkerId(String turkerId) {
-        this.turkerId = turkerId;
     }
     
     public Session_ Node.getSession_() {
@@ -55,12 +48,28 @@ privileged aspect Node_Roo_JavaBean {
         this.incoming = incoming;
     }
     
-    public boolean Node.isAcceptingInput() {
-        return this.acceptingInput;
+    public String Node.getStatus() {
+        return this.status;
     }
     
-    public void Node.setAcceptingInput(boolean acceptingInput) {
-        this.acceptingInput = acceptingInput;
+    public void Node.setStatus(String status) {
+        this.status = status;
+    }
+    
+    public String Node.getMetaData() {
+        return this.metaData;
+    }
+    
+    public void Node.setMetaData(String metaData) {
+        this.metaData = metaData;
+    }
+    
+    public Worker Node.getWorker() {
+        return this.worker;
+    }
+    
+    public void Node.setWorker(Worker worker) {
+        this.worker = worker;
     }
     
 }

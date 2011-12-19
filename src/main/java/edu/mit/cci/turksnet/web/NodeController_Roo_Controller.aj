@@ -5,6 +5,7 @@ package edu.mit.cci.turksnet.web;
 
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
+import edu.mit.cci.turksnet.Worker;
 import java.io.UnsupportedEncodingException;
 import java.lang.Integer;
 import java.lang.Long;
@@ -84,6 +85,31 @@ privileged aspect NodeController_Roo_Controller {
         return "redirect:/nodes?page=" + ((page == null) ? "1" : page.toString()) + "&size=" + ((size == null) ? "10" : size.toString());
     }
     
+    @RequestMapping(params = { "find=ByWorker", "form" }, method = RequestMethod.GET)
+    public String NodeController.findNodesByWorkerForm(Model model) {
+        model.addAttribute("workers", Worker.findAllWorkers());
+        return "nodes/findNodesByWorker";
+    }
+    
+    @RequestMapping(params = "find=ByWorker", method = RequestMethod.GET)
+    public String NodeController.findNodesByWorker(@RequestParam("worker") Worker worker, Model model) {
+        model.addAttribute("nodes", Node.findNodesByWorker(worker).getResultList());
+        return "nodes/list";
+    }
+    
+    @RequestMapping(params = { "find=ByWorkerAndSession_", "form" }, method = RequestMethod.GET)
+    public String NodeController.findNodesByWorkerAndSession_Form(Model model) {
+        model.addAttribute("workers", Worker.findAllWorkers());
+        model.addAttribute("session_s", Session_.findAllSession_s());
+        return "nodes/findNodesByWorkerAndSession_";
+    }
+    
+    @RequestMapping(params = "find=ByWorkerAndSession_", method = RequestMethod.GET)
+    public String NodeController.findNodesByWorkerAndSession_(@RequestParam("worker") Worker worker, @RequestParam("session_") Session_ session_, Model model) {
+        model.addAttribute("nodes", Node.findNodesByWorkerAndSession_(worker, session_).getResultList());
+        return "nodes/list";
+    }
+    
     @ModelAttribute("nodes")
     public Collection<Node> NodeController.populateNodes() {
         return Node.findAllNodes();
@@ -92,6 +118,11 @@ privileged aspect NodeController_Roo_Controller {
     @ModelAttribute("session_s")
     public Collection<Session_> NodeController.populateSession_s() {
         return Session_.findAllSession_s();
+    }
+    
+    @ModelAttribute("workers")
+    public Collection<Worker> NodeController.populateWorkers() {
+        return Worker.findAllWorkers();
     }
     
     String NodeController.encodeUrlPathSegment(String pathSegment, HttpServletRequest request) {

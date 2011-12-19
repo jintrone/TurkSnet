@@ -3,311 +3,44 @@
      xmlns:spring="http://www.springframework.org/tags/form" version="2.0">
     <!--<jsp:directive.page contentType="text/html;charset=UTF-8"/> -->
     <jsp:output omit-xml-declaration="yes"/>
+     <![CDATA[
     <script type="text/javascript">
 
-        var private_data = "${node.privateData_}";
-        var public_data = "${node.publicData_}";
-        var incoming = { <c:forEach var ="data" items = "${node.incoming}" varStatus = "status" > <c:if test = "${!status.first}">,</c:if>${data.id lt 0?data.id*-1:data.id}:"${data.publicData_}"</c:forEach >}
+        var private_data =
+        ${privateData}
+        var public_data =
+        ${publicData}
+        var incoming = ${incomingData}
+            //var worker = "${workerId}}";
 
-        var current_nb_selection = "";
-        var nav_idxs = [];
-        var post_target='./feedback?workerId=${turkerId}&amp;'+
-                'assignmentId=${assignmentId}';
-
-
-        function initPage() {
-
-
-            $.each(incoming, function(key, val) {
-
-                var clz = "nb-index-" + key;
-                nav_idxs.push(clz);
-                $("#selection-panel ul").append('<li class="' + clz + '">' + 'Neighbor ' + key + '</li>')
-                $("#display-panel").append('<div class="' + clz + ' neighborview">' + createList(val, "grid dragsource","draggable neighbor") + '</div>');
-            });
-
-             initNavIndex();
-            $("#private").append(createList(private_data, "droptarget sortable",""));
-            $("#public").append(createList(public_data, "droptarget sortable grid",""));
-            $(".draggable").draggable({
-
-                cancel: ".placed",
-                helper: "clone",
-                appendTo: "body",
-                connectToSortable: ".sortable:not(.full)"
-            });
-            $(".draggable").disableSelection();
-
-            $(".sortable").sortable({
-
-
-                receive:
-                    function(event,ui) {
-                        var me = $(this);
-                        checkSize(me);
-                        if (ui.sender.hasClass("neighbor")) {
-                            ui.sender.addClass("placed");
-                            var sender = ui.sender;
-                            var newItem = $(this).data().sortable.currentItem;
-                            $('<div class="deletemark"><a>X</a></div>').click(function() {
-                                newItem.remove();
-                                sender.removeClass("placed");
-                                checkSize(me);
-                            }).prependTo(newItem);
-
-                        }
-
-
-                },
-                remove: function(event, ui) {
-                  checkSize($(this));
-
-                },
-                placeholder: "ui-state-highlight",
-                connectWith:"ul.sortable:not(.full)"});
-            $(".sortable").disableSelection();
-
-            //checkSize($("#private>ul"));
-
-            selectNavIndex("", nav_idxs[0]);
-
-        }
-
-
-        function checkSize(elt) {
-            if (elt.parents("#private").size() > 0) {
-                if (elt.children("li").size() >= 5) {
-                    elt.addClass("full");
-                } else if (elt.hasClass("full")) {
-                        elt.removeClass("full");
+                function getPublicData() {
+                    return public_data;
                 }
-            }
 
+        function getPrivateData() {
+            return private_data;
         }
 
-        function initNavIndex() {
-            $("#display-panel>div").hide();
-            $("#selection-panel li").click(function() {
-                var clzs = $(this).attr("class").split(" ");
-                for (x in clzs) {
-                    if (clzs[x].indexOf("nb-index") > -1) {
-
-                        selectNavIndex(current_nb_selection, clzs[x]);
-                        break;
-                    }
-                }
-            });
-
-
+        function getNeighborData() {
+            return incoming;
         }
 
-        function selectNavIndex(oldclzname, clzname) {
-
-            if (oldclzname) {
-                $("#selection-panel li." + oldclzname).removeClass("nb-selected")
-            }
-            $("#selection-panel li." + clzname).addClass("nb-selected");
-
-
-
-            if (oldclzname) {
-                $("#display-panel>div." + oldclzname).hide()
-            }
-            $("#display-panel>div." + clzname).fadeIn();
-
-            current_nb_selection = clzname;
-
-
+        function updateLocation(url) {
+            window.location = url;
         }
 
-        function createList(str, ulclz, liclz) {
-            var result = '<ul class="' + ulclz + '">';
-            var tiles = str.split(";");
-            for (x in tiles) {
-                if (tiles[x]) {
-                    var placed =  (private_data.indexOf(tiles[x])> 0 || public_data.indexOf(tiles[x])> 0)?"placed":"";
-                var bits = tiles[x].split(":",2);
-
-                result += '<li class="tile '+liclz+' '+placed+'"><span class="hidden">'+bits[0]+'</span>' + bits[1] + '</li>';
-            }
-            }
-            result += "</ul>";
-            return result;
+        function getBaseUrl() {
+            return "http://" + window.location.host + "${app_root}"
         }
 
-        function extractString(list) {
-            var result="";
-            var sep="";
-            $(list).children("li").each(function(key,val) {
-                result+=sep;
-                result+=$(val).find("span").text()+":"+$(val).clone().children().remove().end().text();
-                sep=";"
-            });
-            return result;
+        function getSessionId() {
+            return ${sessionid}
         }
-
-        function populateForm(list) {
-            $("form#node_results input#privateData").val(extractString($("#private>ul")));
-            $("form#node_results input#publicData").val(extractString($("#public>ul")));
-            return ${turkerId}>-1;
-        }
-
-        function resetLists() {
-            $("#selection>li").remove();
-            $("#display-panel>div").remove();
-            $("#private>ul").remove();
-            $("#public>ul").remove();
-            initPage();
-        }
-
-        function expandInfo() {
-
-            $("span.expandible").toggleClass("hidden");
-            $("span.expandlink").toggleClass("hidden");
-
-
-        }
-        <![CDATA[
-        function browserCheck() {
-           if ($.browser.msie && $.browser.version<8) {
-
-		            $("#checkingBrowser").hide();
-                    $("#noBrowserSupport").show();
-                    return false;
-		         } else {
-
-                $("#checkingBrowser").hide();
-                $("#acceptBrowser").show();
-                return true;
-
-            }
-
-        }
-        ]]>
-
-
-        $(function() {
-            if (browserCheck()) {
-            $("a#feedbackLink").attr("href",post_target);
-            initPage();
-            }
-
-
-        });
-
 
     </script>
-    <div id="checkingBrowser">
-        Checking browser... javascript must be enabled for this application to work.
-    </div>
-    <div id="noBrowserSupport" style="display:none;">
-        This application only supports Firefox, Chrome, Opera, Safari, and IE 8 and up.  Please return the HIT if you have accepted it, or use a more recent browser.
-    </div>
-    <div id="acceptBrowser" style="display:none;">
-    <div id="header">
-        <span id="rounds">Turn: ${round} of ${rounds}, Earned Bonus: ${currentbonus}</span><span id="title">LOOM Story Builder</span><span id="feedback"><a id="feedbackLink" href="" target="_blank">Feedback? Problems?</a></span>
-    </div>
+  ]]>
+    ${appData}
 
-
-        <div id="intro">Try to forumulate the correct story by dragging phrases from your neighbors' stories
-            and your private area to the public area. You have ${rounds} turns, and will be awarded a bonus based on the quality of your story at each turn.
-            <span class="expandible hidden" id="extended_help">
-                <h3>Objective</h3>
-                <p>
-                Your goal is to recreate the correct story from pieces of information you and other players have. You will have ${rounds} turns. You are not competing with the other players. You need them, and they need you, because you all have different pieces of information.</p>
-                <h3>Play</h3>
-                <p>
-                Each player has a screen that looks just like yours.  Your "private information area" contains information that only you can see; it can hold up to three pieces of information.  Your "public information area" can be seen by your neighbors.  The "neighbors public stories" display the contents of your neighbors' public areas at the end of the previous turn. At the beginning of the game, all players only have private information, so you will not see any information in your neighbors' spaces in the first turn.
-                </p>
-                <p>
-                Use the "public story area" to create the best story you can. You are scored on the information in your public story area on each turn, and your ten best turns will be used to determine your bonus.
-                </p>
-                <p>
-                You can drag tiles between your "public" and "private" areas.  You can drag data from your neighbors to either your public or private area. Use the "X" on a tile to remove it from your public or private area.
-                </p>
-
-                 <p>
-                Please note that turns proceed only when each player has submitted their results, so new HITs may not be available immediately. Please submit your results as quickly as possible. Please do not discuss the
-                story outside of the game.
-                </p>
-                <p>
-                If you need to reset your screen (or encounter some unexplained oddness) click the "reset" button at the bottom of the screen. When you are satisfied with your turn, click the "submit" button. If you encounter
-                problems, or would like to provide other feedback, please use this <a id="feedbackLink" href="" target="_blank">form</a>.
-                </p>
-
-                <h3>Bonus</h3>
-                <p>
-                Your score is determined by the number tiles you have in your public area minus the number of reorderings required to achieve the correct relative ordering, divided by the number of words in the complete story.
-                Thus, your should try to use as many information elements as you can in your public space, but only if they are in the correct order. In any round the maximum score is 1, and minimum score is 0.
-                </p>
-                <p>
-                The maximum bonus for a given turn is ${sessionturnbonus}. You will receive a ${sessionfinalbonus} bonus if you have the correct story in your public area at the end of the last turn.
-                Your bonus is determined based on your ${sessionbonuscount} best turns, so you are eligible for up to ${finalbonus} bonus, with a maximum payout of ${maxpayout}.  Bonuses are awarded only if you complete all ${rounds} turns.
-                </p>
-            </span>
-            <a href="javascript:" onclick="expandInfo()"><span class="expandlink">more</span><span class="expandlink hidden">less</span></a>
-        </div>
-
-
-    <table class="layout">
-        <tr class="content">
-            <td class="seventy">
-                <div class="label">Neighbors' public stories</div>
-                <table class="layout-inner">
-                    <tr>
-                        <td id="selection-panel">
-
-
-                                <ul id="selection">
-
-
-                                </ul>
-
-                        </td>
-                        <td id="display-panel" class="hundred">
-
-
-                        </td>
-                        <!--empty-->
-
-                    </tr>
-                </table>
-            </td>
-            <td id="private">
-                <div class="label">Your private information</div>
-
-            </td>
-        </tr>
-
-        <tr class="content">
-            <td id="public" colspan="2">
-                <div class="label">Publicly visible story</div>
-
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <div id="buttons">
-                    <button onclick="resetLists();return false;">Reset</button>
-                    <form id="node_results" method="POST"
-                                 action="${submitTo}/mturk/externalSubmit">
-                        <input type="hidden" id="privateData" name="privateData"/>
-                        <input type="hidden" id="publicData" name="publicData"/>
-                        <input type="hidden" id="assignmentId" name="assignmentId" value="${assignmentId}"/>
-                        <input type="hidden" id="hitId" name="hitId" value="${hitId}"/>
-                        <input type="hidden" id="workerId" name="workerId" value="${turkerId}"/>
-                        <input type="hidden" id="nodeSessionId" name="nodeSessionId" value="${node.session_.id}"/>
-
-
-                        <input type="submit" value="Submit" onclick="return populateForm();"/>
-
-                    </form>
-                </div>
-            </td>
-        </tr>
-
-    </table>
-    </div>
 
 </div>
 

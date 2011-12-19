@@ -9,5 +9,6 @@
         <field:input field="network" id="c_edu_mit_cci_turksnet_Experiment_network" z="E9pISY2sxqo/KJn5z0NNHBHbWfQ="/>
 
 
+    <field:checkbox field="running" id="c_edu_mit_cci_turksnet_Experiment_running" z="Z+1BvTDrmHS0NAGFj5XZgLimGYU="/>
     </form:update>
 </div>

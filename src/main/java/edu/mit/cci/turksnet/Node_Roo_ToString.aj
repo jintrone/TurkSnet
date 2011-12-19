@@ -10,12 +10,15 @@ privileged aspect Node_Roo_ToString {
     public String Node.toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Id: ").append(getId()).append(", ");
-        sb.append("DummyNode: ").append(getDummyNode()).append(", ");
-        sb.append("TurkerId: ").append(getTurkerId()).append(", ");
-        sb.append("Session_: ").append(getSession_()).append(", ");
+//        sb.append("JsonData: ").append(getJsonData() == null ? "null" : getJsonData().size()).append(", ");
+//        sb.append("DummyNode: ").append(getDummyNode()).append(", ");
+//        sb.append("Session_: ").append(getSession_()).append(", ");
         sb.append("PrivateData_: ").append(getPrivateData_()).append(", ");
         sb.append("PublicData_: ").append(getPublicData_()).append(", ");
-        sb.append("Incoming: ").append(getIncoming() == null ? "null" : getIncoming().size());
+        sb.append("Incoming: ").append(getIncoming() == null ? "null" : getIncoming().size()).append(", ");
+        sb.append("Status: ").append(getStatus()).append(", ");
+//        sb.append("MetaData: ").append(getMetaData()).append(", ");
+//        sb.append("Worker: ").append(getWorker());
         return sb.toString();
     }
     

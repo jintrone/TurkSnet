@@ -1,25 +1,23 @@
 package edu.mit.cci.turksnet.util;
 
-import com.sun.xml.internal.bind.v2.model.core.TypeRef;
 import edu.mit.cci.turkit.gui.JavaScriptDatabase;
 import edu.mit.cci.turkit.turkitBridge.TurKit;
 import edu.mit.cci.turkit.util.InvalidPropertiesException;
 import edu.mit.cci.turkit.util.NamedSource;
 import edu.mit.cci.turkit.util.TurkitOutputSink;
 import edu.mit.cci.turkit.util.U;
+import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
+import edu.mit.cci.turksnet.Worker;
+import edu.mit.cci.turksnet.plugins.Plugin;
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.apache.sling.commons.json.JSONException;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import javax.servlet.http.HttpSession;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,7 +33,7 @@ import java.util.concurrent.Executors;
  * Date: 7/19/11
  * Time: 10:14 PM
  */
-public class HeadlessRunner implements ApplicationContextAware {
+public class HeadlessRunner implements ApplicationContextAware, RunStrategy {
     public static JavaScriptDatabase turkitProperties;
     // public SimpleEventManager sem;
 
@@ -57,38 +55,17 @@ public class HeadlessRunner implements ApplicationContextAware {
 
     public boolean forceStop = false;
 
+    public Session_ session;
 
 
-    private static final ExecutorService service =  Executors.newSingleThreadExecutor();
+    private static final ExecutorService service = Executors.newSingleThreadExecutor();
 
     public HeadlessRunner() {
 
     }
 
     public HeadlessRunner(TurkitOutputSink sink) throws Exception {
-        this.sink = sink;
 
-        service.submit(new Runnable() {
-             public void run() {
-                if (turkitProperties == null) {
-                    try {
-                        turkitProperties = new JavaScriptDatabase(new File(
-                                "turkit.properties"), new File("turkit.properties.tmp"));
-                    } catch (Exception e) {
-                         log.error("Error initializing database");
-                         HeadlessRunner.this.sink.startCapture();
-                         HeadlessRunner.this.sink.setText(e.getMessage());
-                         HeadlessRunner.this.sink.stopCapture();
-                         HeadlessRunner.this.service.shutdown();
-                        throw new RuntimeException("Could not init headless runner");
-
-                    }
-
-                }
-            }
-        });
-
-        this.sink = sink;
     }
 
 
@@ -172,6 +149,33 @@ public class HeadlessRunner implements ApplicationContextAware {
     }
 
 
+    @Override
+    public void init(Session_ session, TurkitOutputSink sink) throws Exception {
+        this.sink = sink;
+        this.session = session;
+        service.submit(new Runnable() {
+            public void run() {
+                if (turkitProperties == null) {
+                    try {
+                        turkitProperties = new JavaScriptDatabase(new File(
+                                "turkit.properties"), new File("turkit.properties.tmp"));
+                    } catch (Exception e) {
+                        log.error("Error initializing database");
+                        HeadlessRunner.this.sink.startCapture();
+                        HeadlessRunner.this.sink.setText(e.getMessage());
+                        HeadlessRunner.this.sink.stopCapture();
+                        HeadlessRunner.this.service.shutdown();
+                        throw new RuntimeException("Could not init headless runner");
+
+                    }
+
+                }
+            }
+        });
+        loadScript("Experiment:" + session.getExperiment().getId() + "_Session:" + session.getId(), session.getExperiment().getJavaScript(), session.getExperiment().getPropsAsMap(), session);
+
+    }
+
     public void run(final boolean repeat) {
 
         service.submit(new Runnable() {
@@ -181,7 +185,7 @@ public class HeadlessRunner implements ApplicationContextAware {
                 try {
 //
 
-               _run(repeat);
+                    _run(repeat);
 
                 } catch (Throwable t) {
                     t.printStackTrace();
@@ -192,6 +196,7 @@ public class HeadlessRunner implements ApplicationContextAware {
             }
         });
     }
+
 
     public void haltOnNext() {
         this.forceStop = true;
@@ -246,6 +251,60 @@ public class HeadlessRunner implements ApplicationContextAware {
     }
 
     public boolean isRunning() {
-        return runAgainAtThisTime>-1;
+        return runAgainAtThisTime > -1;
     }
+
+
+    @Override
+    public void updateNode(Node n, String results) throws ClassNotFoundException, IllegalAccessException, InstantiationException, JSONException {
+
+
+
+            //logNodeEvent(n, "results");
+            n.setStatus(NodeStatus.WAITING.name());
+            n.persist();
+            log.debug("Set node " + n.getId() + " to not accept");
+            synchronized (getClass()) {
+                Plugin p =  session.getExperiment().getActualPlugin();
+               p.processResults(n, results);
+                session.logNodeEvent(n, "results");
+                boolean doneiteration = true;
+                for (Node node : session.getAvailableNodes()) {
+                    log.debug("Making sure " + n.getId() + " is up to date");
+                    node.merge();
+                    log.debug("Checking node for doneness " + node.getId());
+                    if (NodeStatus.valueOf(node.getStatus()) == NodeStatus.ACCEPTING_INPUT) {
+                        log.debug("Node is accepting input!");
+                        doneiteration = false;
+                    } else {
+
+                    }
+                    log.debug("Node is NOT accepting input!");
+                }
+                if (doneiteration) {
+                    session.setIteration(session.getIteration() + 1);
+
+                }
+                log.debug("Checking for session doneness");
+                if (p.checkDone(session)) {
+                    log.debug("I am DONE");
+                    session.setActive(false);
+
+
+                }
+
+            }
+            session.persist();
+
+
+
+    }
+
+    @Override
+    public Map<String, Object> ping(Worker w, HttpSession session) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+
 }
