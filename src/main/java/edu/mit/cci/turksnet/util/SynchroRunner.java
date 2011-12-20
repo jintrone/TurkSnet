@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.apache.sling.commons.json.JSONException;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.LockModeType;
 import javax.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.HashMap;
@@ -208,6 +209,7 @@ public class SynchroRunner implements RunStrategy {
         } catch (Exception e) {
             log.warn("Could not finalize turn");
         }
+        Worker.entityManager().refresh(w, LockModeType.PESSIMISTIC_WRITE);
         w.setCurrentAssignment(null);
 
 
