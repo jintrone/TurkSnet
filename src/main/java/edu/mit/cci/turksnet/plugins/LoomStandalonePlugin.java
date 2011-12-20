@@ -350,7 +350,7 @@ public class LoomStandalonePlugin implements Plugin {
     private static List<Integer> getStoryOrder(String story) {
         List<Integer> result = new ArrayList<Integer>();
         logger.debug("Extracting story from " + story);
-        Pattern pat = Pattern.compile("(\\d+)=[\\w\\s]+");
+        Pattern pat = Pattern.compile("(\\d+)=.+");
         if (story != null) {
             for (String p : story.split("&")) {
                 p = p.trim();
@@ -366,7 +366,7 @@ public class LoomStandalonePlugin implements Plugin {
 
     private static Map<String, String> getStoryMap(String story) {
         Map<String, String> result = new HashMap<String, String>();
-        Pattern pat = Pattern.compile("(\\d+)=([\\w\\s]+)");
+        Pattern pat = Pattern.compile("(\\d+)=(.+)");
         if (story != null) {
             for (String p : story.split("&")) {
                 p = p.trim();
