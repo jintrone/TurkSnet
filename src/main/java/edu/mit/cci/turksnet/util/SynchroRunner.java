@@ -196,7 +196,7 @@ public class SynchroRunner implements RunStrategy {
         } else if (gameState == GameState.DONE_GAME) {
             finalizeTurnForWorker(w, result);
 
-            session.removeAttribute("workerid");
+
         }
         return result;
 

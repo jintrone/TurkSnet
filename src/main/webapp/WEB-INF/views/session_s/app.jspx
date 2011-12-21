@@ -3,7 +3,7 @@
      xmlns:spring="http://www.springframework.org/tags/form" version="2.0">
     <!--<jsp:directive.page contentType="text/html;charset=UTF-8"/> -->
     <jsp:output omit-xml-declaration="yes"/>
-     <![CDATA[
+    <![CDATA[
     <script type="text/javascript">
 
         var private_data =
@@ -35,6 +35,10 @@
 
         function getSessionId() {
             return ${sessionid}
+        }
+
+        function getWorkerId() {
+            return ${workerid}
         }
 
     </script>

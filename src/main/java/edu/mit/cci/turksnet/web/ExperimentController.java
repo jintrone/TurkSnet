@@ -126,7 +126,7 @@ public class ExperimentController {
 
             result.put("status", "success");
             result.put("workerid", w.getId());
-            session.setAttribute("workerid", w.getId());
+            //session.setAttribute("workerid", w.getId());
         }
         return U.jsonify(result);
 
@@ -156,8 +156,8 @@ public class ExperimentController {
 
     @RequestMapping(value = "/{id}/ping", method = RequestMethod.GET)
     @ResponseBody
-    public String ping(@PathVariable("id") Long id, Model model, HttpServletRequest request, HttpSession session) {
-        Worker w = Worker.findWorker((Long) session.getAttribute("workerid"));
+    public String ping(@PathVariable("id") Long id, Model model, @RequestParam("workerid") Long workerid, HttpServletRequest request) {
+        Worker w = Worker.findWorker(workerid);
         Experiment e = Experiment.findExperiment(id);
         Map<String, Object> result = new HashMap<String, Object>();
         if (w == null) {

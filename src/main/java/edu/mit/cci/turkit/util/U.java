@@ -1479,14 +1479,18 @@ public class U {
 			if (i >= 0) {
 				Thread.sleep(100 * (long) Math.pow(2, i));
 			}
+             HttpURLConnection c= null;
 			try {
+                c = (HttpURLConnection)url.openConnection();
 				s = webPost((HttpURLConnection) url.openConnection(), args);
 				break;
 			} catch (Exception e) {
 				if (e instanceof IllegalArgumentException) {
 					throw e;
 				}
-			}
+			} finally {
+                if (c!=null) c.disconnect();
+            }
 		}
 		return s;
 	}

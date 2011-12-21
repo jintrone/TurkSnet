@@ -13,8 +13,10 @@
 
     <spring:url value="/resources/javascript/AC_OETags.js" var="flash_version_js"/>
 
-    <spring:url value="/resources/flash" var="flash_lib_dir" scope="request"/>
+
     <spring:url value="/" var="app_root" scope="request"/>
+
+
 
 
 
@@ -28,5 +30,8 @@
     <script src="${jquery_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
     <script src="${jquery_ui_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
     <script src="${flash_version_js}" type="text/javascript"><!-- required for FF3 and Opera --></script>
+    <jsp:scriptlet>
+        request.setAttribute("flash_lib_dir",request.getContextPath()+"/resources/flash");
+    </jsp:scriptlet>
 
 </jsp:root>
