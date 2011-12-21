@@ -14,7 +14,7 @@
     <spring:url value="/resources/javascript/AC_OETags.js" var="flash_version_js"/>
 
 
-    <spring:url value="/" var="app_root" scope="request"/>
+
 
 
 
@@ -32,6 +32,9 @@
     <script src="${flash_version_js}" type="text/javascript"><!-- required for FF3 and Opera --></script>
     <jsp:scriptlet>
         request.setAttribute("flash_lib_dir",request.getContextPath()+"/resources/flash");
+    </jsp:scriptlet>
+    <jsp:scriptlet>
+        request.setAttribute("app_root",request.getContextPath());
     </jsp:scriptlet>
 
 </jsp:root>

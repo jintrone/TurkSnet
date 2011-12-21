@@ -8,7 +8,7 @@
     }
 
     function getBaseUrl() {
-        return "http://"+window.location.host+"${app_root}"
+        return "${app_root}"
     }
 
     function getExperimentId() {
