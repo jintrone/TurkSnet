@@ -64,10 +64,11 @@ public class WaitingRoomManager {
     }
     @Transactional
     public Map<String, Object> checkin(Worker w) {
+        Worker.entityManager().refresh(w,LockModeType.PESSIMISTIC_WRITE);
         w.setLastCheckin(System.currentTimeMillis());
         Map<String, Object> result = new HashMap<String, Object>();
         TypedQuery<Worker> q = Worker.findWorkersByLastCheckinGreaterThanEqualsAndCurrentAssignmentIsNull(System.currentTimeMillis() - 10000l);
-        q.setLockMode(LockModeType.READ);
+        //q.setLockMode(LockModeType.PESSIMISTIC_READ);
         int available = q.getResultList().size();
 
         result.put("percent", "" + available / Float.parseFloat(ex.getPropsAsMap().get(Plugin.PROP_NODE_COUNT)));
