@@ -37,10 +37,18 @@ privileged aspect Worker_Roo_JavaBean {
         return this.qualifications;
     }
     
-    public void Worker.setQualifications(String qualifications) {
-        this.qualifications = qualifications;
+    public void Worker.setQualifications(String q) {
+        this.qualifications = q;
     }
-    
+
+     public String Worker.getTraining() {
+        return this.training;
+    }
+
+    public void Worker.setTraining(String data) {
+        this.training = data;
+    }
+
     public Session_ Worker.getCurrentAssignment() {
         return this.currentAssignment;
     }

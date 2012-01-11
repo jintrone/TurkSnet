@@ -3,12 +3,14 @@ package edu.mit.cci.turksnet;
 
 import edu.mit.cci.turkit.util.U;
 import org.apache.log4j.Logger;
+import org.apache.sling.commons.json.JSONArray;
 import org.apache.sling.commons.json.JSONObject;
 import org.junit.Test;
 
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: jintrone
@@ -37,18 +39,14 @@ public class RestTester {
 
     @Test
     public void testRobustness() throws Exception {
-        URL u = new URL("http://localhost:8084/turksnet/experiments/29/register");
-        String result = U.webPost(u, "login", "t1", "password", "\"\"");
-        JSONObject obj = new JSONObject(result);
 
-
-        for (int i = 0; i < 65; i++) {
+        for (int i = 0; i < 50; i++) {
             final String w = "test-robustness" + i;
 
 
             Thread t = new Thread(new WorkerRunner(w));
             t.start();
-            Thread.sleep((long) (Math.random()*1000l));
+            Thread.sleep((long) (Math.random() * 500l));
 
         }
 
@@ -76,38 +74,144 @@ public class RestTester {
         @Override
         public void run() {
             try {
-                System.err.println("Execute " + name);
+                log.debug("Starting " + name);
                 URL u = null;
 
-                u = new URL("http://localhost:8084/turksnet/experiments/29/register");
+                u = new URL("http://cognosis.mit.edu:8084/turksnet/experiments/1/register");
 
                 String result = U.webPost(u, "login", name, "password", "\"\"");
+                log.debug("Raw result: " + result);
                 JSONObject obj = new JSONObject(result);
 
                 if (obj.getString("status").equals("username_exists")) {
-                    u = new URL("http://localhost:8084/turksnet/experiments/29/login");
+                    u = new URL("http://cognosis:8084/turksnet/experiments/1/login");
                     result = U.webPost(u, "login", name, "password", "\"\"");
                     obj = new JSONObject(result);
 
                 }
-                Long id = obj.getLong("workerid");
+                final Long workerid = obj.getLong("workerid");
                 log.debug(name + " -- register:" + result);
 
-                u = new URL("http://localhost:8084/turksnet/experiments/29/ping?workerid=" + id);
+                u = new URL("http://cognosis.mit.edu:8084/turksnet/experiments/1/ping?workerid=" + workerid);
 
-                for (int i = 0; i < 1000; i++) {
-                    System.err.println("I - "+i);
+                String sessionendpoint = "";
+
+                while (true) {
+
                     HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+                    connection.addRequestProperty("accept", "text/json");
+
+                    connection.connect();
+                    result = U.slurp(connection.getInputStream(), "UTF-8");
+                    connection.disconnect();
+                    obj = new JSONObject(result);
+                    if (obj.getString("status").equals("worker_assigned")) {
+                        Pattern p = Pattern.compile("session_s/([^/]+)/.*$");
+                        Matcher m = p.matcher(obj.getString("session_url"));
+                        if (!m.matches()) {
+                            throw new RuntimeException("Should have matched session url");
+                        } else sessionendpoint = m.group(1);
+                        break;
+                    }
+                    Thread.sleep(500l);
+                }
+
+                final String pingurl = String.format("http://cognosis.mit.edu:8084/turksnet/session_s/%s/ping?workerid=%d", sessionendpoint, workerid.intValue());
+                final String submiturl = String.format("http://cognosis.mit.edu:8084/turksnet/session_s/%s/nodedata", sessionendpoint);
+                final String dataurl = String.format("http://cognosis.mit.edu:8084/turksnet/session_s/%s/nodedata?workerid=%d", sessionendpoint, workerid.intValue());
+                final StringBuffer buf = new StringBuffer();
+
+
+
+                try {
+                    HttpURLConnection connection = (HttpURLConnection) new URL(dataurl).openConnection();
                     connection.addRequestProperty("accept", "text/json");
                     connection.connect();
                     result = U.slurp(connection.getInputStream(), "UTF-8");
                     connection.disconnect();
-                    log.debug(i + "." + name + " -- ping:" + result);
+                    obj = new JSONObject(result);
+                    JSONArray ary = obj.getJSONArray("publicData");
 
-                    Thread.sleep((long) (Math.random()*1000l));
+                    for (int i = 0; i < ary.length(); i++) {
+                        buf.append(ary.getJSONObject(i).keys().next()).append(";");
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                log.debug("URL:" + pingurl);
+
+                while (true) {
+                    final boolean[] submit = {false};
+                    new Thread(new Runnable() {
+                        public void run() {
+                            try {
+                                URL u = new URL(pingurl);
+                                HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+                                connection.addRequestProperty("accept", "text/json");
+                                connection.connect();
+                                String result = U.slurp(connection.getInputStream(), "UTF-8");
+                                connection.disconnect();
+                                JSONObject obj = new JSONObject(result);
+                                log.debug("Worker " + name + " : " + obj.getString("status"));
+                                if (obj.getString("status").equals("WAITING_FOR_RESULTS")) {
+                                    submit[0] = true;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).run();
+                    new Thread(new Runnable() {
+                        public void run() {
+                            try {
+                                URL u = new URL(pingurl);
+                                HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+                                connection.addRequestProperty("accept", "text/json");
+                                connection.connect();
+                                String result = U.slurp(connection.getInputStream(), "UTF-8");
+                                connection.disconnect();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).run();
+
+                    if (submit[0]) {
+                        submit[0] = false;
+                        new Thread(new Runnable() {
+                            public void run() {
+                                try {
+                                    URL u = new URL(submiturl);
+
+                                    HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+                                    log.debug("Worker "+workerid+" submit: "+buf.toString());
+
+                                   String result = U.webPost(connection,"workerid",""+workerid,"data",buf.toString());
+
+                                    JSONObject obj = new JSONObject(result);
+                                    log.debug("Worker " + name + " : " + obj.getString("status"));
+                                    if (obj.getString("status").equals("WAITING_FOR_RESULTS")) {
+                                        submit[0] = true;
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }).run();
+                    }
+                   // Thread.sleep(1000l);
 
 
                 }
+
+
             } catch (Throwable t) {
                 t.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }

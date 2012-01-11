@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div id="turksnet" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page"
+     xmlns:spring="http://www.springframework.org/tags/form" version="2.0">
+    <!--<jsp:directive.page contentType="text/html;charset=UTF-8"/> -->
+    <jsp:output omit-xml-declaration="yes"/>
+    <![CDATA[
+    <script type="text/javascript">
+
+
+        function updateLocation(url) {
+            window.location = url;
+        }
+
+        function getBaseUrl() {
+            return "${app_root}"
+        }
+
+        function getWorkerId() {
+            return ${workerId};
+        }
+
+        function getWorkerName() {
+            return "${workerName}";
+        }
+
+        function getExperimentId() {
+            return ${experimentId};
+        }
+
+    </script>
+  ]]>
+    ${appData}
+
+
+</div>
+

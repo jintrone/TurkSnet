@@ -16,6 +16,8 @@ import org.apache.commons.collections15.Factory;
 import org.apache.log4j.Logger;
 import org.apache.sling.commons.json.JSONArray;
 import org.apache.sling.commons.json.JSONException;
+import org.apache.sling.commons.json.JSONObject;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.*;
@@ -37,6 +39,8 @@ public class LoomStandalonePlugin implements Plugin {
     public static final String PROP_STORY = "story";
     private static final String PROP_PRIVATE_TILES = "private_tile_count";
     private static final String PROP_NET_DEGREE = "network_degree";
+    private static final String PROP_TRAINING_STORY = "training_story";
+    private static final String PROP_TRAINING_DATA = "training";
 
 
     private static Logger logger = Logger.getLogger(LoomStandalonePlugin.class);
@@ -85,19 +89,26 @@ public class LoomStandalonePlugin implements Plugin {
 
     @Override
     public void processResults(Node n, String results) {
+
         logger.debug("Receiving " + results + " from " + n.getWorker().getUsername());
+        Map<String, String> storymap = getStoryMap(n.getSession_().getExperiment().getPropsAsMap().get(PROP_STORY));
+
+        n.setPublicData_(internalFormatData(storymap, results));
+
+    }
+
+    private String internalFormatData(Map<String, String> story, String results) {
         StringBuilder builder = new StringBuilder();
         String[] items = results.split(";");
-        Map<String, String> storymap = getStoryMap(n.getSession_().getExperiment().getPropsAsMap().get(PROP_STORY));
+
         String sep = "";
         for (String i : items) {
-            builder.append(sep).append(i).append("=").append(storymap.get(i));
+            builder.append(sep).append(i).append("=").append(story.get(i));
             sep = "&";
         }
         String s = builder.toString();
-        logger.debug("Setting data: " + s);
-        n.setPublicData_(s);
-        //n.persist();
+
+        return s;
     }
 
     private static int getNewId(Set<Integer> set) {
@@ -143,19 +154,139 @@ public class LoomStandalonePlugin implements Plugin {
     }
 
 
-    @Override
-    public String getApplicationBody(Node n) throws Exception {
+    public String configureApplicationString(String appname) throws Exception {
         InputStream stream = getClass().getResourceAsStream("/loomStandalone.fragment.html");
-        return edu.mit.cci.turkit.util.U.slurp(stream, "UTF8");
+        String result = edu.mit.cci.turkit.util.U.slurp(stream, "UTF8");
+        result = result.replace("${applicationName}",appname);
+        return result;
     }
 
     @Override
+    public String getQualificationApp() throws Exception {
+       return configureApplicationString("Qualifications");
+    }
+
+    @Override
+    public String getTrainingApp() throws Exception {
+      return configureApplicationString("Training");
+    }
+
+    @Override
+    public String getLoginApp() throws Exception {
+      return configureApplicationString("LoginRegister");
+    }
+
+    @Override
+    @Transactional
+    public void addTrainingData(Worker w, Experiment e, Map parameterMap) {
+        String current = w.getTraining();
+        String incoming = ((String[]) parameterMap.get("data"))[0];
+        logger.debug("Set training data:"+incoming);
+        if (current == null) {
+            w.setTraining(incoming);
+        } else {
+            w.setTraining(w.getTraining() + "&" + incoming);
+        }
+        w.flush();
+
+    }
+
+    private String getLastTrainingData(String fulldata) {
+        String[] splitdata = fulldata.split("&");
+        if (splitdata != null && splitdata.length > 0) {
+            return splitdata[splitdata.length - 1];
+        }
+        return "";
+    }
+
+    @Override
+    public JSONObject getTrainingData(Worker w, Experiment e, Map parameterMap) {
+        Map<String, String> props = e.getPropsAsMap();
+        Map<String, String> storymap = getStoryMap(props.get(PROP_TRAINING_STORY));
+
+        Map<String, Object> result = new HashMap<String, Object>();
+
+        int step = Integer.parseInt(((String[]) parameterMap.get("step"))[0]);
+
+
+        String private_data = internalFormatData(storymap, props.get(PROP_TRAINING_DATA + "_n0"));
+        String public_data = "";
+        if (step == 1) {
+            public_data = private_data;
+
+        } else if (step < 4) {
+            public_data = internalFormatData(storymap,getLastTrainingData(w.getTraining()));
+
+
+        } else {
+
+            try {
+                return score(w,props.get(PROP_TRAINING_STORY));
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }
+
+
+        Map<Long, String> neighbors = new HashMap<Long, String>();
+        neighbors.put(1l, internalFormatData(storymap, props.get(PROP_TRAINING_DATA + "_n1_s" + step)));
+        neighbors.put(2l, internalFormatData(storymap, props.get(PROP_TRAINING_DATA + "_n2_s" + step)));
+
+
+        return Node.getJsonDataUtil(public_data, private_data, neighbors);
+    }
+
+    public JSONObject score(Worker w, String story) throws JSONException {
+
+        Map<String, String> storymap = getStoryMap(story);
+        JSONObject result = new JSONObject();
+        JSONArray storylist = new JSONArray();
+        List<Integer> storyorder = getStoryOrder(story);
+        for (Integer i : storyorder) {
+            storylist.put(storymap.get(i + ""));
+        }
+
+        result.put("answer", storylist);
+        List<Float> scores = new ArrayList<Float>();
+        float total = 0f;
+        for (String interim : w.getTraining().split("&")) {
+            List<Integer> order = new ArrayList<Integer>();
+            for (String s : interim.split(";")) {
+                order.add(Integer.parseInt(s));
+            }
+            float f = score(storyorder, order);
+            total += f;
+            scores.add(f);
+        }
+
+        result.put("final_round", Math.floor(100 * (scores.get(scores.size() - 1))));
+        result.put("average", Math.floor(100 * (total / (scores.size()))));
+        return result;
+
+    }
+
+    @Override
+    public String getApplicationBody(Node n) throws Exception {
+        return configureApplicationString("StoryHitProvider");
+    }
+
+    @Override
+    @Transactional
     public void automateNodeTurn(Node n) throws ClassNotFoundException, JSONException, IllegalAccessException, InstantiationException {
-        String[] data = n.getPublicData_().split("&");
+        n = Node.findNode(n.getId());
+        List<String> data = new ArrayList<String>(Arrays.asList(n.getPublicData_().split("&")));
+
+        for (Node neighbor : n.getIncoming()) {
+            List<String> ndata = new ArrayList<String>(Arrays.asList(neighbor.getPublicData_().split("&")));
+            ndata.removeAll(data);
+            data.addAll(ndata);
+
+        }
         StringBuilder builder = new StringBuilder();
         String sep = "";
         for (String elt : data) {
-            builder.append(elt.split("=")[0]).append(sep);
+            builder.append(sep).append(elt.split("=")[0]);
             sep = ";";
         }
 
@@ -272,8 +403,11 @@ public class LoomStandalonePlugin implements Plugin {
                 n.setPublicData_((n.getPublicData_() == null ? "" : n.getPublicData_() + "&") + rndstory.get(i));
                 elt++;
             }
-            logger.debug("Node "+n.getId()+":"+n.getPublicData_());
-           // n.persist();
+            logger.debug("Node " + n.getId() + ":" + n.getPublicData_());
+            // n.persist();
+        }
+        for (Node n:nodes) {
+            n.setPrivateData_(n.getPublicData_());
         }
 
 
@@ -345,6 +479,24 @@ public class LoomStandalonePlugin implements Plugin {
         scoreinfo.put("average", Math.floor(100 * (total / (scores.size()))));
 
         return scoreinfo;
+    }
+
+    @Override
+    public Destination getDestinationForEvent(Worker w, Event e) {
+        if (e == Event.LOGIN || e == Event.REGISTER) {
+            if (w.getQualifications() == null) {
+                return Destination.QUALIFICATIONS;
+            } else if (w.getTraining() == null) {
+                return Destination.TRAINING;
+            } else return Destination.WAITING;
+        }
+        if (e == Event.QUALIFICATIONS_SUBMITTED) {
+            return Destination.TRAINING;
+        }
+        if (e == Event.TRAINING_SUBMITTED) {
+            return Destination.WAITING;
+        }
+        return Destination.WAITING;
     }
 
     private static List<Integer> getStoryOrder(String story) {

@@ -12,6 +12,11 @@
         <intercept-url access="permitAll" pattern="/experiments/*/register"/>
         <intercept-url access="permitAll" pattern="/experiments/*/login"/>
         <intercept-url access="permitAll" pattern="/experiments/*/ping"/>
+        <intercept-url access="permitAll" pattern="/experiments/*/qualifications"/>
+        <intercept-url access="permitAll" pattern="/experiments/*/next"/>
+        <intercept-url access="permitAll" pattern="/experiments/*/training"/>
+        <intercept-url access="permitAll" pattern="/experiments/*/trainingdata"/>
+
 
         <intercept-url access="permitAll" pattern="/session_s/*/application"/>
         <intercept-url access="permitAll" pattern="/session_s/*/nodedata"/>

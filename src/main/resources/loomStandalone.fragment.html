@@ -28,14 +28,14 @@ if (hasRequestedVersion) {  // if we've detected an acceptable version
     	// if we've detected an acceptable version
 		// embed the Flash Content SWF when all tests are passed
 		AC_FL_RunContent(
-					"src", "${flash_lib_dir}/StoryHitProvider",
+					"src", "${flash_lib_dir}/${applicationName}",
 					"width", "100%",
 					"height", "100%",
 					"align", "middle",
-					"id", "StoryHitProvider",
+					"id", "${applicationName}",
 					"quality", "high",
 					"bgcolor", "#FFFFFF",
-					"name", "StoryHitProvider",
+					"name", "${applicationName}",
 					"allowScriptAccess","sameDomain",
 					"type", "application/x-shockwave-flash",
 					"pluginspage", "http://www.adobe.com/go/getflashplayer"
@@ -52,12 +52,12 @@ if (hasRequestedVersion) {  // if we've detected an acceptable version
   	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 			id="StoryHitProvider" width="100%" height="100%"
 			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
-			<param name="movie" value="${flash_lib_dir}/StoryHitProvider.swf" />
+			<param name="movie" value="${flash_lib_dir}/${applicationName}.swf" />
 			<param name="quality" value="high" />
 			<param name="bgcolor" value="#FFFFFF" />
 			<param name="allowScriptAccess" value="sameDomain" />
-			<embed src="StoryHitProvider.swf" quality="high" bgcolor="#FFFFFF"
-				width="100%" height="100%" name="StoryHitProvider" align="middle"
+			<embed src="${applicationName}.swf" quality="high" bgcolor="#FFFFFF"
+				width="100%" height="100%" name="${applicationName}" align="middle"
 				play="true"
 				loop="false"
 				quality="high"

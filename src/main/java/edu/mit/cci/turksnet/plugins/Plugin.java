@@ -5,6 +5,8 @@ import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.Worker;
 import org.apache.sling.commons.json.JSONException;
+import org.apache.sling.commons.json.JSONObject;
+
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,39 @@ import java.util.Map;
  * Time: 7:57 AM
  */
 public interface Plugin {
+
+
+    String getQualificationApp() throws Exception;
+
+    String getTrainingApp() throws Exception;
+
+    String getLoginApp() throws Exception;
+
+    JSONObject getTrainingData(Worker w, Experiment e, Map parameterMap);
+
+    void addTrainingData(Worker w, Experiment e, Map parameterMap);
+
+    public static enum Event {
+        VISIT, LOGIN, REGISTER, QUALIFICATIONS_SUBMITTED, TRAINING_SUBMITTED
+
+    }
+
+    public static enum Destination {
+        LOGIN("/experiments/%d/login"),
+        QUALIFICATIONS("/experiments/%d/qualifications"),
+        TRAINING("/experiments/%d/training"),
+        WAITING("/experiments/%d/waiting");
+
+        String template;
+
+        Destination(String template) {
+            this.template = template;
+        }
+
+        public String url(Long id) {
+            return String.format(template,id);
+        }
+    }
 
     public static final String PROP_NODE_COUNT = "node_count";
     public static final String PROP_GRAPH_TYPE = "graph_type";
@@ -39,4 +74,6 @@ public interface Plugin {
     public long getTurnLength(Experiment experiment);
 
     Map<String, Object> getScoreInformation(Node n);
+
+    public Destination getDestinationForEvent(Worker w, Event e);
 }
