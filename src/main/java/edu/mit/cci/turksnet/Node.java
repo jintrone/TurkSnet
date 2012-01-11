@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -80,15 +81,26 @@ public class Node {
     }
 
     public JSONObject getJsonData() {
-        JSONObject result = new JSONObject();
-        try {
-            result.put("privateData", listStoryData(getPrivateData_()));
-            result.put("publicData", listStoryData(getPublicData_()));
+
+        Map<Long,String> incoming = new HashMap<Long, String>();
+        for (Node i:getIncoming()) {
+            incoming.put(i.getId(),i.getPublicData_());
+        }
+        return getJsonDataUtil(getPublicData_(),getPrivateData_(),incoming);
+    }
+
+
+
+
+    public static JSONObject getJsonDataUtil(String publicData, String privateData, Map<Long,String> neighbors) {
+       JSONObject result = new JSONObject();
+       try {
+            result.put("privateData", listStoryData(privateData));
+            result.put("publicData", listStoryData(publicData));
 
             JSONObject incoming = new JSONObject();
-            for (Node i : getIncoming()) {
-                incoming.put(i.getId() + "", listStoryData(i.getPublicData_()));
-
+            for (Map.Entry<Long,String> ent: neighbors.entrySet()) {
+                incoming.put(ent.getKey() + "", listStoryData(ent.getValue()));
             }
             result.put("incomingData", incoming);
         } catch (JSONException e) {

@@ -12,7 +12,15 @@
     }
 
     function getExperimentId() {
-        return ${experimentid}
+        return ${experimentId};
+    }
+
+    function getWorkerId() {
+        return ${workerId};
+    }
+
+    function getWorkerName() {
+        return "${workerName}"
     }
 
 // -----------------------------------------------------------------------------

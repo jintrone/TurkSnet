@@ -6,6 +6,7 @@ import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.Worker;
 import edu.mit.cci.turksnet.plugins.Plugin;
+import edu.mit.cci.turksnet.util.TestException;
 import edu.mit.cci.turksnet.util.U;
 import org.apache.log4j.Logger;
 import org.apache.sling.commons.json.JSONException;
@@ -17,6 +18,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,7 +45,8 @@ public class Session_Controller {
     //for the html app
 
     @RequestMapping(value = "/{id}/turk/feedback", method = RequestMethod.GET)
-    public String getForm(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("workerId") String workerId, Model model) {
+    public String getForm(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("workerId") String workerId, Model model) throws TestException {
+
         model.addAttribute("workerId", workerId);
         model.addAttribute("assignmentId", assignmentId);
         model.addAttribute("submission", false);
@@ -244,6 +247,13 @@ public class Session_Controller {
         }
 
         return "redirect:/session_s/" + encodeUrlPathSegment(session.getId().toString(), request);
+    }
+
+     @ExceptionHandler(Exception.class)
+    @ResponseBody
+    public String handleException(Exception ex, HttpServletRequest request) {
+        ex.printStackTrace();
+        return "{\"status\":\"error\"}";
     }
 
 

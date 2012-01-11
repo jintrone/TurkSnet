@@ -40,9 +40,7 @@ public class SynchroRunner implements RunStrategy {
     private Set<Long> queue = Collections.synchronizedSet(new HashSet<Long>());
 
 
-    private Map<Long, Long> countdown = new HashMap<Long, Long>();
-
-    private static long TIMEOUT = 30000l;
+    private static long TIMEOUT = 10000l;
 
     private long turnEnd;
 
@@ -56,17 +54,17 @@ public class SynchroRunner implements RunStrategy {
 
     }
 
-   @Transactional
+    @Transactional
     private void startTurn() {
-        log.debug("Start turn with "+turnLength+" sec remaining");
-       //TODO this is to workaround merge failing because we're out of synch.  I don't think this is bulletproof - do i
-       //TODO to synchronize?  How can a reattach and update?
-       session = Session_.findSession_(session.getId());
+        log.debug("Start turn with " + turnLength + " sec remaining");
+        //TODO this is to workaround merge failing because we're out of synch.  I don't think this is bulletproof - do i
+        //TODO to synchronize?  How can a reattach and update?
+        session = Session_.findSession_(session.getId());
 
-       gameState = GameState.IN_TURN;
+        gameState = GameState.IN_TURN;
         turnEnd = System.currentTimeMillis() + turnLength;
-        session.setIteration(session.getIteration()+1);
-        for (Node n:session.getAvailableNodes()) {
+        session.setIteration(session.getIteration() + 1);
+        for (Node n : session.getAvailableNodes()) {
             queue.add(n.getId());
         }
 
@@ -83,17 +81,13 @@ public class SynchroRunner implements RunStrategy {
      */
     private boolean advanceState() throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException {
 
-        log.debug("Current state: "+gameState);
+        log.debug("Current state: " + gameState);
         if (gameState == GameState.IN_TURN) {
 
             if (queue.isEmpty()) {
                 gameState = GameState.DONE_TURN;
                 advanceState();
             } else if (System.currentTimeMillis() > turnEnd) {
-                countdown.clear();
-                for (Long n : queue) {
-                    countdown.put(n, System.currentTimeMillis());
-                }
                 gameState = GameState.WAITING_FOR_RESULTS;
 
             }
@@ -101,16 +95,16 @@ public class SynchroRunner implements RunStrategy {
             if (queue.isEmpty()) {
                 gameState = GameState.DONE_TURN;
             } else {
-                for (Long n : queue) {
-                    if (countdown.get(n) - System.currentTimeMillis() > TIMEOUT) {
-                        Node node = Node.findNode(n);
-                        session.logNodeEvent(node,"timeout");
+                for (Long n : new HashSet<Long>(queue)) {
+                    Node node = Node.findNode(n);
+                    if (System.currentTimeMillis() - node.getWorker().getLastCheckin() > TIMEOUT) {
+                        session.logNodeEvent(node, "timeout");
                         session.getExperiment().getActualPlugin().automateNodeTurn(node);
                     }
                 }
             }
 
-        } else if (gameState == GameState.DONE_TURN || gameState==null) {
+        } else if (gameState == GameState.DONE_TURN || gameState == null) {
             if (session.getExperiment().getActualPlugin().checkDone(session)) {
                 gameState = GameState.DONE_GAME;
             } else {
@@ -129,20 +123,20 @@ public class SynchroRunner implements RunStrategy {
     public void run(boolean repeat) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
 
 
-        turnLength = 1000l*session.getExperiment().getActualPlugin().getTurnLength(session.getExperiment());
+        turnLength = 1000l * session.getExperiment().getActualPlugin().getTurnLength(session.getExperiment());
         final Timer t = new Timer(true);
-        t.schedule(getTimerTask(t),1000l);
+        t.schedule(getTimerTask(t), 1000l);
     }
 
     //will update, driven by timer thread
     private TimerTask getTimerTask(final Timer t) {
-       return new TimerTask() {
+        return new TimerTask() {
 
             public void run() {
                 try {
                     if (advanceState()) {
 
-                        t.schedule(getTimerTask(t),1000l);
+                        t.schedule(getTimerTask(t), 1000l);
                     } else {
                         t.cancel();
                     }
@@ -175,19 +169,19 @@ public class SynchroRunner implements RunStrategy {
     @Override
     @Transactional
     public void updateNode(Node node, String results) throws ClassNotFoundException, IllegalAccessException, InstantiationException, JSONException {
-        log.debug("Process results; queue length "+queue.size());
+        log.debug("Process results; queue length " + queue.size());
         node.getSession_().getExperiment().getActualPlugin().processResults(node, results);
         node.getSession_().logNodeEvent(node, "results");
         queue.remove(node.getId());
-        log.debug("Queue after processing: "+queue.size());
+        log.debug("Queue after processing: " + queue.size());
     }
 
-     //will update worker - request driven
+    //will update worker - request driven
     @Override
     @Transactional
     public Map<String, Object> ping(Worker w, HttpSession session) {
         w.setLastCheckin(System.currentTimeMillis());
-        Map<String,Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<String, Object>();
         result.put("status", gameState);
 
         if (gameState == GameState.IN_TURN) {
@@ -202,7 +196,7 @@ public class SynchroRunner implements RunStrategy {
 
     }
 
-    private void finalizeTurnForWorker(Worker w,Map<String,Object> result) {
+    private void finalizeTurnForWorker(Worker w, Map<String, Object> result) {
         try {
             Node n = Node.findNodesByWorkerAndSession_(w, session).getSingleResult();
             result.putAll(session.getExperiment().getActualPlugin().getScoreInformation(n));
@@ -211,7 +205,6 @@ public class SynchroRunner implements RunStrategy {
         }
         Worker.entityManager().refresh(w, LockModeType.PESSIMISTIC_WRITE);
         w.setCurrentAssignment(null);
-
 
 
     }

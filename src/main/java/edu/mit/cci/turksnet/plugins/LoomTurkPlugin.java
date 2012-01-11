@@ -15,6 +15,7 @@ import edu.uci.ics.jung.algorithms.generators.Lattice2DGenerator;
 import edu.uci.ics.jung.graph.util.Pair;
 import org.apache.log4j.Logger;
 import org.apache.sling.commons.json.JSONException;
+import org.apache.sling.commons.json.JSONObject;
 
 import java.io.InputStream;
 import java.util.*;
@@ -53,6 +54,32 @@ public class LoomTurkPlugin implements Plugin {
 
     private static Logger logger = Logger.getLogger(LoomTurkPlugin.class);
 
+
+    @Override
+    public String getQualificationApp() throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getTrainingApp() throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getLoginApp() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public JSONObject getTrainingData(Worker w, Experiment e, Map parameterMap) {
+        return null;
+
+    }
+
+    @Override
+    public void addTrainingData(Worker w, Experiment e, Map parameterMap) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     public Session_ createSession(Experiment experiment,List<Worker> workers) throws SessionCreationException {
         Map<String, String> props = experiment.getPropsAsMap();
@@ -307,6 +334,11 @@ public class LoomTurkPlugin implements Plugin {
 
         logger.debug("Bonus structure: "+result);
         return result;
+    }
+
+    @Override
+    public Destination getDestinationForEvent(Worker w, Event e) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private static List<Integer> getStoryOrder(String story) {

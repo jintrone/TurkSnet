@@ -4,8 +4,10 @@ import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.Worker;
+import org.apache.sling.commons.json.JSONObject;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +18,33 @@ import java.util.Map;
  */
 public class TestPlugin implements Plugin {
 
+
+    @Override
+    public String getQualificationApp() throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getTrainingApp() throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getLoginApp() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public JSONObject getTrainingData(Worker w, Experiment e, Map parameterMap) {
+        return null;
+
+
+    }
+
+    @Override
+    public void addTrainingData(Worker w, Experiment e, Map parameterMap) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     @Override
     public Session_ createSession(Experiment exp, List<Worker> workers) throws SessionCreationException {
@@ -61,6 +90,11 @@ public class TestPlugin implements Plugin {
     @Override
     public Map<String, Object> getScoreInformation(Node n) {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public Destination getDestinationForEvent(Worker w, Event e) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
 
