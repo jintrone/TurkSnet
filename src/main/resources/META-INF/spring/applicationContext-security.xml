@@ -9,7 +9,7 @@
         <!-- Configure these elements to secure URIs in your application -->
          <intercept-url access="permitAll" pattern="/experiments/current"/>
         <intercept-url access="permitAll" pattern="/experiments/*/join"/>
-        <intercept-url access="permitAll" pattern="/experiments/*/register"/>
+        <intercept-url access="permitAll" pattern="/experiments/*/loginregister"/>
         <intercept-url access="permitAll" pattern="/experiments/*/login"/>
         <intercept-url access="permitAll" pattern="/experiments/*/ping"/>
         <intercept-url access="permitAll" pattern="/experiments/*/qualifications"/>

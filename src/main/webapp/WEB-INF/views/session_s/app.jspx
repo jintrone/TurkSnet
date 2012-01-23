@@ -41,6 +41,10 @@
             return ${workerid}
         }
 
+         function getNumTurns() {
+            return ${numTurns};
+        }
+
     </script>
   ]]>
     ${appData}

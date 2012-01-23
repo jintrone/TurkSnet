@@ -113,6 +113,7 @@ public class Session_Controller {
         model.addAttribute("sessionid", session.getId());
         model.addAttribute("appData", app.replace("${flash_lib_dir}", "/turksnet/resources/flash/"));
         model.addAttribute("workerid",workerid);
+        model.addAttribute("numTurns",Integer.parseInt(exp.getPropsAsMap().get(Plugin.PROP_ITERATION_COUNT)));
 
         return "session_s/app";
     }

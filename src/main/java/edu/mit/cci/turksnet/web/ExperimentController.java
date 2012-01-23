@@ -92,7 +92,7 @@ public class ExperimentController {
         model.addAttribute("remainingSessions",e.getAvailableSessionCount());
         model.addAttribute("waiting", e.getWaitingRoomManager().getWaiting());
         model.addAttribute("desired", e.getPropsAsMap().get(Plugin.PROP_NODE_COUNT));
-        model.addAttribute("launch",e.getStartDate()!=null?e.getStartDate().after(new Date())?e.getStartDate():null:null);
+        model.addAttribute("launchtime",e.getStartDate()!=null?e.getStartDate().after(new Date())?e.getStartDate():null:null);
         model.addAttribute("dateTimePattern", DateTimeFormat.patternForStyle("SS", LocaleContextHolder.getLocale()));
         return "experiments/manage";
 
