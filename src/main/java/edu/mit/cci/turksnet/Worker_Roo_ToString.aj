@@ -11,7 +11,7 @@ privileged aspect Worker_Roo_ToString {
         StringBuilder sb = new StringBuilder();
         sb.append("Username: ").append(getUsername()).append(", ");
         sb.append("Password: ").append(getPassword()).append(", ");
-        sb.append("LastCheckin: ").append(getLastCheckin()).append(", ");
+
         sb.append("Qualifications: ").append(getQualifications()).append(", ");
         sb.append("CurrentAssignment: ").append(getCurrentAssignment());
         return sb.toString();

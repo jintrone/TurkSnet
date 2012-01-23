@@ -22,5 +22,8 @@
 <definition extends="stripped" name="experiments/notavailable">
         <put-attribute name="body" value="/WEB-INF/views/experiments/notavailable.jspx"/>
 </definition>
+<definition extends="custom" name="experiments/manage">
+        <put-attribute name="body" value="/WEB-INF/views/experiments/forcerun.jspx"/>
+</definition>
 
 </tiles-definitions>

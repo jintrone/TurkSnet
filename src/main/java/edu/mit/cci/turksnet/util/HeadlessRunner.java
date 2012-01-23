@@ -288,7 +288,7 @@ public class HeadlessRunner implements ApplicationContextAware, RunStrategy {
                 log.debug("Checking for session doneness");
                 if (p.checkDone(session)) {
                     log.debug("I am DONE");
-                    session.setActive(false);
+                    session.setStatus(Session_.Status.RUNNING);
 
 
                 }

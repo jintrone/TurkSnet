@@ -16,13 +16,14 @@
         <intercept-url access="permitAll" pattern="/experiments/*/next"/>
         <intercept-url access="permitAll" pattern="/experiments/*/training"/>
         <intercept-url access="permitAll" pattern="/experiments/*/trainingdata"/>
+        <intercept-url access="permitAll" pattern="/experiments/*/message"/>
 
 
         <intercept-url access="permitAll" pattern="/session_s/*/application"/>
         <intercept-url access="permitAll" pattern="/session_s/*/nodedata"/>
         <intercept-url access="permitAll" pattern="/session_s/*/ping"/>
         <intercept-url access="permitAll" pattern="/session_s/*/score"/>
-        <intercept-url access="permitAll" pattern="/session_s/*/feedback"/>
+        <intercept-url access="permitAll" pattern="/session_s/*/message"/>
 
         <intercept-url access="permitAll" pattern="/resources/**"/>
         <intercept-url access="permitAll" pattern="/login"/>

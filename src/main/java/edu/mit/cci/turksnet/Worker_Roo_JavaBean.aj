@@ -25,13 +25,13 @@ privileged aspect Worker_Roo_JavaBean {
         this.password = password;
     }
     
-    public Long Worker.getLastCheckin() {
-        return this.lastCheckin;
-    }
-    
-    public void Worker.setLastCheckin(Long lastCheckin) {
-        this.lastCheckin = lastCheckin;
-    }
+//    public Long Worker.getLastCheckin() {
+//        return this.lastCheckin;
+//    }
+//
+//    public void Worker.setLastCheckin(Long lastCheckin) {
+//        this.lastCheckin = lastCheckin;
+//    }
     
     public String Worker.getQualifications() {
         return this.qualifications;
@@ -51,6 +51,14 @@ privileged aspect Worker_Roo_JavaBean {
 
     public Session_ Worker.getCurrentAssignment() {
         return this.currentAssignment;
+    }
+
+    public WorkerCheckin Worker.getWorkerCheckin() {
+      return this.workerCheckin;
+    }
+
+    public void Worker.setWorkerCheckin(WorkerCheckin wc) {
+      this.workerCheckin=wc;
     }
     
     public void Worker.setCurrentAssignment(Session_ currentAssignment) {

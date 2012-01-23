@@ -1,0 +1,29 @@
+
+#main {
+    margin-top:40px;
+
+}
+
+
+.manage {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: thin ;
+    padding: 20px;
+}
+
+.fixed-height {
+
+    height:400px;
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+
+
+
+
+
+
+
+
+

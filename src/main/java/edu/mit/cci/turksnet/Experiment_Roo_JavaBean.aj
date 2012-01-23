@@ -6,6 +6,7 @@ package edu.mit.cci.turksnet;
 import java.lang.Boolean;
 import java.lang.String;
 import java.util.Map;
+import java.util.Date;
 
 privileged aspect Experiment_Roo_JavaBean {
     
@@ -49,8 +50,12 @@ privileged aspect Experiment_Roo_JavaBean {
         return this.running;
     }
     
-    public void Experiment.setRunning(Boolean running) {
-        this.running = running;
+
+
+     public Date Experiment.getStartDate() {
+        return this.startDate;
     }
+
+
     
 }

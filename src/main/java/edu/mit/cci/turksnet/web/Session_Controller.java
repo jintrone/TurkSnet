@@ -55,15 +55,16 @@ public class Session_Controller {
     }
 
 
-    @RequestMapping(value = "/{id}/turk/feedback", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}/message", method = RequestMethod.POST)
     public String postFeedback(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("workerId") String workerId, @RequestParam("feedback") String feedback, Model model) {
         StringBuilder builder = new StringBuilder();
         builder.append("Worker: ").append(workerId).append("\n");
+        builder.append("Experiment:").append(Session_.findSession_(id).getExperiment().getId()).append("\n");
         builder.append("Session: ").append(id).append("\n");
-        builder.append("Assignment: ").append(assignmentId).append("\n");
+
         builder.append("Message:\n\n");
         builder.append(feedback);
-
+        log.warn("Worker sent message:\n\n"+builder.toString());
 
         ApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
         SimpleMailMessage tmpl = context.getBean("mailMessage", SimpleMailMessage.class);
@@ -72,9 +73,7 @@ public class Session_Controller {
         message.setSentDate(new Date());
         message.setText(builder.toString());
         sender.send(message);
-        model.addAttribute("submission", true);
-
-        return "session_s/node/feedback";
+         return "{\"status\":\"ok\"}";
     }
 
     @RequestMapping(value = "/{id}/application", method = RequestMethod.GET)
@@ -157,6 +156,7 @@ public class Session_Controller {
             throw new IllegalArgumentException("Worker could not be resolved to a node");
         }
         JSONObject reply = new JSONObject();
+
         try {
             for (Map.Entry<String, Object> ent : session.getExperiment().getActualPlugin().getScoreInformation(n).entrySet()) {
                 reply.put(ent.getKey(), ent.getValue());
