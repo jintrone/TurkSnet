@@ -26,6 +26,8 @@
         <property name="unmarshaller" ref="oxmMarshaller"/>
     </bean>
 
+    <bean class="edu.mit.cci.turksnet.ExperimentRunner" init-method="start"/>
+
 
     <!-- Required for REST services in order to bind the return value to the ResponseBody.  -->
 

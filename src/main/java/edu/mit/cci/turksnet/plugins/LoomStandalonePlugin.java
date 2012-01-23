@@ -46,10 +46,10 @@ public class LoomStandalonePlugin implements Plugin {
     private static Logger logger = Logger.getLogger(LoomStandalonePlugin.class);
 
 
-    public Session_ createSession(Experiment experiment, List<Worker> workers) throws SessionCreationException {
+    public Session_ createSession(Experiment experiment, List<Worker> workers, boolean force) throws SessionCreationException {
         //@TODO add logic for checking worker history and making sure there is an available session
         Map<String, String> props = experiment.getPropsAsMap();
-        if (workers.size() < Integer.parseInt(experiment.getPropsAsMap().get(PROP_NODE_COUNT))) {
+        if (!force && workers.size() < Integer.parseInt(experiment.getPropsAsMap().get(PROP_NODE_COUNT))) {
             return null;
         } else {
             Session_ session = new Session_(experiment.getId());
@@ -57,7 +57,7 @@ public class LoomStandalonePlugin implements Plugin {
             session.setIteration(-1);
             session.persist();
             try {
-                createGraph(props, session);
+                createGraph(props.get(PROP_GRAPH_TYPE),workers.size(),props, session);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new SessionCreationException("Error generating graph");
@@ -67,6 +67,7 @@ public class LoomStandalonePlugin implements Plugin {
             for (int i = 0; i < session.getAvailableNodes().size(); i++) {
                 session.assignNodeToTurker(workers.get(i));
             }
+            session.flush();
             //session.merge();
             return session;
 
@@ -298,9 +299,8 @@ public class LoomStandalonePlugin implements Plugin {
         return Long.parseLong(experiment.getPropsAsMap().get(PROP_TURN_LENGTH_SECONDS));
     }
 
-    private void createGraph(Map<String, String> props, Session_ session) throws GraphCreationException {
-        String graphtype = props.get(PROP_GRAPH_TYPE);
-        Integer nodecount = Integer.parseInt(props.get(PROP_NODE_COUNT));
+    private void createGraph(String graphtype, Integer nodecount, Map<String,String> props, Session_ session) throws GraphCreationException {
+
         DefaultJungGraph graph = null;
         if (nodecount == 1) {
             graph = new DefaultJungGraph();

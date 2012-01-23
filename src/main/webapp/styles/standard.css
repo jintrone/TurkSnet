@@ -526,35 +526,6 @@ div#intro a {
 
 
 
-table.layout tr td.buttonrow {
-    background: #446644;
-}
-
-table.layout {
-    margin-top:54px;
-    border: none;
-    background: #446644;
-}
-
-table.layout tr.content>td {
-    height: 300px;
-}
-
-
-table.layout tr td {
-    padding: 10px;
-    background: #EEEEEE;
-    border: 10px solid #446644;
-    vertical-align: top;
-    height: 100%;
-
-}
-
-table.layout-inner tr td {
-    height:300px;
-    border: none;
-
-}
 
 td.seventy {
     width:70%;

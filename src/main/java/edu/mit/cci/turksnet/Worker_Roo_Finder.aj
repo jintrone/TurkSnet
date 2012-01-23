@@ -53,6 +53,7 @@ privileged aspect Worker_Roo_Finder {
 
         EntityManager em = Worker.entityManager();
         TypedQuery<Worker> q = em.createQuery("SELECT Worker FROM Worker AS worker WHERE worker.lastCheckin >= :lastCheckin  AND worker.currentAssignment is NULL", Worker.class);
+       // TypedQuery<Worker> q = em.createQuery("SELECT wc.worker FROM WorkerCheckin wc WHERE wc.checkIn >= :lastCheckin and wc.worker.currentAssignment IS NULL", Worker.class);
         q.setParameter("lastCheckin", lastCheckin);
 
         return q;

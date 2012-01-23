@@ -84,12 +84,12 @@
 
     <bean id="mailMessage" class="org.springframework.mail.SimpleMailMessage">
     <property name="from">
-        <value><![CDATA[LOOM Turksnet Service <noreply@nohost.com>]]></value>
+        <value><![CDATA[Genpact Narrative Experiment <noreply@nohost.com>]]></value>
     </property>
     <property name="to">
-        <value><![CDATA[Josh Introne <jintrone@mit.edu>]]></value>
+        <value><![CDATA[Josh's phone <6173205415@txt.att.net>, Josh Introne <jintrone@mit.edu>, Janusz Parfieniuk <janusz.parfieniuk@gmail.com> ]]></value>
     </property>
-    <property name="subject" value="LOOM Turker Message"/>
+    <property name="subject" value="Participant Message"/>
 </bean>
 
 </beans>

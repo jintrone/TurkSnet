@@ -11,6 +11,8 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 
+import javax.mail.Session;
+
 privileged aspect Session__Roo_JavaBean {
     
     public Logger Session_.getLog() {
@@ -37,13 +39,9 @@ privileged aspect Session__Roo_JavaBean {
         this.created = created;
     }
     
-    public Boolean Session_.getActive() {
-        return this.active;
-    }
+
     
-    public void Session_.setActive(Boolean active) {
-        this.active = active;
-    }
+
     
     public Experiment Session_.getExperiment() {
         return this.experiment;

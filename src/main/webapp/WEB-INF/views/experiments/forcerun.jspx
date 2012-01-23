@@ -1,0 +1,64 @@
+<div id="manage" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page"
+     xmlns:spring="http://www.springframework.org/tags" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+    <!--<jsp:directive.page contentType="text/html;charset=UTF-8"/> -->
+    <jsp:output omit-xml-declaration="yes"/>
+    <spring:url value="${path}" var="form_url"/>
+    <spring:url value="/experiments/current" var="current"/>
+    <script type="text/javascript">
+        function leave() {
+            window.location="${current}";
+
+        }
+    </script>
+    <h3>Existing Sessions</h3>
+    <div class="fixed-height">
+    <table>
+       <c:forEach items="${sessions}" var="session">
+           <tr>
+               <td>Session ${session["id"]}</td>
+               <td>${session["status"] == null?"N/A":session["status"]}</td>
+           </tr>
+
+       </c:forEach>
+    </table>
+        </div>
+    <h3>Pending Session Information</h3>
+    <div id="">
+      ${remainingSessions > 10?"Lots of":remainingSessions} session${reaminingSessions>1?"s are":" is"} available <br/>
+      ${waiting} of ${desired} workers waiting <br/>
+      Next launch time: ${launchtime==null?"none set":launchtime}
+    </div>
+     <h3>Action</h3>
+    <form method="POST" action="${form_url}">
+        <table class="layout">
+            <tr>
+
+                <td>
+            <input type="radio" name="action" value="nothing" checked="true" />
+                </td>
+                <td>No action</td>
+                </tr>
+            <tr>
+                <td>
+            <input type="radio" name="action" value="force" />
+                </td>
+             <td>
+                 Force run immediately
+             </td>
+            </tr>
+            <tr>
+                <td>
+            <input type="radio" name="action" value="schedule" />
+              </td>
+                <td>
+            <field:datetime id="run_date" field="run_date" disableFormBinding="true" dateTimePattern="${dateTimePattern}" label="Schedule"/>
+                </td>
+            </tr>
+        </table>
+        <br/><br/>
+        <input type="submit" value="Submit" /><button onclick="leave();return false;">Cancel</button><br />
+
+    </form>
+
+
+</div>

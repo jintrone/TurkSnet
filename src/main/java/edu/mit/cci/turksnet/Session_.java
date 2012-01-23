@@ -13,15 +13,9 @@ import org.springframework.orm.hibernate3.SpringSessionContext;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.LockModeType;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -47,7 +41,8 @@ public class Session_ {
     @DateTimeFormat(style = "S-")
     private Date created;
 
-    private Boolean active;
+
+    private String status;
 
     @ManyToOne
     private Experiment experiment;
@@ -78,6 +73,8 @@ public class Session_ {
     DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
 
+    public static enum Status {WAITING,RUNNING,ABORTED,COMPLETE}
+
     private String qualificationRequirements;
 
     public Session_() {
@@ -87,7 +84,7 @@ public class Session_ {
     public Session_(long experimentId) {
         setExperiment(Experiment.findExperiment(experimentId));
         setIteration(0);
-        setActive(true);
+
 
     }
 
@@ -134,7 +131,7 @@ public class Session_ {
     }
 
     public void processNodeResults(Worker worker, String results) throws JSONException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        log.debug("Am I active? " + getActive());
+        log.debug("Status? " + getStatus());
         Node n = Node.findNodesByWorker(worker).getSingleResult();
         if (n == null) {
             log.info("Could not identify node for turker " + worker.getUsername());
@@ -144,6 +141,26 @@ public class Session_ {
 
         }
 
+    }
+
+    public Status getStatus() {
+
+        if (Status.RUNNING.name().equals(this.status) && !isRunning()) {
+           setStatus(Status.ABORTED);
+            // flush();
+        }
+
+        return this.status != null?Status.valueOf(this.status):null;
+    }
+
+     public void setStatus(Status s) {
+
+
+        this.status = s.name();
+    }
+
+     public EntityManager getEntityManager() {
+        return entityManager;
     }
 
 
@@ -176,17 +193,23 @@ public class Session_ {
         slog.persist();
     }
 
+
     public void run() throws Exception {
-        this.active = true;
+        log.info("Starting a run "+getId());
+
 
 
         try {
             setRunner(experiment.getStrategyInstance());
             getRunner().run(true);
+             this.setStatus(Status.RUNNING);
+
         } catch (Exception e) {
             e.printStackTrace();
             updateLog(e.getMessage());
         }
+        log.info("Setting status to: "+this.getStatus()+" ("+status+")");
+       this.flush();
     }
 
 

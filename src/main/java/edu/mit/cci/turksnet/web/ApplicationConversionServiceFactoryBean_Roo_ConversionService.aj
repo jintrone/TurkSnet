@@ -85,7 +85,7 @@ privileged aspect ApplicationConversionServiceFactoryBean_Roo_ConversionService 
     Converter<Worker, String> ApplicationConversionServiceFactoryBean.getWorkerConverter() {
         return new Converter<Worker, String>() {
             public String convert(Worker source) {
-                return new StringBuilder().append(source.getUsername()).append(" ").append(source.getPassword()).append(" ").append(source.getLastCheckin()).toString();
+                return new StringBuilder().append(source.getUsername()).append(" ").append(source.getPassword()).append(" ").toString();
             }
         };
     }

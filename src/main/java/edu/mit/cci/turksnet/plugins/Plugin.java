@@ -19,6 +19,8 @@ import java.util.Map;
 public interface Plugin {
 
 
+
+
     String getQualificationApp() throws Exception;
 
     String getTrainingApp() throws Exception;
@@ -56,8 +58,9 @@ public interface Plugin {
     public static final String PROP_RUN_STRATEGY = "run_strategy";
     public static final String PROP_ITERATION_COUNT = "iteration_count";
     public static final String PROP_TURN_LENGTH_SECONDS = "turnLength";
+    public static final String PROP_SESSION_COUNT = "session_count";
 
-    public Session_ createSession(Experiment exp, List<Worker> workers) throws SessionCreationException;
+    public Session_ createSession(Experiment exp, List<Worker> workers,boolean force) throws SessionCreationException;
 
     public boolean checkDone(Session_ s);
 

@@ -47,7 +47,7 @@ public class TestPlugin implements Plugin {
     }
 
     @Override
-    public Session_ createSession(Experiment exp, List<Worker> workers) throws SessionCreationException {
+    public Session_ createSession(Experiment exp, List<Worker> workers, boolean force) throws SessionCreationException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

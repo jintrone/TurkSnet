@@ -16,7 +16,7 @@ privileged aspect Session__Roo_ToString {
        // sb.append("Log: ").append(getLog()).append(", ");
        // sb.append("Network: ").append(getNetwork()).append(", ");
         sb.append("Created: ").append(getCreated()).append(", ");
-        sb.append("Active: ").append(getActive()).append(", ");
+        sb.append("Status: ").append(getStatus()).append(", ");
         sb.append("Experiment: ").append(getExperiment().getId()).append(", ");
         sb.append("Iteration: ").append(getIteration()).append(", ");
        // sb.append("Test: ").append(getTest()).append(", ");
