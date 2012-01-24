@@ -8,7 +8,8 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=8" />	
-			
+		<META HTTP-EQUIV="Pragma" CONTENT="no-cache"/>
+		<META HTTP-EQUIV="Expires" CONTENT="-1"/>	
 		<util:load-scripts/>
         <spring:url value="/resources/styles/custom.css" var="custom_url" />
         <link rel="stylesheet" type="text/css" href="${custom_url}" media="screen"><!-- fooey --></link>
