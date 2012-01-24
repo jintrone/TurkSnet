@@ -56,7 +56,8 @@ public class Session_Controller {
 
 
     @RequestMapping(value = "/{id}/message", method = RequestMethod.POST)
-    public String postFeedback(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("workerId") String workerId, @RequestParam("feedback") String feedback, Model model) {
+      @ResponseBody
+    public String postFeedback(@PathVariable("id") Long id, @RequestParam("workerId") String workerId, @RequestParam("message") String feedback, Model model) {
         StringBuilder builder = new StringBuilder();
         builder.append("Worker: ").append(workerId).append("\n");
         builder.append("Experiment:").append(Session_.findSession_(id).getExperiment().getId()).append("\n");

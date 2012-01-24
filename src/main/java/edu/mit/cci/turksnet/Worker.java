@@ -53,7 +53,10 @@ public class Worker {
             ck.persist();
         }
         Date current = new Date();
-        ck.setLastCheckIn(current);
-        ck.flush();
+
+        synchronized (ck.lock()) {
+            ck.setLastCheckIn(current);
+            ck.flush();
+        }
     }
 }
