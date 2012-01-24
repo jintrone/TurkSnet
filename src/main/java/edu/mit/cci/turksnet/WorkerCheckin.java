@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: jintrone
@@ -16,6 +18,8 @@ import java.util.Date;
 @Entity
 @Configurable
 public class WorkerCheckin {
+
+
 
 
     @PersistenceContext
@@ -32,11 +36,22 @@ public class WorkerCheckin {
     private Integer version;
 
 
+    @Transient
+    static Map<Long,Object> locks = new HashMap<Long,Object>();
+
     @OneToOne
     private Worker worker;
 
     public Date getLastCheckIn() {
         return lastCheckIn;
+    }
+
+    public  Object lock() {
+        if (!locks.containsKey(this.id)) {
+            locks.put(this.id,new Object());
+        }
+
+        return locks.get(this.id);
     }
 
     public void setLastCheckIn(Date lastCheckIn) {
