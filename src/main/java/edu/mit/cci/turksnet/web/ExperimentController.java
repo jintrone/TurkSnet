@@ -170,7 +170,7 @@ public class ExperimentController {
         }
         model.addAttribute("experimentId", experimentId);
         model.addAttribute("numTurns", d == Plugin.Destination.TRAINING ? 3 : p.getTurnLength(Experiment.findExperiment(experimentId)));
-
+        model.addAttribute("timestamp",System.currentTimeMillis());
 
         if (d == Plugin.Destination.WAITING) {
             if (!checkAvailable(experimentId)) {
@@ -200,7 +200,7 @@ public class ExperimentController {
             return "experiments/notavailable";
         }
         //@TODO fixme - this is a pretty bad hack.  need to figure out fixes
-        model.addAttribute("appData", body.replace("${flash_lib_dir}", "/turksnet/resources/flash/"));
+        model.addAttribute("appData", body.replace("${flash_lib_dir}", "/turksnet/resources/flash/").replace("${timestamp}", System.currentTimeMillis()+""));
         return "experiments/flash";
     }
 

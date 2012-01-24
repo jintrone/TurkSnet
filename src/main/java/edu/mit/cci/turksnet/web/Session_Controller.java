@@ -112,7 +112,7 @@ public class Session_Controller {
         }
         //@TODO fixme - this is a pretty bad hack.  need to figure out fixes
         model.addAttribute("sessionid", session.getId());
-        model.addAttribute("appData", app.replace("${flash_lib_dir}", "/turksnet/resources/flash/"));
+        model.addAttribute("appData", app.replace("${flash_lib_dir}", "/turksnet/resources/flash/").replace("${timestamp}",System.currentTimeMillis()+""));
         model.addAttribute("workerid",workerid);
         model.addAttribute("numTurns",Integer.parseInt(exp.getPropsAsMap().get(Plugin.PROP_ITERATION_COUNT)));
 
