@@ -17,7 +17,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpSession;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -301,7 +300,7 @@ public class HeadlessRunner implements ApplicationContextAware, RunStrategy {
     }
 
     @Override
-    public Map<String, Object> ping(Worker w, HttpSession session) {
+    public Map<String, Object> ping(Worker w) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

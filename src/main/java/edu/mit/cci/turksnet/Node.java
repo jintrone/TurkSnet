@@ -73,6 +73,8 @@ public class Node {
 
     private String metaData;
 
+    private String scores;
+
     @ManyToOne
     private Worker worker;
 
@@ -168,6 +170,33 @@ public class Node {
         }
 
         return result;
+    }
+
+    public Float[] getScores() {
+        if (scores==null || scores.isEmpty()) {
+            return new Float[0];
+        } else {
+            String[] scorestring = scores.split(";");
+            Float[] f = new Float[scorestring.length];
+            int i = 0;
+            for (String s:scorestring) {
+                f[i++] = Float.parseFloat(s);
+            }
+            return f;
+        }
+    }
+
+    public String getRawScores() {
+        return scores;
+    }
+
+    public void addScore(Float f) {
+        if (scores == null || scores.isEmpty()) {
+            scores = String.format("%f",f);
+
+        } else {
+            scores = scores+";"+String.format("%f",f);
+        }
     }
 
     public static void main(String[] args) throws JSONException {

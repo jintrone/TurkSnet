@@ -8,10 +8,6 @@ import org.apache.log4j.Logger;
 import org.apache.sling.commons.json.JSONException;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.Session;
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -194,7 +190,7 @@ public class SynchroRunner implements RunStrategy {
     //will update worker - request driven
     @Override
     @Transactional
-    public Map<String, Object> ping(Worker w, HttpSession session) {
+    public Map<String, Object> ping(Worker w) {
         w.checkin();
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("status", gameState);

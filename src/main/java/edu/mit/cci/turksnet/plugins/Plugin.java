@@ -31,6 +31,8 @@ public interface Plugin {
 
     void addTrainingData(Worker w, Experiment e, Map parameterMap);
 
+    Map<String,Object> getFinalInfo(Node n);
+
     public static enum Event {
         VISIT, LOGIN, REGISTER, QUALIFICATIONS_SUBMITTED, TRAINING_SUBMITTED
 

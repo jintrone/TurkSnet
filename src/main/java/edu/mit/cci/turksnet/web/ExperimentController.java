@@ -64,11 +64,11 @@ public class ExperimentController {
             model.addAttribute("experiment", experiment);
             return "experiments/create";
         }
-        try {
-            experiment.getActualPlugin().preprocessProperties(experiment);
-        } catch (Exception e) {
-            log.error("Error processing properties file");
-        }
+//        try {
+//            experiment.getActualPlugin().preprocessProperties(experiment);
+//        } catch (Exception e) {
+//            log.error("Error processing properties file");
+//        }
         experiment.persist();
        return "redirect://experiments/"+encodeUrlPathSegment(experiment.getId().toString(),request);
        // return "redirect:/experiments/" + encodeUrlPathSegment(experiment.getId().toString(), request);

@@ -7,7 +7,9 @@ import org.apache.sling.commons.json.JSONArray;
 import org.apache.sling.commons.json.JSONObject;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,10 +48,23 @@ public class RestTester {
 
             Thread t = new Thread(new WorkerRunner(w));
             t.start();
-            Thread.sleep((long) (Math.random() * 500l));
+
 
         }
 
+    }
+
+    public void testExternalService() throws Exception {
+         for (int i = 1; i < 8; i++) {
+            final String w = "test-robustness" + i;
+
+
+            Thread t = new Thread(new SimplePingWorker(1));
+            t.start();
+             Thread.sleep((long) Math.random()+100l);
+
+
+        }
     }
 
 
@@ -61,6 +76,41 @@ public class RestTester {
     public void logonProcedure() {
         //URL register = new URL("http://localhost:8084/turksnet/experiment/1/")
 
+    }
+
+    public static class SimplePingWorker implements Runnable {
+
+        private URL u;
+        private int id;
+
+        public SimplePingWorker(int workerid) throws MalformedURLException {
+            String urlstring = String.format("http://localhost:8084/turksnet/experiments/1/ping?workerId=%d",  workerid);
+            u = new URL(urlstring);
+            id = workerid;
+        }
+        public void run() {
+            while (true) {
+                HttpURLConnection connection = null;
+                try {
+                    connection = (HttpURLConnection) u.openConnection();
+                    connection.connect();
+                    String x = U.slurp(connection.getInputStream(), "UTF-8");
+                    System.err.println("Received "+x);
+
+                    if (id !=40) {
+                        Thread.sleep((long) (900l));
+                    }
+                    connection.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+
+
+
+            }
+        }
     }
 
     public static class WorkerRunner implements Runnable {
@@ -220,6 +270,6 @@ public class RestTester {
     }
 
     public static void main(String[] args) throws Exception {
-        new RestTester().testRobustness();
+        new RestTester().testExternalService();
     }
 }

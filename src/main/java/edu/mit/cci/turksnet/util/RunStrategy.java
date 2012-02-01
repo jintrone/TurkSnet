@@ -27,7 +27,7 @@ public interface RunStrategy {
 
     public void updateNode(Node node, String results) throws ClassNotFoundException, IllegalAccessException, InstantiationException, JSONException;
 
-    public Map<String, Object> ping(Worker w, HttpSession session);
+    public Map<String, Object> ping(Worker w);
 
 
 

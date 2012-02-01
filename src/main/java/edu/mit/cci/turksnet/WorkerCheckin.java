@@ -20,8 +20,6 @@ import java.util.Map;
 public class WorkerCheckin {
 
 
-
-
     @PersistenceContext
     transient EntityManager entityManager;
 
@@ -37,7 +35,7 @@ public class WorkerCheckin {
 
 
     @Transient
-    static Map<Long,Object> locks = new HashMap<Long,Object>();
+    static Map<Long, Object> locks = new HashMap<Long, Object>();
 
     @OneToOne
     private Worker worker;
@@ -46,14 +44,15 @@ public class WorkerCheckin {
         return lastCheckIn;
     }
 
-    public  Object lock() {
+    public Object lock() {
         if (!locks.containsKey(this.id)) {
-            locks.put(this.id,new Object());
+            locks.put(this.id, new Object());
         }
 
         return locks.get(this.id);
     }
 
+    @Transactional
     public void setLastCheckIn(Date lastCheckIn) {
         this.lastCheckIn = lastCheckIn;
     }
@@ -125,7 +124,10 @@ public class WorkerCheckin {
         this.worker = worker;
     }
 
-
+    public static WorkerCheckin findWorkerCheckin(Long id) {
+        if (id == null) return null;
+        return entityManager().find(WorkerCheckin.class, id);
+    }
 
     public static TypedQuery<Worker> findAvailableWorkers(Date lastCheckin) {
         if (lastCheckin == null) throw new IllegalArgumentException("The lastCheckin argument is required");

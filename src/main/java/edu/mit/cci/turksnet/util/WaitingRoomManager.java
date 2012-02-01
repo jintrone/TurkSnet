@@ -75,18 +75,25 @@ public class WaitingRoomManager {
             }
         };
     }
-    @Transactional
+
     public Map<String, Object> checkin(Worker w) {
         //Worker.entityManager().refresh(w,LockModeType.PESSIMISTIC_WRITE);
-       w.checkin();
+
+            w.checkin();
+
 
         Map<String, Object> result = new HashMap<String, Object>();
         Date previous = new Date(System.currentTimeMillis() - 10000l);
         TypedQuery<Worker> q = WorkerCheckin.findAvailableWorkers(previous);
         //q.setLockMode(LockModeType.PESSIMISTIC_READ);
         int available = q.getResultList().size();
+        Map<String,String> props = ex.getPropsAsMap();
+        int node_count = Integer.MAX_VALUE;
+        if (props.get(Plugin.PROP_NODE_COUNT) != null) {
+            node_count =  Integer.parseInt(props.get(Plugin.PROP_NODE_COUNT));
+        }
 
-        result.put("percent", "" + available / Float.parseFloat(ex.getPropsAsMap().get(Plugin.PROP_NODE_COUNT)));
+        result.put("percent", "" + (float)available / node_count);
         result.put("workers", available);
         return result;
     }

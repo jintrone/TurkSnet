@@ -81,6 +81,11 @@ public class LoomTurkPlugin implements Plugin {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public Map<String, Object> getFinalInfo(Node n) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public Session_ createSession(Experiment experiment,List<Worker> workers, boolean force) throws SessionCreationException {
         Map<String, String> props = experiment.getPropsAsMap();
         Session_ session = new Session_(experiment.getId());

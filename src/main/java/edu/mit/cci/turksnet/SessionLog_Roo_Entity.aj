@@ -91,7 +91,7 @@ privileged aspect SessionLog_Roo_Entity {
     }
     
     public static List<SessionLog> SessionLog.findAllSessionLogs() {
-        return entityManager().createQuery("select o from SessionLog o", SessionLog.class).getResultList();
+        return entityManager().createQuery("select o from SessionLog o order by o.date_", SessionLog.class).getResultList();
     }
     
     public static SessionLog SessionLog.findSessionLog(Long id) {

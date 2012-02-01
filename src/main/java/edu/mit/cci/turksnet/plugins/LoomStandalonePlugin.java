@@ -57,7 +57,7 @@ public class LoomStandalonePlugin implements Plugin {
             session.setIteration(-1);
             session.persist();
             try {
-                createGraph(props.get(PROP_GRAPH_TYPE),workers.size(),props, session);
+                createGraph(props.get(PROP_GRAPH_TYPE), workers.size(), props, session);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new SessionCreationException("Error generating graph");
@@ -93,8 +93,8 @@ public class LoomStandalonePlugin implements Plugin {
 
         logger.debug("Receiving " + results + " from " + n.getWorker().getUsername());
         Map<String, String> storymap = getStoryMap(n.getSession_().getExperiment().getPropsAsMap().get(PROP_STORY));
-
         n.setPublicData_(internalFormatData(storymap, results));
+        n.addScore(getScore(n.getSession_().getExperiment().getPropsAsMap().get(PROP_STORY), n.getPublicData_()));
 
     }
 
@@ -158,23 +158,23 @@ public class LoomStandalonePlugin implements Plugin {
     public String configureApplicationString(String appname) throws Exception {
         InputStream stream = getClass().getResourceAsStream("/loomStandalone.fragment.html");
         String result = edu.mit.cci.turkit.util.U.slurp(stream, "UTF8");
-        result = result.replace("${applicationName}",appname);
+        result = result.replace("${applicationName}", appname);
         return result;
     }
 
     @Override
     public String getQualificationApp() throws Exception {
-       return configureApplicationString("Qualifications");
+        return configureApplicationString("Qualifications");
     }
 
     @Override
     public String getTrainingApp() throws Exception {
-      return configureApplicationString("Training");
+        return configureApplicationString("Training");
     }
 
     @Override
     public String getLoginApp() throws Exception {
-      return configureApplicationString("LoginRegister");
+        return configureApplicationString("LoginRegister");
     }
 
     @Override
@@ -182,8 +182,8 @@ public class LoomStandalonePlugin implements Plugin {
     public void addTrainingData(Worker w, Experiment e, Map parameterMap) {
         String current = w.getTraining();
         String incoming = ((String[]) parameterMap.get("data"))[0];
-        logger.debug("Set training data:"+incoming);
-        if (current == null) {
+        logger.debug("Set training data:" + incoming);
+        if (current == null || current.isEmpty()) {
             w.setTraining(incoming);
         } else {
             w.setTraining(w.getTraining() + "&" + incoming);
@@ -205,7 +205,6 @@ public class LoomStandalonePlugin implements Plugin {
         Map<String, String> props = e.getPropsAsMap();
         Map<String, String> storymap = getStoryMap(props.get(PROP_TRAINING_STORY));
 
-        Map<String, Object> result = new HashMap<String, Object>();
 
         int step = Integer.parseInt(((String[]) parameterMap.get("step"))[0]);
 
@@ -216,14 +215,17 @@ public class LoomStandalonePlugin implements Plugin {
             public_data = private_data;
 
         } else if (step < 4) {
-            public_data = internalFormatData(storymap,getLastTrainingData(w.getTraining()));
+            public_data = internalFormatData(storymap, getLastTrainingData(w.getTraining()));
 
 
         } else {
 
             try {
-                return score(w,props.get(PROP_TRAINING_STORY));
-            } catch(Exception ex) {
+                String story = props.get(PROP_TRAINING_STORY);
+                JSONObject result = scoreTraining(w, props.get(PROP_TRAINING_STORY));
+                result.put("answer", new JSONArray(getStoryAsList(story)));
+                return result;
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             return null;
@@ -233,39 +235,46 @@ public class LoomStandalonePlugin implements Plugin {
         Map<Long, String> neighbors = new HashMap<Long, String>();
         neighbors.put(1l, internalFormatData(storymap, props.get(PROP_TRAINING_DATA + "_n1_s" + step)));
         neighbors.put(2l, internalFormatData(storymap, props.get(PROP_TRAINING_DATA + "_n2_s" + step)));
-
-
-        return Node.getJsonDataUtil(public_data, private_data, neighbors);
+        JSONObject result = Node.getJsonDataUtil(public_data, private_data, neighbors);
+        try {
+            JSONObject scoremap = scoreTraining(w, props.get(PROP_TRAINING_STORY));
+            for (Iterator<String> i = scoremap.keys(); i.hasNext(); ) {
+                String key = i.next();
+                result.put(key, scoremap.get(key));
+            }
+            return result;
+        } catch (JSONException e1) {
+            e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return null;
     }
 
-    public JSONObject score(Worker w, String story) throws JSONException {
+    public JSONObject scoreTraining(Worker w, String story) throws JSONException {
 
-        Map<String, String> storymap = getStoryMap(story);
         JSONObject result = new JSONObject();
-        JSONArray storylist = new JSONArray();
         List<Integer> storyorder = getStoryOrder(story);
-        for (Integer i : storyorder) {
-            storylist.put(storymap.get(i + ""));
-        }
 
-        result.put("answer", storylist);
         List<Float> scores = new ArrayList<Float>();
         float total = 0f;
-        for (String interim : w.getTraining().split("&")) {
-            List<Integer> order = new ArrayList<Integer>();
-            for (String s : interim.split(";")) {
-                order.add(Integer.parseInt(s));
+        String trainingdata = w.getTraining();
+        if (trainingdata != null && !trainingdata.isEmpty()) {
+            for (String interim : w.getTraining().split("&")) {
+                List<Integer> order = new ArrayList<Integer>();
+                for (String s : interim.split(";")) {
+                    order.add(Integer.parseInt(s));
+                }
+                float f = (float)Math.floor(100*score(storyorder, order));
+                total += f;
+                scores.add(f);
             }
-            float f = score(storyorder, order);
-            total += f;
-            scores.add(f);
         }
 
-        result.put("final_round", Math.floor(100 * (scores.get(scores.size() - 1))));
-        result.put("average", Math.floor(100 * (total / (scores.size()))));
+        result.put("roundScore", scores.isEmpty() ? 0 : scores.get(scores.size()-1));
+        result.put("cumulativeScore", scores.isEmpty() ? 0 : total);
         return result;
 
     }
+
 
     @Override
     public String getApplicationBody(Node n) throws Exception {
@@ -299,7 +308,7 @@ public class LoomStandalonePlugin implements Plugin {
         return Long.parseLong(experiment.getPropsAsMap().get(PROP_TURN_LENGTH_SECONDS));
     }
 
-    private void createGraph(String graphtype, Integer nodecount, Map<String,String> props, Session_ session) throws GraphCreationException {
+    private void createGraph(String graphtype, Integer nodecount, Map<String, String> props, Session_ session) throws GraphCreationException {
 
         DefaultJungGraph graph = null;
         if (nodecount == 1) {
@@ -406,7 +415,7 @@ public class LoomStandalonePlugin implements Plugin {
             logger.debug("Node " + n.getId() + ":" + n.getPublicData_());
             // n.persist();
         }
-        for (Node n:nodes) {
+        for (Node n : nodes) {
             n.setPrivateData_(n.getPublicData_());
         }
 
@@ -415,26 +424,15 @@ public class LoomStandalonePlugin implements Plugin {
 
     @Override
     public String getHitCreation(Session_ session, String rooturl) {
-//        Map<String,String> props = session.getExperiment().getPropsAsMap();
-//        String val = props.get(PROP_ASSIGNMENT_VALUE);
-//        Map<String, String> result = new HashMap<String, String>();
-//        result.put("title", props.get(PROP_HIT_TITLE));
-//        result.put("desc", props.get(PROP_HIT_DESCRIPTION));
-//        result.put("url", rooturl + "/session_s/" + session.getId() + "/turk/app");
-//        result.put("autoApprovalDelayInSeconds",props.get(PROP_HIT_AUTO_APPROVAL_DELAY));
-//        result.put("assignmentDurationInSeconds",props.get(PROP_HIT_ASSIGNMENT_DURATION));
-//        result.put("reward", val);
-//        result.put("assignments", props.get(PROP_NODE_COUNT));
-//        result.put("keywords",props.get(PROP_HIT_KEYWORDS));
-//        result.put("height", props.get(PROP_HIT_HEIGHT));
-//        if (session.getQualificationRequirements()!=null ) {
-//            result.put("qualificationRequirements", createQualificationString(session.getQualificationRequirements()));
-//        }
-//        return "("+jsonify(result)+")";
+
         return null;
 
     }
 
+    public static Float getScore(String story, String publicData) {
+        List<Integer> truth = getStoryOrder(story);
+        return score(truth, getStoryOrder(publicData));
+    }
 
     public static List<Float> getSessionScores(Experiment experiment, List<SessionLog> logs) {
         List<Float> result = new ArrayList<Float>();
@@ -448,38 +446,28 @@ public class LoomStandalonePlugin implements Plugin {
 
 
     public Map<String, Object> getScoreInformation(Node n) {
-        Experiment e = n.getSession_().getExperiment();
-
         Map<String, Object> scoreinfo = new HashMap<String, Object>();
-
-        JSONArray storylist = new JSONArray();
-        String story = e.getPropsAsMap().get(PROP_STORY);
-        Map<String, String> storymap = getStoryMap(story);
-        for (Integer i : getStoryOrder(story)) {
-            storylist.put(storymap.get(i + ""));
-
-        }
-
-        scoreinfo.put("answer", storylist);
-        List<SessionLog> logs = new ArrayList<SessionLog>();
-        for (SessionLog log : SessionLog.findAllSessionLogs()) {
-            if (n.getId().equals(log.getNode().getId()) && log.getType().equals("results")) {
-                logs.add(log);
-            }
-        }
-
-        List<Float> scores = getSessionScores(n.getSession_().getExperiment(), logs);
-
-        scoreinfo.put("final_round", Math.floor(100 * (scores.get(scores.size() - 1))));
+        Float f[] = n.getScores();
+        scoreinfo.put("roundScore", f.length==0?0:Math.floor(100 * f[f.length - 1]));
         float total = 0;
-        for (float f : scores) {
-            total += f;
+        for (float fi : f) {
+            total += (100*fi);
         }
-
-        scoreinfo.put("average", Math.floor(100 * (total / (scores.size()))));
+        scoreinfo.put("cumulativeScore", f.length==0?0:Math.floor(total));
 
         return scoreinfo;
     }
+
+
+    @Override
+    public Map<String, Object> getFinalInfo(Node n) {
+        String story = n.getSession_().getExperiment().getPropsAsMap().get(PROP_STORY);
+        Map<String, Object> result = getScoreInformation(n);
+        result.put("answer", new JSONArray(getStoryAsList(story)));
+        return result;
+
+    }
+
 
     @Override
     public Destination getDestinationForEvent(Worker w, Event e) {
@@ -515,6 +503,23 @@ public class LoomStandalonePlugin implements Plugin {
         logger.debug("Got story order: " + result);
         return result;
     }
+
+    private static List<String> getStoryAsList(String story) {
+        List<String> result = new ArrayList<String>();
+        logger.debug("Extracting story from " + story);
+        Pattern pat = Pattern.compile("\\d+=(.+)");
+        if (story != null) {
+            for (String p : story.split("&")) {
+                p = p.trim();
+                Matcher m = pat.matcher(p);
+                if (m.matches()) {
+                    result.add(m.group(1));
+                }
+            }
+        }
+        return result;
+    }
+
 
     private static Map<String, String> getStoryMap(String story) {
         Map<String, String> result = new HashMap<String, String>();

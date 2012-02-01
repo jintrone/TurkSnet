@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.ContextLoader;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -160,7 +159,15 @@ public class Session_Controller {
         JSONObject reply = new JSONObject();
 
         try {
-            for (Map.Entry<String, Object> ent : session.getExperiment().getActualPlugin().getScoreInformation(n).entrySet()) {
+            Map<String,Object> result = null;
+            if (session.getRunner().isRunning()) {
+                result =  session.getExperiment().getActualPlugin().getScoreInformation(n);
+            } else {
+                result =  session.getExperiment().getActualPlugin().getFinalInfo(n);
+
+            }
+
+            for (Map.Entry<String, Object> ent : result.entrySet()) {
                 reply.put(ent.getKey(), ent.getValue());
             }
         } catch (JSONException e) {
@@ -208,7 +215,7 @@ public class Session_Controller {
 
         } else {
 
-            result = s.getRunner().ping(w,null);
+            result = s.getRunner().ping(w);
         }
 
 

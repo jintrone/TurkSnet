@@ -47,6 +47,11 @@ public class TestPlugin implements Plugin {
     }
 
     @Override
+    public Map<String, Object> getFinalInfo(Node n) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public Session_ createSession(Experiment exp, List<Worker> workers, boolean force) throws SessionCreationException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
