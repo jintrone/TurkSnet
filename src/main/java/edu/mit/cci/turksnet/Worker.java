@@ -9,7 +9,13 @@ import javax.persistence.Column;
 import javax.persistence.LockModeType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 @RooJavaBean
 @RooToString
@@ -34,6 +40,9 @@ public class Worker {
     @OneToOne
     private WorkerCheckin workerCheckin;
 
+    @Transient
+    private static final Map<Long,Date> checkins = Collections.synchronizedMap(new HashMap<Long, Date>());
+
 
     public Long getCheckin() {
         Long result = Long.MAX_VALUE;
@@ -57,11 +66,26 @@ public class Worker {
     }
 
 
-    public synchronized void checkin() {
+    public void checkin() {
+//        checkins.put(getId(),new Date());
         synchronized (getOrCreateWorkerCheckin().lock()) {
             _checkin();
         }
 
+    }
+
+    public static int countAvailableWorkerSince(Date d, boolean prune) {
+        Map<Long,Date> copy = new HashMap<Long, Date>(checkins);
+        int total = 0;
+        for (Map.Entry<Long,Date> ent:copy.entrySet()) {
+            if (ent.getValue().before(d)) {
+                checkins.remove(ent.getKey());
+            } else if (Worker.findWorker(ent.getKey()).getCurrentAssignment()==null) {
+                total++;
+            }
+
+        }
+        return total;
     }
 
     @Transactional

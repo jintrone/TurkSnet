@@ -90,7 +90,7 @@ public class ExperimentController {
         model.addAttribute("path", "/experiments/" + id + "/force");
         model.addAttribute("sessions",e.getSessions());
         model.addAttribute("remainingSessions",e.getAvailableSessionCount());
-        model.addAttribute("waiting", e.getWaitingRoomManager().getWaiting());
+        model.addAttribute("waiting", e.getWaitingRoomManager().getWaiting(true));
         model.addAttribute("desired", e.getPropsAsMap().get(Plugin.PROP_NODE_COUNT));
         model.addAttribute("launchtime",e.getStartDate()!=null?e.getStartDate().after(new Date())?e.getStartDate():null:null);
         model.addAttribute("dateTimePattern", DateTimeFormat.patternForStyle("SS", LocaleContextHolder.getLocale()));

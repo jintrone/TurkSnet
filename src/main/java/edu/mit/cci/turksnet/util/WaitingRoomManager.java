@@ -1,18 +1,17 @@
 package edu.mit.cci.turksnet.util;
 
+
 import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.Worker;
-import edu.mit.cci.turksnet.WorkerCheckin;
 import edu.mit.cci.turksnet.plugins.Plugin;
 import edu.mit.cci.turksnet.plugins.SessionCreationException;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.Session;
-import javax.persistence.LockModeType;
-import javax.persistence.TypedQuery;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -28,6 +27,8 @@ public class WaitingRoomManager {
     private final Experiment ex;
     private Plugin p;
     private boolean force = false;
+
+    private final static LinkedHashMap<Long, Long> checkins = new LinkedHashMap<Long, Long>();
 
     public WaitingRoomManager(Experiment e) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         this.ex = e;
@@ -49,7 +50,7 @@ public class WaitingRoomManager {
 
     public TimerTask getTimerTask(final Timer t) {
         return new TimerTask() {
-             @Transactional
+            @Transactional
             public void run() {
 
 
@@ -78,44 +79,70 @@ public class WaitingRoomManager {
 
     public Map<String, Object> checkin(Worker w) {
         //Worker.entityManager().refresh(w,LockModeType.PESSIMISTIC_WRITE);
-
-            w.checkin();
+        Map<String, String> props = ex.getPropsAsMap();
+        int node_count = Integer.MAX_VALUE;
+        if (props.get(Plugin.PROP_NODE_COUNT) != null) {
+            node_count = Integer.parseInt(props.get(Plugin.PROP_NODE_COUNT));
+        }
+        synchronized (checkins) {
+            System.err.println("Order before add: "+checkins);
+            if (checkins.containsKey(w.getId())) {
+                checkins.remove(w.getId());
+            }
+            checkins.put(w.getId(), System.currentTimeMillis());
+            System.err.println("Order after add: "+checkins);
+        }
+        int available = getWaiting(true);
 
 
         Map<String, Object> result = new HashMap<String, Object>();
-        Date previous = new Date(System.currentTimeMillis() - 10000l);
-        TypedQuery<Worker> q = WorkerCheckin.findAvailableWorkers(previous);
-        //q.setLockMode(LockModeType.PESSIMISTIC_READ);
-        int available = q.getResultList().size();
-        Map<String,String> props = ex.getPropsAsMap();
-        int node_count = Integer.MAX_VALUE;
-        if (props.get(Plugin.PROP_NODE_COUNT) != null) {
-            node_count =  Integer.parseInt(props.get(Plugin.PROP_NODE_COUNT));
-        }
-
-        result.put("percent", "" + (float)available / node_count);
+        result.put("percent", "" + (float) available / node_count);
         result.put("workers", available);
         return result;
     }
 
-    public int getWaiting() {
+    public int getWaiting(boolean prune) {
+        long previous = System.currentTimeMillis() - 10000l;
+        int available = 0;
+        synchronized (checkins) {
+            for (Iterator<Map.Entry<Long, Long>> ei = checkins.entrySet().iterator(); ei.hasNext(); ) {
+                if (ei.next().getValue() < previous) {
+                    ei.remove();
+                } else {
+                    break;
+                }
+            }
 
-         Date previous = new Date(System.currentTimeMillis() - 10000l);
+            available = checkins.size();
+        }
+        return available;
 
-        return  WorkerCheckin.findAvailableWorkers(previous).getResultList().size();
     }
 
 
     public Session_ assignSession() throws SessionCreationException {
+        Session_ result;
+        synchronized (checkins) {
+            getWaiting(true);
 
-         Date previous = new Date(System.currentTimeMillis() - 10000l);
-        List<Worker> available = WorkerCheckin.findAvailableWorkers(previous).getResultList();
-        Session_ result =  p.createSession(ex, available, force);
-        if (result!=null && force) {
-            force = false;
+
+            List<Worker> available = new ArrayList<Worker>(checkins.size());
+            for (Long l : checkins.keySet()) {
+                available.add(Worker.findWorker(l));
+            }
+            result = p.createSession(ex, available, force);
+            if (result != null) {
+                if (force) {
+                    force = false;
+                }
+                checkins.clear();
+            }
+
         }
         return result;
     }
+
+
 
 
 }
