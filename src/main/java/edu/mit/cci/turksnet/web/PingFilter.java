@@ -3,6 +3,7 @@ package edu.mit.cci.turksnet.web;
 
 import edu.mit.cci.turksnet.Experiment;
 import edu.mit.cci.turksnet.util.U;
+import org.apache.log4j.Logger;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 public class PingFilter implements Filter {
 
 
+    private static Logger log = Logger.getLogger(PingFilter.class);
 
     public void doFilter(ServletRequest req, ServletResponse res,
                          FilterChain chain) throws IOException, ServletException {
@@ -28,6 +30,7 @@ public class PingFilter implements Filter {
             Map<String, Object> result = Experiment.waitingRoomManager.checkin(Long.parseLong(req.getParameter("workerId")));
             String response = U.safejson(result);
             PrintWriter w = res.getWriter();
+            log.debug("Filter response: "+response);
             w.print(response);
             w.close();
             //res.flushBuffer();
