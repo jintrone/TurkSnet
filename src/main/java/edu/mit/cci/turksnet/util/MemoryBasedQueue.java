@@ -17,15 +17,15 @@ public class MemoryBasedQueue  implements WorkerQueue {
     private final Map<Long,MyLinkedList.Entry<Long[]>> index = new HashMap<Long,MyLinkedList.Entry<Long[]>>();
 
     @Override
-    public void checkin(Worker w, boolean prune) {
+    public void checkin(Long workerid, boolean prune) {
 
 
         synchronized (checkins) {
-            MyLinkedList.Entry<Long[]> e = index.get(w.getId());
+            MyLinkedList.Entry<Long[]> e = index.get(workerid);
             if (e!=null) {
                 checkins.removeSpecial(e);
             }
-            index.put(w.getId(), checkins.addSpecial(new Long[]{w.getId(), System.currentTimeMillis()}));
+            index.put(workerid, checkins.addSpecial(new Long[]{workerid, System.currentTimeMillis()}));
         }
 
     }

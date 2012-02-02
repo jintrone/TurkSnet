@@ -28,15 +28,23 @@
         <init-param>
             <param-name>forceEncoding</param-name>
             <param-value>true</param-value>
-        </init-param>
+        </init
+
+        -param>
     </filter> -->
     
-    
+     <filter>
+        <filter-name>PingFilter</filter-name>
+        <filter-class>edu.mit.cci.turksnet.web.PingFilter</filter-class>
+    </filter>
+
     
     <filter>
         <filter-name>HttpMethodFilter</filter-name>
         <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
     </filter>
+
+
     
     
     
@@ -71,7 +79,10 @@
         <filter-name>HttpMethodFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    
+    <filter-mapping>
+        <filter-name>PingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     
     
     <filter-mapping>

@@ -50,7 +50,7 @@ public class Experiment {
     private Boolean running= false;
 
     @Transient
-    private static WaitingRoomManager waitingRoomManager;
+    public static WaitingRoomManager waitingRoomManager;
 
      @Transient
     private static Logger log = Logger.getLogger(Experiment.class);

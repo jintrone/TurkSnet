@@ -74,7 +74,11 @@ public class WaitingRoomManager {
         };
     }
 
-    public Map<String, Object> checkin(Worker w) {
+    public Map<String,Object> checkin(Worker w) {
+        return checkin(w.getId());
+    }
+
+    public Map<String, Object> checkin(long w) {
         //Worker.entityManager().refresh(w,LockModeType.PESSIMISTIC_WRITE);
         checkins.checkin(w, false);
         Map<String, String> props = ex.getPropsAsMap();
