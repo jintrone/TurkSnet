@@ -8,10 +8,7 @@ import edu.mit.cci.turksnet.plugins.Plugin;
 import edu.mit.cci.turksnet.plugins.SessionCreationException;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -28,7 +25,7 @@ public class WaitingRoomManager {
     private Plugin p;
     private boolean force = false;
 
-    private final static LinkedHashMap<Long, Long> checkins = new LinkedHashMap<Long, Long>();
+    private final static WorkerQueue checkins = new MemoryBasedQueue();
 
     public WaitingRoomManager(Experiment e) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         this.ex = e;
@@ -79,20 +76,14 @@ public class WaitingRoomManager {
 
     public Map<String, Object> checkin(Worker w) {
         //Worker.entityManager().refresh(w,LockModeType.PESSIMISTIC_WRITE);
+        checkins.checkin(w, false);
         Map<String, String> props = ex.getPropsAsMap();
         int node_count = Integer.MAX_VALUE;
         if (props.get(Plugin.PROP_NODE_COUNT) != null) {
             node_count = Integer.parseInt(props.get(Plugin.PROP_NODE_COUNT));
         }
-        synchronized (checkins) {
-            System.err.println("Order before add: "+checkins);
-            if (checkins.containsKey(w.getId())) {
-                checkins.remove(w.getId());
-            }
-            checkins.put(w.getId(), System.currentTimeMillis());
-            System.err.println("Order after add: "+checkins);
-        }
-        int available = getWaiting(true);
+
+        int available = checkins.countAvailable(10000l, false);
 
 
         Map<String, Object> result = new HashMap<String, Object>();
@@ -102,47 +93,25 @@ public class WaitingRoomManager {
     }
 
     public int getWaiting(boolean prune) {
-        long previous = System.currentTimeMillis() - 10000l;
-        int available = 0;
-        synchronized (checkins) {
-            for (Iterator<Map.Entry<Long, Long>> ei = checkins.entrySet().iterator(); ei.hasNext(); ) {
-                if (ei.next().getValue() < previous) {
-                    ei.remove();
-                } else {
-                    break;
-                }
-            }
-
-            available = checkins.size();
-        }
-        return available;
-
+        return checkins.countAvailable(10000l, prune);
     }
 
 
     public Session_ assignSession() throws SessionCreationException {
         Session_ result;
-        synchronized (checkins) {
-            getWaiting(true);
 
-
-            List<Worker> available = new ArrayList<Worker>(checkins.size());
-            for (Long l : checkins.keySet()) {
-                available.add(Worker.findWorker(l));
+        List<Worker> available = checkins.getAvailable(10000l, true);
+        result = p.createSession(ex, available, force);
+        if (result != null) {
+            if (force) {
+                force = false;
             }
-            result = p.createSession(ex, available, force);
-            if (result != null) {
-                if (force) {
-                    force = false;
-                }
-                checkins.clear();
-            }
-
+            checkins.remove(available);
         }
+
+
         return result;
     }
-
-
 
 
 }
