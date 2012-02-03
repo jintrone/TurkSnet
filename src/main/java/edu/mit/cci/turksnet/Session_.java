@@ -7,6 +7,7 @@ import edu.mit.cci.turksnet.util.NodeStatus;
 import edu.mit.cci.turksnet.util.RunStrategy;
 import org.apache.log4j.Logger;
 import org.apache.sling.commons.json.JSONException;
+import org.apache.sling.commons.json.JSONObject;
 import org.hibernate.LockMode;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.orm.hibernate3.SpringSessionContext;
@@ -66,12 +67,23 @@ public class Session_ {
     @Column(columnDefinition = "LONGTEXT")
     private String properties;
 
-    @Transient
-    Map<String, String> propertiesAsMap = null;
 
     @Transient
     DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
+    @Transient
+    private JSONObject jsonprops = null;
+
+    public String getProperty(String propName) {
+        try {
+            JSONObject obj = getPropertiesAsJson();
+
+            return obj.has(propName)?getPropertiesAsJson().getString(propName):null;
+        } catch (JSONException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return null;
+    }
 
     public static enum Status {WAITING,RUNNING,ABORTED,COMPLETE}
 
@@ -81,10 +93,38 @@ public class Session_ {
     }
 
 
+    public static RunStrategy lookupRunStrategy(long id) {
+        return runners.get(id);
+    }
+
     public Session_(long experimentId) {
+        Experiment ex = Experiment.findExperiment(experimentId);
         setExperiment(Experiment.findExperiment(experimentId));
+        ex.getSessions().add(this);
         setIteration(0);
 
+
+    }
+
+    public JSONObject getPropertiesAsJson() {
+        if (jsonprops == null && properties!=null) {
+            try {
+                jsonprops = new JSONObject(properties);
+            } catch (JSONException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+        return jsonprops;
+    }
+
+    public void updateProperty(String prop, Object value) {
+        JSONObject obj = getPropertiesAsJson();
+        try {
+            obj.put(prop,value);
+        } catch (JSONException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        properties = obj.toString();
 
     }
 
@@ -92,30 +132,11 @@ public class Session_ {
         getAvailableNodes().add(n);
     }
 
-    public Map<String, String> getPropertiesAsMap() {
-        if (propertiesAsMap == null) {
-            propertiesAsMap = new HashMap<String, String>();
-            propertiesAsMap.putAll(U.splitProperties(getProperties()));
-        }
-        return Collections.unmodifiableMap(propertiesAsMap);
-    }
 
-    public void storePropertyMap() {
-        StringBuffer buffer = new StringBuffer();
-        for (Map.Entry<String, String> ent : getPropertiesAsMap().entrySet()) {
-            buffer.append(ent.getKey()).append("=").append(ent.getValue()).append("\n");
-        }
-        setProperties(buffer.toString());
-    }
 
-    public void updateProperty(String property, Object value) {
-        if (propertiesAsMap == null) {
-            getPropertiesAsMap();
-        }
-        propertiesAsMap.put(property, value.toString());
-        storePropertyMap();
-        merge();
-    }
+
+
+
 
 
     public List<Node> getNodesAsList() {
@@ -126,53 +147,28 @@ public class Session_ {
         return (getRunner() != null && getRunner().isRunning());
     }
 
-    public List<Node> getUnassignedNodes() {
-        return Node.findNodesByWorker(null).getResultList();
-    }
 
-    public void processNodeResults(Worker worker, String results) throws JSONException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        log.debug("Status? " + getStatus());
-        Node n = Node.findNodesByWorker(worker).getSingleResult();
-        if (n == null) {
-            log.info("Could not identify node for turker " + worker.getUsername());
-            throw new IllegalArgumentException("Could not identify turker " + worker.getUsername());
-        } else {
-            getRunner().updateNode(n, results);
-
-        }
-
-    }
 
     public Status getStatus() {
-
-        if (Status.RUNNING.name().equals(this.status) && !isRunning()) {
-           setStatus(Status.ABORTED);
-            // flush();
-        }
-
         return this.status != null?Status.valueOf(this.status):null;
     }
 
      public void setStatus(Status s) {
-
-
         this.status = s.name();
     }
 
-     public EntityManager getEntityManager() {
-        return entityManager;
-    }
 
-
+    @Transactional
     public Node assignNodeToTurker(Worker worker) {
         for (Node n : getAvailableNodes()) {
             if (n.getWorker() == null) {
                 n.setWorker(worker);
                 n.setStatus(NodeStatus.ASSIGNED.name());
                 //n.persist();
+                log.debug("Assign worker to "+n.getId()+" in session "+n.getSession_().getId());
                 worker.entityManager.refresh(worker,LockModeType.PESSIMISTIC_WRITE);
                 worker.setCurrentAssignment(this);
-                //worker.flush();
+                worker.flush();
                 //worker.persist();
                 logNodeEvent(n, "assigned");
                 return n;
@@ -182,7 +178,7 @@ public class Session_ {
     }
 
     public void logNodeEvent(Node n, String type) {
-        log.debug("Logging results ");
+
         SessionLog slog = new SessionLog();
         slog.setDate_(new Date());
         slog.setNode(n);
@@ -214,7 +210,7 @@ public class Session_ {
 
 
     public RunStrategy getRunner() {
-        return runners.get(this.getId());
+        return lookupRunStrategy(this.getId());
     }
 
     public void setRunner(RunStrategy runner) throws Exception {
@@ -231,15 +227,7 @@ public class Session_ {
         }
     }
 
-    public String getHitCreationString(String baseurl) throws Exception {
-        String result = null;
-        try {
-            result = this.experiment.getActualPlugin().getHitCreation(this, baseurl);
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
-        return result;
-    }
+
 
     private void updateLog(String update) {
         Session_ s = entityManager().find(Session_.class, Session_.this.getId());

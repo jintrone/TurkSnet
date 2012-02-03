@@ -13,9 +13,8 @@
 
 .fixed-height {
 
-    height:400px;
-    max-height: 400px;
-    overflow-y: scroll;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 

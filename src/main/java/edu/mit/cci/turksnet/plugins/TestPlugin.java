@@ -52,6 +52,12 @@ public class TestPlugin implements Plugin {
     }
 
     @Override
+    public int getRemainingSessions(Experiment e) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    @Override
     public Session_ createSession(Experiment exp, List<Worker> workers, boolean force) throws SessionCreationException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -71,10 +77,7 @@ public class TestPlugin implements Plugin {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
-    public void preprocessProperties(Experiment experiment) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+
 
 
     @Override
@@ -88,9 +91,10 @@ public class TestPlugin implements Plugin {
     }
 
     @Override
-    public long getTurnLength(Experiment experiment) {
+    public long getTurnLength(Session_ session) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
 
     @Override
     public Map<String, Object> getScoreInformation(Node n) {

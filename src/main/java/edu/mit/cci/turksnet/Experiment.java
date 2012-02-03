@@ -6,6 +6,8 @@ import edu.mit.cci.turksnet.plugins.Plugin;
 import edu.mit.cci.turksnet.util.RunStrategy;
 import edu.mit.cci.turksnet.util.WaitingRoomManager;
 import org.apache.log4j.Logger;
+import org.apache.sling.commons.json.JSONException;
+import org.apache.sling.commons.json.JSONObject;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
@@ -34,6 +36,9 @@ public class Experiment {
     @Column(columnDefinition = "LONGTEXT")
     private String javaScript;
 
+    @Column(columnDefinition = "LONGTEXT")
+    private String sessionProps;
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(style = "SS")
     private Date startDate;
@@ -58,6 +63,7 @@ public class Experiment {
      @Transient
     private ExperimentRunner runner = new ExperimentRunner();
 
+
     public Plugin getActualPlugin() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (actual == null) {
             actual = (Plugin) Class.forName(pluginClazz).newInstance();
@@ -68,7 +74,7 @@ public class Experiment {
 
 
     public RunStrategy getStrategyInstance() {
-        return RunStrategy.Type.valueOf(getPropsAsMap().get(Plugin.PROP_RUN_STRATEGY)).instance();
+        return RunStrategy.Type.valueOf(getProperty(Plugin.PROP_RUN_STRATEGY)).instance();
     }
 
     public List<Session_> getSessions() {
@@ -80,6 +86,14 @@ public class Experiment {
         return result;
     }
 
+    public String getSessionProps() {
+        return sessionProps;
+    }
+
+    public void setSessionProps(String props) {
+        this.sessionProps = props;
+    }
+
     public Map<String, String> getPropsAsMap() {
         if (propsAsMap == null) {
             propsAsMap = new HashMap<String, String>();
@@ -87,6 +101,8 @@ public class Experiment {
         }
         return propsAsMap;
     }
+
+
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -136,21 +152,8 @@ public class Experiment {
         return waitingRoomManager;
     }
 
-    public int getAvailableSessionCount() {
-        List<Session_> sessions = getSessions();
-        int count = 0;
-        if (getPropsAsMap().containsKey(Plugin.PROP_SESSION_COUNT)) {
-           count = Integer.parseInt(getPropsAsMap().get(Plugin.PROP_SESSION_COUNT));
-        } else {
-            return Integer.MAX_VALUE;
-        }
-        getPropsAsMap().get(Plugin.PROP_SESSION_COUNT);
-        for (Session_ s:sessions) {
-            if (s.getStatus() == Session_.Status.COMPLETE || s.getStatus()== Session_.Status.RUNNING) {
-               count --;
-            }
-        }
-        return count;
+    public int getAvailableSessionCount() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        return getActualPlugin().getRemainingSessions(this);
 
     }
 
@@ -184,5 +187,9 @@ public class Experiment {
 
     public void forceRun() {
        getWaitingRoomManager().setForce(true);
+    }
+
+    public String getProperty(String property) {
+       return getPropsAsMap().get(property);
     }
 }

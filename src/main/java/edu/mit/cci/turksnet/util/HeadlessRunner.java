@@ -8,7 +8,6 @@ import edu.mit.cci.turkit.util.TurkitOutputSink;
 import edu.mit.cci.turkit.util.U;
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
-import edu.mit.cci.turksnet.Worker;
 import edu.mit.cci.turksnet.plugins.Plugin;
 import org.apache.log4j.Logger;
 import org.apache.sling.commons.json.JSONException;
@@ -258,52 +257,54 @@ public class HeadlessRunner implements ApplicationContextAware, RunStrategy {
     public void updateNode(Node n, String results) throws ClassNotFoundException, IllegalAccessException, InstantiationException, JSONException {
 
 
-
-            //logNodeEvent(n, "results");
-            n.setStatus(NodeStatus.WAITING.name());
-            n.persist();
-            log.debug("Set node " + n.getId() + " to not accept");
-            synchronized (getClass()) {
-                Plugin p =  session.getExperiment().getActualPlugin();
-               p.processResults(n, results);
-                session.logNodeEvent(n, "results");
-                boolean doneiteration = true;
-                for (Node node : session.getAvailableNodes()) {
-                    log.debug("Making sure " + n.getId() + " is up to date");
-                    node.merge();
-                    log.debug("Checking node for doneness " + node.getId());
-                    if (NodeStatus.valueOf(node.getStatus()) == NodeStatus.ACCEPTING_INPUT) {
-                        log.debug("Node is accepting input!");
-                        doneiteration = false;
-                    } else {
-
-                    }
-                    log.debug("Node is NOT accepting input!");
-                }
-                if (doneiteration) {
-                    session.setIteration(session.getIteration() + 1);
+        //logNodeEvent(n, "results");
+        n.setStatus(NodeStatus.WAITING.name());
+        n.persist();
+        log.debug("Set node " + n.getId() + " to not accept");
+        synchronized (getClass()) {
+            Plugin p = session.getExperiment().getActualPlugin();
+            p.processResults(n, results);
+            session.logNodeEvent(n, "results");
+            boolean doneiteration = true;
+            for (Node node : session.getAvailableNodes()) {
+                log.debug("Making sure " + n.getId() + " is up to date");
+                node.merge();
+                log.debug("Checking node for doneness " + node.getId());
+                if (NodeStatus.valueOf(node.getStatus()) == NodeStatus.ACCEPTING_INPUT) {
+                    log.debug("Node is accepting input!");
+                    doneiteration = false;
+                } else {
 
                 }
-                log.debug("Checking for session doneness");
-                if (p.checkDone(session)) {
-                    log.debug("I am DONE");
-                    session.setStatus(Session_.Status.RUNNING);
-
-
-                }
+                log.debug("Node is NOT accepting input!");
+            }
+            if (doneiteration) {
+                session.setIteration(session.getIteration() + 1);
 
             }
-            session.persist();
+            log.debug("Checking for session doneness");
+            if (p.checkDone(session)) {
+                log.debug("I am DONE");
+                session.setStatus(Session_.Status.RUNNING);
 
+
+            }
+
+        }
+        session.persist();
 
 
     }
 
     @Override
-    public Map<String, Object> ping(Worker w) {
+    public Map<String, Object> ping(long workerid) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public GameState getGameState() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
 
 }

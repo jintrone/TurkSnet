@@ -49,6 +49,7 @@ privileged aspect Session__Roo_JavaBean {
     
     public void Session_.setExperiment(Experiment experiment) {
         this.experiment = experiment;
+
     }
     
     public int Session_.getIteration() {
@@ -91,9 +92,7 @@ privileged aspect Session__Roo_JavaBean {
         this.properties = properties;
     }
     
-    public void Session_.setPropertiesAsMap(Map<String, String> propertiesAsMap) {
-        this.propertiesAsMap = propertiesAsMap;
-    }
+
     
     public DateFormat Session_.getFormat() {
         return this.format;

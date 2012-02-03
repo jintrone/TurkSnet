@@ -113,7 +113,7 @@ public class Session_Controller {
         model.addAttribute("sessionid", session.getId());
         model.addAttribute("appData", app.replace("${flash_lib_dir}", "/turksnet/resources/flash/").replace("${timestamp}",System.currentTimeMillis()+""));
         model.addAttribute("workerid",workerid);
-        model.addAttribute("numTurns",Integer.parseInt(exp.getPropsAsMap().get(Plugin.PROP_ITERATION_COUNT)));
+        model.addAttribute("numTurns",session.getProperty(Plugin.PROP_ITERATION_COUNT).toString()   );
 
         return "session_s/app";
     }
@@ -215,7 +215,7 @@ public class Session_Controller {
 
         } else {
 
-            result = s.getRunner().ping(w);
+            result = s.getRunner().ping(w.getId());
         }
 
 

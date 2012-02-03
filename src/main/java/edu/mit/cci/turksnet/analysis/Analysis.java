@@ -55,7 +55,7 @@ public class Analysis {
                 }
 
             }
-            List<Float> scores = plugin.getSessionScores(n.getSession_().getExperiment(), logs);
+            List<Float> scores = plugin.getSessionScores(logs);
 
             System.err.println(n.getWorker().getUsername() + "\n**************");
             for (int i = 0;i<scores.size();i++) {

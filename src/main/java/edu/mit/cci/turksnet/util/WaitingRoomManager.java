@@ -2,12 +2,16 @@ package edu.mit.cci.turksnet.util;
 
 
 import edu.mit.cci.turksnet.Experiment;
+import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.Worker;
 import edu.mit.cci.turksnet.plugins.Plugin;
 import edu.mit.cci.turksnet.plugins.SessionCreationException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +25,7 @@ import java.util.TimerTask;
  */
 public class WaitingRoomManager {
 
-    private final Experiment ex;
+    private Experiment ex;
     private Plugin p;
     private boolean force = false;
 
@@ -56,9 +60,9 @@ public class WaitingRoomManager {
                     Session_ s = assignSession();
                     if (s != null) {
                         s.run();
-                    } else {
-                        t.schedule(getTimerTask(t), 1000);
                     }
+                    t.schedule(getTimerTask(t), 1000);
+
 
 
                 } catch (ClassNotFoundException e) {
@@ -74,22 +78,16 @@ public class WaitingRoomManager {
         };
     }
 
-    public Map<String,Object> checkin(Worker w) {
+    public Map<String, Object> checkin(Worker w) {
         return checkin(w.getId());
     }
 
     public Map<String, Object> checkin(long w) {
         //Worker.entityManager().refresh(w,LockModeType.PESSIMISTIC_WRITE);
         checkins.checkin(w, false);
-        Map<String, String> props = ex.getPropsAsMap();
-        int node_count = Integer.MAX_VALUE;
-        if (props.get(Plugin.PROP_NODE_COUNT) != null) {
-            node_count = Integer.parseInt(props.get(Plugin.PROP_NODE_COUNT));
-        }
 
+        int node_count =getDesiredNumberOfUsers();
         int available = checkins.countAvailable(10000l, false);
-
-
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("percent", "" + (float) available / node_count);
         result.put("workers", available);
@@ -100,17 +98,32 @@ public class WaitingRoomManager {
         return checkins.countAvailable(10000l, prune);
     }
 
+    private int getDesiredNumberOfUsers() {
+
+        int node_count = Integer.MAX_VALUE;
+        if (ex.getProperty(Plugin.PROP_NODE_COUNT)!=null) {
+            node_count = Integer.parseInt(ex.getProperty(Plugin.PROP_NODE_COUNT));
+        }
+        return node_count;
+    }
+
 
     public Session_ assignSession() throws SessionCreationException {
-        Session_ result;
-
-        List<Worker> available = checkins.getAvailable(10000l, true);
-        result = p.createSession(ex, available, force);
-        if (result != null) {
-            if (force) {
-                force = false;
+        Session_ result = null;
+        if ((checkins.countAvailable(10000l, true) >= getDesiredNumberOfUsers()) || force) {
+            List<Worker> available = new ArrayList<Worker>(checkins.getAvailable(10000l, true));
+            ex = Experiment.findExperiment(ex.getId());
+            result = p.createSession(ex, available, force);
+            if (result != null) {
+                if (force) {
+                    force = false;
+                }
+                available.clear();
+                for (Node n:result.getNodesAsList()) {
+                    available.add(n.getWorker());
+                }
+                checkins.remove(available);
             }
-            checkins.remove(available);
         }
 
 

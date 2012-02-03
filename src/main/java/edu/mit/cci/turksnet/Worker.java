@@ -1,5 +1,6 @@
 package edu.mit.cci.turksnet;
 
+import com.sun.istack.internal.Nullable;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
@@ -35,6 +36,7 @@ public class Worker {
     private String training;
 
     @ManyToOne
+    @Nullable
     private Session_ currentAssignment;
 
     @OneToOne

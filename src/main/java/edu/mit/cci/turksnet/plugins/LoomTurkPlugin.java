@@ -86,6 +86,13 @@ public class LoomTurkPlugin implements Plugin {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public int getRemainingSessions(Experiment e) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+
     public Session_ createSession(Experiment experiment,List<Worker> workers, boolean force) throws SessionCreationException {
         Map<String, String> props = experiment.getPropsAsMap();
         Session_ session = new Session_(experiment.getId());
@@ -140,36 +147,6 @@ public class LoomTurkPlugin implements Plugin {
         return n;
     }
 
-    @Override
-    public void preprocessProperties(Experiment experiment) throws ExperimentCreationException {
-        StringBuilder builder = new StringBuilder();
-        Map<String, String> props = experiment.getPropsAsMap();
-        String story = props.get(PROP_STORY);
-        Pattern pat = Pattern.compile("(\\d+):([\\w\\s]+)");
-        if (story == null) throw new ExperimentCreationException("No story associated with Loom Experiment");
-        String sep = "";
-        Set<Integer> ids = new HashSet<Integer>();
-        for (String p : story.split(";")) {
-            p = p.trim();
-            builder.append(sep);
-            Matcher m = pat.matcher(p);
-            if (m.matches()) {
-                if (!ids.contains(m.group(1))) {
-                    ids.add(Integer.getInteger(m.group(1)));
-                    builder.append(p);
-                } else {
-                    int nid = getNewId(ids);
-                    builder.append(nid).append(":").append(m.group(2));
-                }
-            } else {
-                int nid = getNewId(ids);
-                builder.append(nid).append(":").append(p);
-
-            }
-            sep = ";";
-        }
-        experiment.updateProperty(PROP_STORY, builder.toString());
-    }
 
     private void createGraph(Map<String, String> props, Session_ session) throws GraphCreationException {
         String graphtype = props.get(PROP_GRAPH_TYPE);
@@ -436,11 +413,9 @@ public class LoomTurkPlugin implements Plugin {
     }
 
     @Override
-    public long getTurnLength(Experiment experiment) {
+    public long getTurnLength(Session_ session) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
-
-
 
 
     public static void main(String[] args) {

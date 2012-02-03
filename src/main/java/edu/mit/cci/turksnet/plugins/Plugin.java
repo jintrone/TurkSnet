@@ -33,6 +33,10 @@ public interface Plugin {
 
     Map<String,Object> getFinalInfo(Node n);
 
+    int getRemainingSessions(Experiment e);
+
+
+
     public static enum Event {
         VISIT, LOGIN, REGISTER, QUALIFICATIONS_SUBMITTED, TRAINING_SUBMITTED
 
@@ -61,6 +65,7 @@ public interface Plugin {
     public static final String PROP_ITERATION_COUNT = "iteration_count";
     public static final String PROP_TURN_LENGTH_SECONDS = "turnLength";
     public static final String PROP_SESSION_COUNT = "session_count";
+    public static final String PROP_SESSION_ID = "sessionid";
 
     public Session_ createSession(Experiment exp, List<Worker> workers,boolean force) throws SessionCreationException;
 
@@ -70,15 +75,15 @@ public interface Plugin {
 
     public void processResults(Node n, String results);
 
-    public void preprocessProperties(Experiment experiment) throws ExperimentCreationException;
-
     public String getApplicationBody(Node n) throws Exception;
 
     public void automateNodeTurn(Node n) throws ClassNotFoundException, JSONException, IllegalAccessException, InstantiationException;
 
-    public long getTurnLength(Experiment experiment);
+    public long getTurnLength(Session_ session);
 
     Map<String, Object> getScoreInformation(Node n);
 
     public Destination getDestinationForEvent(Worker w, Event e);
+
+
 }

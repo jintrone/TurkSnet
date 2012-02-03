@@ -64,14 +64,9 @@ public class ExperimentController {
             model.addAttribute("experiment", experiment);
             return "experiments/create";
         }
-//        try {
-//            experiment.getActualPlugin().preprocessProperties(experiment);
-//        } catch (Exception e) {
-//            log.error("Error processing properties file");
-//        }
         experiment.persist();
-       return "redirect://experiments/"+encodeUrlPathSegment(experiment.getId().toString(),request);
-       // return "redirect:/experiments/" + encodeUrlPathSegment(experiment.getId().toString(), request);
+        return "redirect://experiments/" + encodeUrlPathSegment(experiment.getId().toString(), request);
+        // return "redirect:/experiments/" + encodeUrlPathSegment(experiment.getId().toString(), request);
     }
 
     @RequestMapping(value = "/{id}/run", method = RequestMethod.POST)
@@ -88,11 +83,11 @@ public class ExperimentController {
     public String manageExperiment(@PathVariable("id") Long id, Model model, HttpServletRequest request) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Experiment e = Experiment.findExperiment(id);
         model.addAttribute("path", "/experiments/" + id + "/force");
-        model.addAttribute("sessions",e.getSessions());
-        model.addAttribute("remainingSessions",e.getAvailableSessionCount());
+        model.addAttribute("sessions", e.getSessions());
+        model.addAttribute("remainingSessions", e.getAvailableSessionCount());
         model.addAttribute("waiting", e.getWaitingRoomManager().getWaiting(true));
-        model.addAttribute("desired", e.getPropsAsMap().get(Plugin.PROP_NODE_COUNT));
-        model.addAttribute("launchtime",e.getStartDate()!=null?e.getStartDate().after(new Date())?e.getStartDate():null:null);
+        model.addAttribute("desired", e.getProperty(Plugin.PROP_NODE_COUNT));
+        model.addAttribute("launchtime", e.getStartDate() != null ? e.getStartDate().after(new Date()) ? e.getStartDate() : null : null);
         model.addAttribute("dateTimePattern", DateTimeFormat.patternForStyle("SS", LocaleContextHolder.getLocale()));
         return "experiments/manage";
 
@@ -102,21 +97,21 @@ public class ExperimentController {
     public String doForceExperiment(@PathVariable("id") Long id, @RequestParam("action") String action, @RequestParam("run_date") String run_date, HttpServletRequest request) {
         Experiment e = Experiment.findExperiment(id);
         if ("force".equals(action)) {
-           e.forceRun();
-        } else if ("schedule".equals(action) && run_date!=null) {
+            e.forceRun();
+        } else if ("schedule".equals(action) && run_date != null) {
             Date d = null;
             try {
-                d = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT).parse(run_date);
+                d = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse(run_date);
             } catch (ParseException e1) {
                 e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-            if (d!=null && d.after(new Date())) {
+            if (d != null && d.after(new Date())) {
                 e.setStartDate(d);
             }
         } else {
             e.setStartDate(null);
         }
-        return "redirect://experiments/"+encodeUrlPathSegment(""+id,request)+"/manage";
+        return "redirect://experiments/" + encodeUrlPathSegment("" + id, request) + "/manage";
 
     }
 
@@ -154,29 +149,28 @@ public class ExperimentController {
     }
 
 
-    private boolean checkAvailable(Long experimentId) {
-            Experiment e = Experiment.findExperiment(experimentId);
-
-        return (e.getAvailableSessionCount() >0 );
+    private boolean checkAvailable(Long experimentId) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Experiment e = Experiment.findExperiment(experimentId);
+        Plugin p = e.getActualPlugin();
+        return (p.getRemainingSessions(e) > 0);
 
 
     }
 
-    private String configureResponse(Long experimentId, Plugin p, Plugin.Destination d, Worker w, Model model) {
+    private String configureResponse(Long experimentId, Plugin p, Plugin.Destination d, Worker w, Model model) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
 
         if (w != null) {
             model.addAttribute("workerId", w.getId());
             model.addAttribute("workerName", w.getUsername());
         }
         model.addAttribute("experimentId", experimentId);
-        model.addAttribute("numTurns", d == Plugin.Destination.TRAINING ? 3 : p.getTurnLength(Experiment.findExperiment(experimentId)));
-        model.addAttribute("timestamp",System.currentTimeMillis());
+        model.addAttribute("timestamp", System.currentTimeMillis());
 
         if (d == Plugin.Destination.WAITING) {
             if (!checkAvailable(experimentId)) {
                 return "experiments/notavailable";
             } else {
-            return "experiments/waiting";
+                return "experiments/waiting";
             }
         }
 
@@ -189,6 +183,7 @@ public class ExperimentController {
             } else if (d == Plugin.Destination.QUALIFICATIONS) {
                 body = p.getQualificationApp();
             } else if (d == Plugin.Destination.TRAINING) {
+                model.addAttribute("numTurns", 3);
                 body = p.getTrainingApp();
             } else {
                 return "experiments/notavailable";
@@ -200,7 +195,7 @@ public class ExperimentController {
             return "experiments/notavailable";
         }
         //@TODO fixme - this is a pretty bad hack.  need to figure out fixes
-        model.addAttribute("appData", body.replace("${flash_lib_dir}", "/turksnet/resources/flash/").replace("${timestamp}", System.currentTimeMillis()+""));
+        model.addAttribute("appData", body.replace("${flash_lib_dir}", "/turksnet/resources/flash/").replace("${timestamp}", System.currentTimeMillis() + ""));
         return "experiments/flash";
     }
 
@@ -250,10 +245,10 @@ public class ExperimentController {
     }
 
 
-     @RequestMapping(value = "/{id}/loginregister", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}/loginregister", method = RequestMethod.POST)
     @ResponseBody
     public String loginOrRegister(@PathVariable("id") Long id, @RequestParam("login") String login, @RequestParam("password") String password, Model model, HttpSession session) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-         List<Worker> ws = Worker.findWorkersByUsernameAndPassword(login, password).getResultList();
+        List<Worker> ws = Worker.findWorkersByUsernameAndPassword(login, password).getResultList();
         Map<String, Object> result = new HashMap<String, Object>();
         Worker w;
         if (ws.isEmpty()) {
@@ -264,8 +259,8 @@ public class ExperimentController {
         } else {
 
             if (ws.size() > 1) {
-            log.error("WARNING:  Multiple users registered under the same name!");
-            result.put("status", "server_error");
+                log.error("WARNING:  Multiple users registered under the same name!");
+                result.put("status", "server_error");
             }
             w = ws.get(0);
         }

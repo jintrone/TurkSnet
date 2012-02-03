@@ -2,6 +2,7 @@ package edu.mit.cci.turksnet.util;
 
 import edu.mit.cci.turksnet.Worker;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -13,6 +14,8 @@ public interface WorkerQueue {
 
     public void checkin(Long workerId, boolean prune);
     public int countAvailable(long timeout,boolean prune);
-    public List<Worker> getAvailable(long timeout,boolean prune);
+    public Collection<Worker> getAvailable(long timeout, boolean prune);
     public void remove(List<Worker> workers);
+    public boolean isActive(long workerid, long timeout);
+    public void clear();
 }

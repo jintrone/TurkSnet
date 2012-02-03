@@ -4,10 +4,12 @@ import edu.mit.cci.turkit.util.TurkitOutputSink;
 import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.Worker;
+import edu.mit.cci.turksnet.plugins.Plugin;
 import org.apache.log4j.Logger;
 import org.apache.sling.commons.json.JSONException;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.LockModeType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,15 +31,12 @@ public class SynchroRunner implements RunStrategy {
     private GameState gameState;
 
 
-
     private static Logger log = Logger.getLogger(SynchroRunner.class);
 
-    public static enum GameState {
-        IN_TURN, WAITING_FOR_RESULTS, DONE_TURN, DONE_GAME, FORCE_DONE_GAME
-    }
 
     private Set<Long> queue = Collections.synchronizedSet(new HashSet<Long>());
 
+    private final WorkerQueue wq = new MemoryBasedQueue();
 
     private static long TIMEOUT = 10000l;
 
@@ -78,26 +77,30 @@ public class SynchroRunner implements RunStrategy {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-     @Transactional
+    @Transactional
     private boolean advanceState() throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException {
 
         log.debug("Current state: " + gameState);
         if (gameState == GameState.IN_TURN) {
 
-            if (queue.isEmpty()) {
-                gameState = GameState.DONE_TURN;
-                advanceState();
-            } else if (System.currentTimeMillis() > turnEnd) {
+            //uncomment to support submissions from users
+//            if (queue.isEmpty()) {
+//                gameState = GameState.DONE_TURN;
+//                advanceState();
+//            } else
+            if (System.currentTimeMillis() > turnEnd) {
                 gameState = GameState.WAITING_FOR_RESULTS;
 
             }
+
+
         } else if (gameState == GameState.WAITING_FOR_RESULTS) {
             if (queue.isEmpty()) {
                 gameState = GameState.DONE_TURN;
             } else {
                 for (Long n : new HashSet<Long>(queue)) {
                     Node node = Node.findNode(n);
-                    if (node.getWorker().getCheckin() > TIMEOUT) {
+                    if (!wq.isActive(node.getWorker().getId(), TIMEOUT)) {
                         session.logNodeEvent(node, "timeout");
                         session.getExperiment().getActualPlugin().automateNodeTurn(node);
                     }
@@ -112,27 +115,33 @@ public class SynchroRunner implements RunStrategy {
                 startTurn();
             }
         } else if (gameState == GameState.DONE_GAME) {
-            log.debug("Setting game state to complete");
-            session = Session_.findSession_(session.getId());
-            session.setStatus(Session_.Status.COMPLETE);
-            session.flush();
-            //@TODO Clean up session
+            log.info("Completing session "+session.getId());
+            cleanupSession(Session_.Status.COMPLETE);
             return false;
         } else if (gameState == GameState.FORCE_DONE_GAME) {
-            session.setStatus(Session_.Status.ABORTED);
-            session.flush();
-            //@TODO Clean up session
+            cleanupSession(Session_.Status.ABORTED);
             return false;
         }
         return true;
 
     }
 
+    @Transactional
+    private void cleanupSession(Session_.Status status) {
+        session = Session_.findSession_(session.getId());
+        session.setStatus(status);
+        session.flush();
+        for (Node n:session.getNodesAsList()) {
+            finalizeTurnForWorker(n.getWorker());
+        }
+        wq.clear();
+    }
+
     @Override
     public void run(boolean repeat) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
 
 
-        turnLength = 1000l * session.getExperiment().getActualPlugin().getTurnLength(session.getExperiment());
+        turnLength = 1000l * Integer.parseInt(session.getProperty(Plugin.PROP_TURN_LENGTH_SECONDS));
         final Timer t = new Timer(true);
         t.schedule(getTimerTask(t), 1000l);
     }
@@ -165,6 +174,10 @@ public class SynchroRunner implements RunStrategy {
         };
     }
 
+    public GameState getGameState() {
+        return gameState;
+    }
+
     @Override
     public void haltOnNext() {
         gameState = GameState.FORCE_DONE_GAME;
@@ -172,7 +185,7 @@ public class SynchroRunner implements RunStrategy {
 
     @Override
     public boolean isRunning() {
-        return (gameState==null?0:gameState.ordinal()) < GameState.DONE_GAME.ordinal();
+        return (gameState == null ? 0 : gameState.ordinal()) < GameState.DONE_GAME.ordinal();
     }
 
 
@@ -189,9 +202,8 @@ public class SynchroRunner implements RunStrategy {
 
     //will update worker - request driven
     @Override
-    @Transactional
-    public Map<String, Object> ping(Worker w) {
-        w.checkin();
+    public Map<String, Object> ping(long workerid) {
+        wq.checkin(workerid, false);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("status", gameState);
 
@@ -199,7 +211,8 @@ public class SynchroRunner implements RunStrategy {
             result.put("turn", this.session.getIteration() + "");
             result.put("remaining", Math.max(0, turnEnd - System.currentTimeMillis()));
         } else if (gameState == GameState.DONE_GAME) {
-            finalizeTurnForWorker(w, result);
+            log.debug("Finalizing turn for worker");
+            finalizeTurnForWorker(Worker.findWorker(workerid));
 
 
         }
@@ -207,16 +220,11 @@ public class SynchroRunner implements RunStrategy {
 
     }
 
-    private void finalizeTurnForWorker(Worker w, Map<String, Object> result) {
-        try {
-            Node n = Node.findNodesByWorkerAndSession_(w, session).getSingleResult();
-           // result.putAll(session.getExperiment().getActualPlugin().getScoreInformation(n));
-        } catch (Exception e) {
-            log.warn("Could not finalize turn");
-        }
-       // Worker.entityManager().refresh(w, LockModeType.PESSIMISTIC_WRITE);
+    @Transactional
+    private void finalizeTurnForWorker(Worker w) {
+        Worker.entityManager().refresh(w, LockModeType.PESSIMISTIC_WRITE);
         w.setCurrentAssignment(null);
-
+        w.flush();
 
 
     }

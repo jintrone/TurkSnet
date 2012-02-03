@@ -27,10 +27,15 @@ public interface RunStrategy {
 
     public void updateNode(Node node, String results) throws ClassNotFoundException, IllegalAccessException, InstantiationException, JSONException;
 
-    public Map<String, Object> ping(Worker w);
 
 
+    public Map<String, Object> ping(long workerid);
 
+    public GameState getGameState();
+
+    public static enum GameState {
+        IN_TURN, WAITING_FOR_RESULTS, DONE_TURN, DONE_GAME, FORCE_DONE_GAME
+    }
 
     public static enum Type {
 

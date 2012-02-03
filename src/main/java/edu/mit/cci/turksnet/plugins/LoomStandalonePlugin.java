@@ -47,35 +47,89 @@ public class LoomStandalonePlugin implements Plugin {
 
 
     public Session_ createSession(Experiment experiment, List<Worker> workers, boolean force) throws SessionCreationException {
+        logger.info("Creating session with "+workers.size()+" workers");
         //@TODO add logic for checking worker history and making sure there is an available session
-        Map<String, String> props = experiment.getPropsAsMap();
-        if (!force && workers.size() < Integer.parseInt(experiment.getPropsAsMap().get(PROP_NODE_COUNT))) {
-            return null;
-        } else {
-            Session_ session = new Session_(experiment.getId());
-            session.setCreated(new Date());
-            session.setIteration(-1);
-            session.persist();
-            try {
-                createGraph(props.get(PROP_GRAPH_TYPE), workers.size(), props, session);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new SessionCreationException("Error generating graph");
-            }
-            initNodes(session.getAvailableNodes(), props);
-
-            for (int i = 0; i < session.getAvailableNodes().size(); i++) {
-                session.assignNodeToTurker(workers.get(i));
-            }
-            session.flush();
-            //session.merge();
-            return session;
-
+        Session_ session = setupSession(experiment);
+        logger.info("Created session "+session.getId());
+        try {
+            createGraph(session, workers.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new SessionCreationException("Error generating graph");
         }
+        initNodes(session);
 
+        for (int i = 0; i < session.getAvailableNodes().size(); i++) {
+            session.assignNodeToTurker(workers.get(i));
+        }
+        logger.debug("Attempting to flush new session "+session.getId());
+        session.flush();
 
+        //session.merge();
+        return session;
     }
 
+    private Session_ setupSession(Experiment e) {
+        Session_ session = new Session_(e.getId());
+        session.setCreated(new Date());
+        session.setIteration(-1);
+        List<Session_> known = new ArrayList<Session_>();
+        for (Session_ s : e.getSessions()) {
+            if (s.getStatus() != Session_.Status.ABORTED) {
+                known.add(s);
+            }
+        }
+        if (e.getSessionProps() != null) {
+            try {
+
+
+                JSONArray sessions = null;
+                sessions = new JSONArray(e.getSessionProps());
+                Set<String> sessionids = new HashSet<String>();
+                for (Session_ s : known) {
+                    sessionids.add(s.getProperty(PROP_SESSION_ID));
+                }
+
+                int i = 0;
+                for (; i < sessions.length(); i++) {
+                    JSONObject props = sessions.getJSONObject(i);
+                    String sessionid = props.getString(PROP_SESSION_ID);
+                    if (!sessionids.contains(sessionid)) {
+                        session.setProperties(props.toString());
+                        break;
+                    }
+                }
+                if (i==sessions.length()) {
+                   logger.error("No sessions available! (using specific session properties)");
+                    return null;
+                }
+
+
+            } catch (JSONException e1) {
+                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        } else if (e.getProperty(Plugin.PROP_SESSION_COUNT) != null) {
+            if (Integer.parseInt(e.getProperty(Plugin.PROP_SESSION_COUNT)) >= known.size()) {
+                logger.error("No sessions available! (using prop session count)");
+                return null;
+            }
+        }
+
+        List<String> sessionprops = new ArrayList<String>();
+        Collections.addAll(sessionprops, PROP_NODE_COUNT,PROP_STORY, PROP_ITERATION_COUNT, PROP_NET_DEGREE, PROP_GRAPH_TYPE, PROP_TURN_LENGTH_SECONDS, PROP_PRIVATE_TILES);
+        for (String p : sessionprops) {
+            if (session.getProperty(p) == null) {
+                session.updateProperty(p, e.getProperty(p));
+            }
+
+        }
+        session.updateProperty(PROP_STORY,processStory(session.getProperty(PROP_STORY)));
+        session.setStatus(Session_.Status.WAITING);
+        session.persist();
+        session.flush();
+        return session;
+    }
 
     @Override
     public boolean checkDone(Session_ s) {
@@ -84,7 +138,7 @@ public class LoomStandalonePlugin implements Plugin {
                 return false;
             }
         }
-        return (s.getIteration() >= Integer.parseInt(s.getExperiment().getPropsAsMap().get(PROP_ITERATION_COUNT)));
+        return (s.getIteration() >= Integer.parseInt(s.getProperty(PROP_ITERATION_COUNT).toString()));
 
     }
 
@@ -92,9 +146,9 @@ public class LoomStandalonePlugin implements Plugin {
     public void processResults(Node n, String results) {
 
         logger.debug("Receiving " + results + " from " + n.getWorker().getUsername());
-        Map<String, String> storymap = getStoryMap(n.getSession_().getExperiment().getPropsAsMap().get(PROP_STORY));
+        Map<String, String> storymap = getStoryMap(n.getSession_().getProperty(PROP_STORY));
         n.setPublicData_(internalFormatData(storymap, results));
-        n.addScore(getScore(n.getSession_().getExperiment().getPropsAsMap().get(PROP_STORY), n.getPublicData_()));
+        n.addScore(getScore(n.getSession_().getProperty(PROP_STORY), n.getPublicData_()));
 
     }
 
@@ -123,36 +177,35 @@ public class LoomStandalonePlugin implements Plugin {
         return n;
     }
 
-    @Override
-    public void preprocessProperties(Experiment experiment) throws ExperimentCreationException {
-        StringBuilder builder = new StringBuilder();
-        Map<String, String> props = experiment.getPropsAsMap();
-        String story = props.get(PROP_STORY);
-        Pattern pat = Pattern.compile("(\\d+)=([\\w\\s]+)");
-        if (story == null) throw new ExperimentCreationException("No story associated with Loom Experiment");
-        String sep = "";
-        Set<Integer> ids = new HashSet<Integer>();
-        for (String p : story.split("&")) {
-            p = p.trim();
-            builder.append(sep);
-            Matcher m = pat.matcher(p);
-            if (m.matches()) {
-                if (!ids.contains(m.group(1))) {
-                    ids.add(Integer.getInteger(m.group(1)));
-                    builder.append(p);
-                } else {
-                    int nid = getNewId(ids);
-                    builder.append(nid).append("=").append(m.group(2));
-                }
-            } else {
-                int nid = getNewId(ids);
-                builder.append(nid).append("=").append(p);
 
-            }
-            sep = "&";
-        }
-        experiment.updateProperty(PROP_STORY, builder.toString());
+
+    private String processStory(String story) {
+        StringBuilder builder = new StringBuilder();
+        Pattern pat = Pattern.compile("(\\d+)=([\\w\\s]+)");
+           String sep = "";
+           Set<Integer> ids = new HashSet<Integer>();
+           for (String p : story.split("&")) {
+               p = p.trim();
+               builder.append(sep);
+               Matcher m = pat.matcher(p);
+               if (m.matches()) {
+                   if (!ids.contains(m.group(1))) {
+                       ids.add(Integer.getInteger(m.group(1)));
+                       builder.append(p);
+                   } else {
+                       int nid = getNewId(ids);
+                       builder.append(nid).append("=").append(m.group(2));
+                   }
+               } else {
+                   int nid = getNewId(ids);
+                   builder.append(nid).append("=").append(p);
+
+               }
+               sep = "&";
+           }
+        return builder.toString();
     }
+
 
 
     public String configureApplicationString(String appname) throws Exception {
@@ -202,14 +255,14 @@ public class LoomStandalonePlugin implements Plugin {
 
     @Override
     public JSONObject getTrainingData(Worker w, Experiment e, Map parameterMap) {
-        Map<String, String> props = e.getPropsAsMap();
-        Map<String, String> storymap = getStoryMap(props.get(PROP_TRAINING_STORY));
+
+        Map<String, String> storymap = getStoryMap(e.getProperty(PROP_TRAINING_STORY));
 
 
         int step = Integer.parseInt(((String[]) parameterMap.get("step"))[0]);
 
 
-        String private_data = internalFormatData(storymap, props.get(PROP_TRAINING_DATA + "_n0"));
+        String private_data = internalFormatData(storymap, e.getProperty(PROP_TRAINING_DATA + "_n0"));
         String public_data = "";
         if (step == 1) {
             public_data = private_data;
@@ -221,8 +274,8 @@ public class LoomStandalonePlugin implements Plugin {
         } else {
 
             try {
-                String story = props.get(PROP_TRAINING_STORY);
-                JSONObject result = scoreTraining(w, props.get(PROP_TRAINING_STORY));
+                String story = e.getProperty(PROP_TRAINING_STORY);
+                JSONObject result = scoreTraining(w, e.getProperty(PROP_TRAINING_STORY));
                 result.put("answer", new JSONArray(getStoryAsList(story)));
                 return result;
             } catch (Exception ex) {
@@ -233,11 +286,11 @@ public class LoomStandalonePlugin implements Plugin {
 
 
         Map<Long, String> neighbors = new HashMap<Long, String>();
-        neighbors.put(1l, internalFormatData(storymap, props.get(PROP_TRAINING_DATA + "_n1_s" + step)));
-        neighbors.put(2l, internalFormatData(storymap, props.get(PROP_TRAINING_DATA + "_n2_s" + step)));
+        neighbors.put(1l, internalFormatData(storymap, e.getProperty(PROP_TRAINING_DATA + "_n1_s" + step)));
+        neighbors.put(2l, internalFormatData(storymap, e.getProperty(PROP_TRAINING_DATA + "_n2_s" + step)));
         JSONObject result = Node.getJsonDataUtil(public_data, private_data, neighbors);
         try {
-            JSONObject scoremap = scoreTraining(w, props.get(PROP_TRAINING_STORY));
+            JSONObject scoremap = scoreTraining(w, e.getProperty(PROP_TRAINING_STORY));
             for (Iterator<String> i = scoremap.keys(); i.hasNext(); ) {
                 String key = i.next();
                 result.put(key, scoremap.get(key));
@@ -263,13 +316,13 @@ public class LoomStandalonePlugin implements Plugin {
                 for (String s : interim.split(";")) {
                     order.add(Integer.parseInt(s));
                 }
-                float f = (float)Math.floor(100*score(storyorder, order));
+                float f = (float) Math.floor(100 * score(storyorder, order));
                 total += f;
                 scores.add(f);
             }
         }
 
-        result.put("roundScore", scores.isEmpty() ? 0 : scores.get(scores.size()-1));
+        result.put("roundScore", scores.isEmpty() ? 0 : scores.get(scores.size() - 1));
         result.put("cumulativeScore", scores.isEmpty() ? 0 : total);
         return result;
 
@@ -304,13 +357,22 @@ public class LoomStandalonePlugin implements Plugin {
     }
 
     @Override
-    public long getTurnLength(Experiment experiment) {
-        return Long.parseLong(experiment.getPropsAsMap().get(PROP_TURN_LENGTH_SECONDS));
+    public long getTurnLength(Session_ session) {
+        try {
+            return session.getPropertiesAsJson().getLong(PROP_TURN_LENGTH_SECONDS);
+        } catch (JSONException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return 0;
     }
 
-    private void createGraph(String graphtype, Integer nodecount, Map<String, String> props, Session_ session) throws GraphCreationException {
+
+    private void createGraph(Session_ s, Integer nodecount) throws GraphCreationException {
 
         DefaultJungGraph graph = null;
+        String graphtype = s.getProperty(PROP_GRAPH_TYPE);
+
+        nodecount = Math.min(nodecount,Integer.parseInt(s.getProperty(PROP_NODE_COUNT)));
         if (nodecount == 1) {
             graph = new DefaultJungGraph();
             DefaultJungNode node = DefaultJungNode.getFactory().create();
@@ -356,7 +418,7 @@ public class LoomStandalonePlugin implements Plugin {
             graph = DefaultJungGraph.getFactory().create();
             Factory<DefaultJungNode> nfact = DefaultJungNode.getFactory();
             Factory<DefaultJungEdge> efact = DefaultJungEdge.getFactory();
-            int degree = Math.min(Integer.parseInt(props.get(PROP_NET_DEGREE)), nodecount - 1);
+            int degree = Math.min(Integer.parseInt(s.getProperty(PROP_NET_DEGREE)), nodecount - 1);
             for (int i = 0; i < nodecount; i++) {
                 graph.addVertex(nfact.create());
             }
@@ -377,9 +439,10 @@ public class LoomStandalonePlugin implements Plugin {
         Map<DefaultJungNode, Node> nodes = new HashMap<DefaultJungNode, Node>();
         for (DefaultJungNode vertex : graph.getVertices()) {
             Node node = new Node();
-            node.setSession_(session);
-            session.addNode(node);
+            node.setSession_(s);
+            s.addNode(node);
             nodes.put(vertex, node);
+            node.persist();
 
 
         }
@@ -389,15 +452,15 @@ public class LoomStandalonePlugin implements Plugin {
             nodes.get(eps.getSecond()).getIncoming().add(nodes.get(eps.getFirst()));
         }
 
-        session.persist();
-
 
     }
 
 
-    private void initNodes(Collection<Node> nodes, Map<String, String> props) {
-        int numtiles = Integer.valueOf(props.get(PROP_PRIVATE_TILES));
-        String[] story = props.get(PROP_STORY).split("&");
+    private void initNodes(Session_ session) {
+        Set<Node> nodes = session.getAvailableNodes();
+        logger.info("Assigned "+nodes.size()+" for session "+session.getId());
+        int numtiles = Integer.valueOf(session.getProperty(PROP_PRIVATE_TILES));
+        String[] story = session.getProperty(PROP_STORY).split("&");
         List<Node> rndnodes = new ArrayList<Node>(nodes);
         List<String> rndstory = new ArrayList<String>(Arrays.asList(story));
         Collections.shuffle(rndnodes);
@@ -434,9 +497,15 @@ public class LoomStandalonePlugin implements Plugin {
         return score(truth, getStoryOrder(publicData));
     }
 
-    public static List<Float> getSessionScores(Experiment experiment, List<SessionLog> logs) {
+    public static List<Float> getSessionScores(List<SessionLog> logs) {
+
+
         List<Float> result = new ArrayList<Float>();
-        List<Integer> truth = getStoryOrder(experiment.getPropsAsMap().get(PROP_STORY));
+        if (logs == null || logs.size() == 0) {
+            return result;
+        }
+        Session_ session = logs.get(0).getSession_();
+        List<Integer> truth = getStoryOrder(session.getProperty(PROP_STORY));
         for (SessionLog log : logs) {
             result.add(score(truth, getStoryOrder(log.getNodePublicData())));
         }
@@ -448,12 +517,12 @@ public class LoomStandalonePlugin implements Plugin {
     public Map<String, Object> getScoreInformation(Node n) {
         Map<String, Object> scoreinfo = new HashMap<String, Object>();
         Float f[] = n.getScores();
-        scoreinfo.put("roundScore", f.length==0?0:Math.floor(100 * f[f.length - 1]));
+        scoreinfo.put("roundScore", f.length == 0 ? 0 : Math.floor(100 * f[f.length - 1]));
         float total = 0;
         for (float fi : f) {
-            total += (100*fi);
+            total += (100 * fi);
         }
-        scoreinfo.put("cumulativeScore", f.length==0?0:Math.floor(total));
+        scoreinfo.put("cumulativeScore", f.length == 0 ? 0 : Math.floor(total));
 
         return scoreinfo;
     }
@@ -461,11 +530,45 @@ public class LoomStandalonePlugin implements Plugin {
 
     @Override
     public Map<String, Object> getFinalInfo(Node n) {
-        String story = n.getSession_().getExperiment().getPropsAsMap().get(PROP_STORY);
+        String story = n.getSession_().getProperty(PROP_STORY);
         Map<String, Object> result = getScoreInformation(n);
         result.put("answer", new JSONArray(getStoryAsList(story)));
         return result;
 
+    }
+     //TODO: Please please improve me
+    public int getRemainingSessions(Experiment e) {
+        List<Session_> known = new ArrayList<Session_>();
+        for (Session_ s : e.getSessions()) {
+            if (s.getStatus() != Session_.Status.ABORTED) {
+                known.add(s);
+            }
+        }
+        if (e.getSessionProps() != null) {
+            try {
+
+                JSONArray pending = null;
+                pending = new JSONArray(e.getSessionProps());
+                Set<String> sessionids = new HashSet<String>();
+                for (int i = 0; i < pending.length(); i++) {
+                    JSONObject props = pending.getJSONObject(i);
+                    sessionids.add( props.getString(PROP_SESSION_ID));
+
+                }
+                for (Session_ s : known) {
+                    sessionids.remove(s.getProperty(PROP_SESSION_ID));
+                }
+                return (sessionids.size());
+
+
+            } catch (JSONException e1) {
+                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        } else if (e.getProperty(Plugin.PROP_SESSION_COUNT) != null) {
+            return Math.max(0,Integer.parseInt(e.getProperty(Plugin.PROP_SESSION_COUNT))-known.size());
+        }
+        return 0;
     }
 
 
