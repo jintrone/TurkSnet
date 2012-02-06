@@ -58,7 +58,7 @@ public interface Plugin {
             return String.format(template,id);
         }
     }
-
+    public static final  String PROP_TRAINING_TURN_COUNT = "training_numturns";
     public static final String PROP_NODE_COUNT = "node_count";
     public static final String PROP_GRAPH_TYPE = "graph_type";
     public static final String PROP_RUN_STRATEGY = "run_strategy";

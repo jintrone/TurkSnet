@@ -44,6 +44,7 @@ public class LoomStandalonePlugin implements Plugin {
     private static final String PROP_NET_DEGREE = "network_degree";
     private static final String PROP_TRAINING_STORY = "training_story";
     private static final String PROP_TRAINING_DATA = "training";
+    private static final String PROP_TRAINING_TURNLENGTH = "training_turnlength";
 
 
     private static Logger logger = Logger.getLogger(LoomStandalonePlugin.class);
@@ -290,7 +291,11 @@ public class LoomStandalonePlugin implements Plugin {
         neighbors.put(1l, internalFormatData(storymap, e.getProperty(PROP_TRAINING_DATA + "_n1_s" + step)));
         neighbors.put(2l, internalFormatData(storymap, e.getProperty(PROP_TRAINING_DATA + "_n2_s" + step)));
         JSONObject result = Node.getJsonDataUtil(public_data, private_data, neighbors);
+
         try {
+            if (e.getProperty(PROP_TRAINING_TURNLENGTH)!=null) {
+            result.put("turnlength",e.getProperty(PROP_TRAINING_TURNLENGTH));
+            }
             JSONObject scoremap = scoreTraining(w, e.getProperty(PROP_TRAINING_STORY));
             for (Iterator<String> i = scoremap.keys(); i.hasNext(); ) {
                 String key = i.next();

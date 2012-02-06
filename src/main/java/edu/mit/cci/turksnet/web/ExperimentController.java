@@ -187,7 +187,10 @@ public class ExperimentController {
             } else if (d == Plugin.Destination.QUALIFICATIONS) {
                 body = p.getQualificationApp();
             } else if (d == Plugin.Destination.TRAINING) {
-                model.addAttribute("numTurns", 3);
+                Experiment e = Experiment.findExperiment(experimentId);
+                String turns = e.getProperty(Plugin.PROP_TRAINING_TURN_COUNT);
+
+                model.addAttribute("numTurns",turns==null?3:Integer.parseInt(turns));
                 body = p.getTrainingApp();
             } else {
                 return "experiments/notavailable";
