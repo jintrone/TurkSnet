@@ -45,7 +45,7 @@ privileged aspect ApplicationConversionServiceFactoryBean_Roo_ConversionService 
     Converter<Experiment, String> ApplicationConversionServiceFactoryBean.getExperimentConverter() {
         return new Converter<Experiment, String>() {
             public String convert(Experiment source) {
-                return new StringBuilder().append(source.getWaitingRoomManager()).append(" ").append(source.getProperties()).append(" ").append(source.getNetwork()).toString();
+                return new StringBuilder().append(" ").append(source.getProperties()).append(" ").append(source.getNetwork()).toString();
             }
         };
     }

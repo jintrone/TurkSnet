@@ -55,7 +55,9 @@ public class Experiment {
     private Boolean running= false;
 
     @Transient
-    public static WaitingRoomManager waitingRoomManager;
+       private static Map<Long, WaitingRoomManager> managers = new HashMap<Long, WaitingRoomManager>();
+
+
 
      @Transient
     private static Logger log = Logger.getLogger(Experiment.class);
@@ -128,29 +130,40 @@ public class Experiment {
         storePropertyMap();
     }
 
-   public void run() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public static WaitingRoomManager getWaitingRoomManager(long id) {
+        Experiment e = Experiment.findExperiment(id);
+        WaitingRoomManager manager = null;
+        if (e == null || !e.getRunning()) {
+          log.error("Experiment "+id+" is not available");
+        } else {
+            manager = managers.get(id);
+            if (manager == null) {
+                try {
+                    manager = new WaitingRoomManager(e);
+                    managers.put(id,manager);
+                } catch (ClassNotFoundException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (InstantiationException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (IllegalAccessException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
 
-        waitingRoomManager = new WaitingRoomManager(this);
-        this.setRunning(true);
-       this.persist();
+        }
+        return manager;
+
+    }
+
+   public void run() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+       this.setRunning(true);
+       this.flush();
+       getWaitingRoomManager(this.getId());
+
 
    }
 
-    public WaitingRoomManager getWaitingRoomManager() {
-        if (waitingRoomManager == null && this.getRunning()) {
-            try {
-                log.warn("Waiting room manager not running; trying to restart");
-                run();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } catch (InstantiationException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-        return waitingRoomManager;
-    }
+
 
     public int getAvailableSessionCount() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         return getActualPlugin().getRemainingSessions(this);
@@ -186,7 +199,7 @@ public class Experiment {
     }
 
     public void forceRun() {
-       getWaitingRoomManager().setForce(true);
+       getWaitingRoomManager(this.getId()).setForce(true);
     }
 
     public String getProperty(String property) {

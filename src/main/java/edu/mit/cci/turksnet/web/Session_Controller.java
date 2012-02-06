@@ -44,9 +44,9 @@ public class Session_Controller {
     //for the html app
 
     @RequestMapping(value = "/{id}/turk/feedback", method = RequestMethod.GET)
-    public String getForm(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("workerId") String workerId, Model model) throws TestException {
+    public String getForm(@PathVariable("id") Long id, @RequestParam("assignmentId") String assignmentId, @RequestParam("workerid") String workerid, Model model) throws TestException {
 
-        model.addAttribute("workerId", workerId);
+        model.addAttribute("workerid", workerid);
         model.addAttribute("assignmentId", assignmentId);
         model.addAttribute("submission", false);
 
@@ -56,9 +56,9 @@ public class Session_Controller {
 
     @RequestMapping(value = "/{id}/message", method = RequestMethod.POST)
       @ResponseBody
-    public String postFeedback(@PathVariable("id") Long id, @RequestParam("workerId") String workerId, @RequestParam("message") String feedback, Model model) {
+    public String postFeedback(@PathVariable("id") Long id, @RequestParam("workerid") String workerid, @RequestParam("message") String feedback, Model model) {
         StringBuilder builder = new StringBuilder();
-        builder.append("Worker: ").append(workerId).append("\n");
+        builder.append("Worker: ").append(workerid).append("\n");
         builder.append("Experiment:").append(Session_.findSession_(id).getExperiment().getId()).append("\n");
         builder.append("Session: ").append(id).append("\n");
 

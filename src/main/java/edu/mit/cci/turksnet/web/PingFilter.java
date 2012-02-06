@@ -35,13 +35,15 @@ public class PingFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         Matcher m = p.matcher(request.getRequestURI());
 
-        if (m.matches()) {
 
-            if (m.group(1).equals("experiments") && Experiment.waitingRoomManager != null) {
-                long wid = Long.parseLong(request.getParameter("workerId"));
+        if (m.matches()) {
+            String  path = m.group(1);
+            Long id = Long.parseLong(m.group(2));
+            if (m.group(1).equals("experiments") && Experiment.getWaitingRoomManager(id) != null) {
+                long wid = Long.parseLong(request.getParameter("workerid"));
                 Worker wrker = Worker.findWorker(wid);
                 if (wrker.getCurrentAssignment() == null) {
-                    Map<String, Object> result = Experiment.waitingRoomManager.checkin(wid);
+                    Map<String, Object> result = Experiment.getWaitingRoomManager(id).checkin(wid);
                     result.put("status", "waiting");
                     String response = U.safejson(new JSONObject(result));
                     PrintWriter w = res.getWriter();

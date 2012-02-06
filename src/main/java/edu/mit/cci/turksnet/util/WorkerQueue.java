@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface WorkerQueue {
 
-    public void checkin(Long workerId, boolean prune);
+    public void checkin(Long workerid, boolean prune);
     public int countAvailable(long timeout,boolean prune);
     public Collection<Worker> getAvailable(long timeout, boolean prune);
     public void remove(List<Worker> workers);

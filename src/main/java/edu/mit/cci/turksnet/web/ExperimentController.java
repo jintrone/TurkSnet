@@ -82,14 +82,18 @@ public class ExperimentController {
     @RequestMapping(value = "/{id}/manage", method = RequestMethod.GET)
     public String manageExperiment(@PathVariable("id") Long id, Model model, HttpServletRequest request) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Experiment e = Experiment.findExperiment(id);
-        model.addAttribute("path", "/experiments/" + id + "/force");
-        model.addAttribute("sessions", e.getSessions());
-        model.addAttribute("remainingSessions", e.getAvailableSessionCount());
-        model.addAttribute("waiting", e.getWaitingRoomManager().getWaiting(true));
-        model.addAttribute("desired", e.getProperty(Plugin.PROP_NODE_COUNT));
-        model.addAttribute("launchtime", e.getStartDate() != null ? e.getStartDate().after(new Date()) ? e.getStartDate() : null : null);
-        model.addAttribute("dateTimePattern", DateTimeFormat.patternForStyle("SS", LocaleContextHolder.getLocale()));
-        return "experiments/manage";
+        if (!e.getRunning()) {
+            return "experiments/notavailable";
+        } else {
+            model.addAttribute("path", "/experiments/" + id + "/force");
+            model.addAttribute("sessions", e.getSessions());
+            model.addAttribute("remainingSessions", e.getAvailableSessionCount());
+            model.addAttribute("waiting", e.getWaitingRoomManager(id).getWaiting(true));
+            model.addAttribute("desired", e.getProperty(Plugin.PROP_NODE_COUNT));
+            model.addAttribute("launchtime", e.getStartDate() != null ? e.getStartDate().after(new Date()) ? e.getStartDate() : null : null);
+            model.addAttribute("dateTimePattern", DateTimeFormat.patternForStyle("SS", LocaleContextHolder.getLocale()));
+            return "experiments/manage";
+        }
 
     }
 
@@ -160,7 +164,7 @@ public class ExperimentController {
     private String configureResponse(Long experimentId, Plugin p, Plugin.Destination d, Worker w, Model model) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
 
         if (w != null) {
-            model.addAttribute("workerId", w.getId());
+            model.addAttribute("workerid", w.getId());
             model.addAttribute("workerName", w.getUsername());
         }
         model.addAttribute("experimentId", experimentId);
@@ -280,8 +284,8 @@ public class ExperimentController {
     }
 
     @RequestMapping(value = "/{id}/qualifications", method = RequestMethod.GET)
-    public String getQualifications(@PathVariable("id") Long id, @RequestParam("workerId") Long workerId, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Worker worker = Worker.findWorker(workerId);
+    public String getQualifications(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Worker worker = Worker.findWorker(workerid);
         if (worker == null) {
             return "redirect:/experiments/" + id + "/join";
         }
@@ -290,8 +294,8 @@ public class ExperimentController {
 
     @RequestMapping(value = "/{id}/qualifications", method = RequestMethod.POST)
     @ResponseBody
-    public String postQualifications(@PathVariable("id") Long id, @RequestParam("workerId") Long workerId, @RequestParam("data") String data) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Worker worker = Worker.findWorker(workerId);
+    public String postQualifications(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, @RequestParam("data") String data) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Worker worker = Worker.findWorker(workerid);
         if (worker == null) {
             return "redirect:/experiments/" + id + "/join";
         }
@@ -305,8 +309,8 @@ public class ExperimentController {
     }
 
     @RequestMapping(value = "/{id}/next", method = RequestMethod.GET)
-    public String next(@PathVariable("id") Long id, @RequestParam("workerId") Long workerId, @RequestParam("event") String event, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Worker worker = Worker.findWorker(workerId);
+    public String next(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, @RequestParam("event") String event, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Worker worker = Worker.findWorker(workerid);
         Experiment e = Experiment.findExperiment(id);
         Plugin p = e.getActualPlugin();
         Plugin.Destination d = p.getDestinationForEvent(worker, Plugin.Event.valueOf(event));
@@ -314,8 +318,8 @@ public class ExperimentController {
     }
 
     @RequestMapping(value = "/{id}/training", method = RequestMethod.GET)
-    public String getTraining(@PathVariable("id") Long id, @RequestParam("workerId") Long workerId, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Worker worker = Worker.findWorker(workerId);
+    public String getTraining(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Worker worker = Worker.findWorker(workerid);
         if (worker == null) {
             return "redirect:/experiments/" + id + "/join";
         }
@@ -324,8 +328,8 @@ public class ExperimentController {
 
     @RequestMapping(value = "/{id}/trainingdata", method = RequestMethod.GET)
     @ResponseBody
-    public String getTrainingData(@PathVariable("id") Long id, @RequestParam("workerId") Long workerId, HttpServletRequest request, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Worker worker = Worker.findWorker(workerId);
+    public String getTrainingData(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, HttpServletRequest request, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Worker worker = Worker.findWorker(workerid);
         Experiment e = Experiment.findExperiment(id);
         Plugin p = e.getActualPlugin();
         return U.safejson(p.getTrainingData(worker, e, request.getParameterMap()));
@@ -334,8 +338,8 @@ public class ExperimentController {
 
     @RequestMapping(value = "/{id}/trainingdata", method = RequestMethod.POST)
     @ResponseBody
-    public String setTrainingData(@PathVariable("id") Long id, @RequestParam("workerId") Long workerId, HttpServletRequest request, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Worker worker = Worker.findWorker(workerId);
+    public String setTrainingData(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, HttpServletRequest request, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Worker worker = Worker.findWorker(workerid);
         Experiment e = Experiment.findExperiment(id);
         Plugin p = e.getActualPlugin();
         p.addTrainingData(worker, e, request.getParameterMap());
@@ -345,7 +349,7 @@ public class ExperimentController {
 
     @RequestMapping(value = "/{id}/ping", method = RequestMethod.GET)
     @ResponseBody
-    public String ping(@PathVariable("id") Long id, Model model, @RequestParam("workerId") Long workerid, HttpServletRequest request) {
+    public String ping(@PathVariable("id") Long id, Model model, @RequestParam("workerid") Long workerid, HttpServletRequest request) {
         Worker w = Worker.findWorker(workerid);
         Experiment e = Experiment.findExperiment(id);
         Map<String, Object> result = new HashMap<String, Object>();
@@ -362,7 +366,7 @@ public class ExperimentController {
 
         } else {
             result.put("status", "waiting");
-            result.putAll(e.getWaitingRoomManager().checkin(w));
+            result.putAll(e.getWaitingRoomManager(id).checkin(w));
 
         }
         String response = U.jsonify(result);
@@ -374,9 +378,9 @@ public class ExperimentController {
 
     @RequestMapping(value = "/{id}/message", method = RequestMethod.POST)
     @ResponseBody
-    public String postFeedback(@PathVariable("id") Long id, @RequestParam("workerId") String workerId, @RequestParam("message") String feedback, Model model) {
+    public String postFeedback(@PathVariable("id") Long id, @RequestParam("workerid") String workerid, @RequestParam("message") String feedback, Model model) {
         StringBuilder builder = new StringBuilder();
-        builder.append("Worker: ").append(workerId).append("\n");
+        builder.append("Worker: ").append(workerid).append("\n");
         builder.append("Experiment: ").append(id).append("\n");
         builder.append("Session: Training\n");
         builder.append("Message:\n\n").append(feedback).append("\n");

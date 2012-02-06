@@ -20,7 +20,7 @@
 
         <form action="" method="POST" id="post">
 
-            <input type="hidden" id="workerId" value="${workerId}"/>
+            <input type="hidden" id="workerid" value="${workerid}"/>
             <input type="hidden" id="assignmentId" value="${assignmentId}"/>
 
             <textarea name="feedback" cols="100" rows="20"><!--- nothing --> </textarea>

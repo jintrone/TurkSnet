@@ -11,7 +11,7 @@
         var public_data =
         ${publicData}
         var incoming = ${incomingData}
-            //var worker = "${workerId}}";
+            //var worker = "${workerid}}";
 
                 function getPublicData() {
                     return public_data;

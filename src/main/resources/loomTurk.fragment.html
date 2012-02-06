@@ -1,7 +1,7 @@
 <script type="text/javascript">
         var current_nb_selection = "";
         var nav_idxs = [];
-        var post_target='./feedback?workerId='+turnJson.workerId+'&amp;'+
+        var post_target='./feedback?workerid='+turnJson.workerid+'&amp;'+
                 'assignmentId='+turnJson.assignmentId;
 
         function populateTemplate() {
@@ -291,7 +291,7 @@
                         <input type="hidden" id="publicData" name="publicData"/>
                         <input type="hidden" id="assignmentId" name="assignmentId" value="__ASSIGNMENTID__"/>
                         <input type="hidden" id="hitId" name="hitId" value="__HITID__"/>
-                        <input type="hidden" id="workerId" name="workerId" value="__TURKERID__"/>
+                        <input type="hidden" id="workerid" name="workerid" value="__TURKERID__"/>
                         <input type="hidden" id="nodeSessionId" name="nodeSessionId" value="__NODE_SESSION_ID__"/>
 
 

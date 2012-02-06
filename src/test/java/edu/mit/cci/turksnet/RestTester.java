@@ -84,7 +84,7 @@ public class RestTester {
         private int id;
 
         public SimplePingWorker(int workerid) throws MalformedURLException {
-            String urlstring = String.format("http://localhost:8084/turksnet/experiments/1/ping?workerId=%d",  workerid);
+            String urlstring = String.format("http://localhost:8084/turksnet/experiments/1/ping?workerid=%d",  workerid);
             u = new URL(urlstring);
             id = workerid;
         }

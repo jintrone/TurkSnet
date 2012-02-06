@@ -11,7 +11,7 @@
 
         var current_nb_selection = "";
         var nav_idxs = [];
-        var post_target='./feedback?workerId=${turkerId}&amp;'+
+        var post_target='./feedback?workerid=${turkerId}&amp;'+
                 'assignmentId=${assignmentId}';
 
 
@@ -295,7 +295,7 @@
                         <input type="hidden" id="publicData" name="publicData"/>
                         <input type="hidden" id="assignmentId" name="assignmentId" value="${assignmentId}"/>
                         <input type="hidden" id="hitId" name="hitId" value="${hitId}"/>
-                        <input type="hidden" id="workerId" name="workerId" value="${turkerId}"/>
+                        <input type="hidden" id="workerid" name="workerid" value="${turkerId}"/>
                         <input type="hidden" id="nodeSessionId" name="nodeSessionId" value="${node.session_.id}"/>
 
 
