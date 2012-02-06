@@ -9,8 +9,11 @@ import edu.mit.cci.turksnet.Node;
 import edu.mit.cci.turksnet.SessionLog;
 import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.Worker;
+import edu.mit.cci.turksnet.util.GraphGenerator;
 import edu.mit.cci.turksnet.util.NodeStatus;
 import edu.uci.ics.jung.algorithms.generators.Lattice2DGenerator;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
 import org.apache.commons.collections15.Factory;
 import org.apache.log4j.Logger;
@@ -47,10 +50,10 @@ public class LoomStandalonePlugin implements Plugin {
 
 
     public Session_ createSession(Experiment experiment, List<Worker> workers, boolean force) throws SessionCreationException {
-        logger.info("Creating session with "+workers.size()+" workers");
+        logger.info("Creating session with " + workers.size() + " workers");
         //@TODO add logic for checking worker history and making sure there is an available session
         Session_ session = setupSession(experiment);
-        logger.info("Created session "+session.getId());
+        logger.info("Created session " + session.getId());
         try {
             createGraph(session, workers.size());
         } catch (Exception e) {
@@ -62,7 +65,7 @@ public class LoomStandalonePlugin implements Plugin {
         for (int i = 0; i < session.getAvailableNodes().size(); i++) {
             session.assignNodeToTurker(workers.get(i));
         }
-        logger.debug("Attempting to flush new session "+session.getId());
+        logger.debug("Attempting to flush new session " + session.getId());
         session.flush();
 
         //session.merge();
@@ -99,8 +102,8 @@ public class LoomStandalonePlugin implements Plugin {
                         break;
                     }
                 }
-                if (i==sessions.length()) {
-                   logger.error("No sessions available! (using specific session properties)");
+                if (i == sessions.length()) {
+                    logger.error("No sessions available! (using specific session properties)");
                     return null;
                 }
 
@@ -117,14 +120,14 @@ public class LoomStandalonePlugin implements Plugin {
         }
 
         List<String> sessionprops = new ArrayList<String>();
-        Collections.addAll(sessionprops, PROP_NODE_COUNT,PROP_STORY, PROP_ITERATION_COUNT, PROP_NET_DEGREE, PROP_GRAPH_TYPE, PROP_TURN_LENGTH_SECONDS, PROP_PRIVATE_TILES);
+        Collections.addAll(sessionprops, PROP_NODE_COUNT, PROP_STORY, PROP_ITERATION_COUNT, PROP_NET_DEGREE, PROP_GRAPH_TYPE, PROP_TURN_LENGTH_SECONDS, PROP_PRIVATE_TILES);
         for (String p : sessionprops) {
             if (session.getProperty(p) == null) {
                 session.updateProperty(p, e.getProperty(p));
             }
 
         }
-        session.updateProperty(PROP_STORY,processStory(session.getProperty(PROP_STORY)));
+        session.updateProperty(PROP_STORY, processStory(session.getProperty(PROP_STORY)));
         session.setStatus(Session_.Status.WAITING);
         session.persist();
         session.flush();
@@ -178,34 +181,32 @@ public class LoomStandalonePlugin implements Plugin {
     }
 
 
-
     private String processStory(String story) {
         StringBuilder builder = new StringBuilder();
         Pattern pat = Pattern.compile("(\\d+)=([\\w\\s]+)");
-           String sep = "";
-           Set<Integer> ids = new HashSet<Integer>();
-           for (String p : story.split("&")) {
-               p = p.trim();
-               builder.append(sep);
-               Matcher m = pat.matcher(p);
-               if (m.matches()) {
-                   if (!ids.contains(m.group(1))) {
-                       ids.add(Integer.getInteger(m.group(1)));
-                       builder.append(p);
-                   } else {
-                       int nid = getNewId(ids);
-                       builder.append(nid).append("=").append(m.group(2));
-                   }
-               } else {
-                   int nid = getNewId(ids);
-                   builder.append(nid).append("=").append(p);
+        String sep = "";
+        Set<Integer> ids = new HashSet<Integer>();
+        for (String p : story.split("&")) {
+            p = p.trim();
+            builder.append(sep);
+            Matcher m = pat.matcher(p);
+            if (m.matches()) {
+                if (!ids.contains(m.group(1))) {
+                    ids.add(Integer.getInteger(m.group(1)));
+                    builder.append(p);
+                } else {
+                    int nid = getNewId(ids);
+                    builder.append(nid).append("=").append(m.group(2));
+                }
+            } else {
+                int nid = getNewId(ids);
+                builder.append(nid).append("=").append(p);
 
-               }
-               sep = "&";
-           }
+            }
+            sep = "&";
+        }
         return builder.toString();
     }
-
 
 
     public String configureApplicationString(String appname) throws Exception {
@@ -369,14 +370,16 @@ public class LoomStandalonePlugin implements Plugin {
 
     private void createGraph(Session_ s, Integer nodecount) throws GraphCreationException {
 
-        DefaultJungGraph graph = null;
+        Graph<DefaultJungNode, DefaultJungEdge> graph = null;
         String graphtype = s.getProperty(PROP_GRAPH_TYPE);
+        int degree = Integer.parseInt(s.getProperty(PROP_NET_DEGREE));
 
-        nodecount = Math.min(nodecount,Integer.parseInt(s.getProperty(PROP_NODE_COUNT)));
+        nodecount = Math.min(nodecount, Integer.parseInt(s.getProperty(PROP_NODE_COUNT)));
         if (nodecount == 1) {
-            graph = new DefaultJungGraph();
+            DefaultJungGraph g = new DefaultJungGraph();
             DefaultJungNode node = DefaultJungNode.getFactory().create();
-            graph.addVertex(node);
+            g.addVertex(node);
+            graph = g;
         } else if ("lattice".equals(graphtype)) {
             if (Math.floor(Math.sqrt(nodecount.doubleValue())) < Math.sqrt(nodecount.doubleValue())) {
                 logger.warn("Requested number of nodes must be a perfect square for lattice networks");
@@ -386,50 +389,62 @@ public class LoomStandalonePlugin implements Plugin {
                     DefaultJungNode.getFactory(),
                     DefaultJungEdge.getFactory(), (int) Math.sqrt(nodecount.doubleValue()), true);
             graph = (DefaultJungGraph) generator.create();
-//        } else if ("erdosrenyi".equals(graphtype)) {
-//            ErdosRenyiGenerator<DefaultJungNode,DefaultJungEdge> generator = new ErdosRenyiGenerator<DefaultJungNode, DefaultJungEdge>(
-//                    DefaultUndirectedJungGraph.getFactory(),
-//                    DefaultJungNode.getFactory(),
-//                    DefaultJungEdge.getFactory(), nodecount.intValue(),1.0f);
-//            graph = (DefaultJungGraph)
-//
-//        }
+
         } else if ("connected".equals(graphtype)) {
-            graph = DefaultJungGraph.getFactory().create();
+            DefaultJungGraph g = DefaultJungGraph.getFactory().create();
             Factory<DefaultJungNode> nfact = DefaultJungNode.getFactory();
             Factory<DefaultJungEdge> efact = DefaultJungEdge.getFactory();
 
             for (int i = 0; i < nodecount; i++) {
-                graph.addVertex(nfact.create());
+                g.addVertex(nfact.create());
             }
 
-            List<DefaultJungNode> nodes = new ArrayList<DefaultJungNode>(graph.getVertices());
+            List<DefaultJungNode> nodes = new ArrayList<DefaultJungNode>(g.getVertices());
             for (int i = 0; i < nodes.size(); i++) {
                 for (int j = 0; j < nodes.size(); j++) {
                     if (i == j) continue;
                     else {
-                        graph.addEdge(efact.create(), nodes.get(i), nodes.get(j));
+                        g.addEdge(efact.create(), nodes.get(i), nodes.get(j));
                     }
                 }
             }
 
+            graph = g;
+
 
         } else if ("ring".equals(graphtype)) {
-            graph = DefaultJungGraph.getFactory().create();
+            DefaultJungGraph g = DefaultJungGraph.getFactory().create();
             Factory<DefaultJungNode> nfact = DefaultJungNode.getFactory();
             Factory<DefaultJungEdge> efact = DefaultJungEdge.getFactory();
-            int degree = Math.min(Integer.parseInt(s.getProperty(PROP_NET_DEGREE)), nodecount - 1);
+
             for (int i = 0; i < nodecount; i++) {
-                graph.addVertex(nfact.create());
+                g.addVertex(nfact.create());
             }
 
-            List<DefaultJungNode> nodes = new ArrayList<DefaultJungNode>(graph.getVertices());
+            List<DefaultJungNode> nodes = new ArrayList<DefaultJungNode>(g.getVertices());
             for (int i = 0; i < nodes.size(); i++) {
                 for (int j = 1; j <= degree; j++) {
-                    graph.addEdge(efact.create(), nodes.get(i), nodes.get((i + j) % nodecount));
+                    g.addEdge(efact.create(), nodes.get(i), nodes.get((i + j) % nodecount));
                 }
             }
+            graph = g;
 
+        } else if ("bowtie".equals(graphtype)) {
+            graph = GraphGenerator.generateBowtie(nodecount);
+        } else if ("bowtie-circle".equals(graphtype)) {
+            nodecount = (nodecount / 6) * 6;
+
+            graph = GraphGenerator.generateBowtieCircle(nodecount);
+        } else if ("wheel".equals(graphtype)) {
+            nodecount = (nodecount / 2) * 2;
+            graph = GraphGenerator.generateWheel(nodecount,degree );
+        } else if ("square-tesselation".equals(graphtype)) {
+            if (nodecount / 2 * 2 != nodecount) {
+                nodecount--;
+            }
+            graph = GraphGenerator.generateSquareLatticeGraph(nodecount, degree);
+        } else if ("ring-lattice".equals(graphtype)) {
+            graph = GraphGenerator.generateLatticeGraph(nodecount, degree);
 
         } else {
             throw new GraphCreationException("Graph type not supported");
@@ -437,19 +452,22 @@ public class LoomStandalonePlugin implements Plugin {
 
 
         Map<DefaultJungNode, Node> nodes = new HashMap<DefaultJungNode, Node>();
+
         for (DefaultJungNode vertex : graph.getVertices()) {
             Node node = new Node();
             node.setSession_(s);
             s.addNode(node);
             nodes.put(vertex, node);
             node.persist();
-
-
         }
+
 
         for (DefaultJungEdge edge : graph.getEdges()) {
             Pair<DefaultJungNode> eps = graph.getEndpoints(edge);
             nodes.get(eps.getSecond()).getIncoming().add(nodes.get(eps.getFirst()));
+            if (graph.getDefaultEdgeType() == EdgeType.UNDIRECTED) {
+                nodes.get(eps.getFirst()).getIncoming().add(nodes.get(eps.getSecond()));
+            }
         }
 
 
@@ -458,7 +476,7 @@ public class LoomStandalonePlugin implements Plugin {
 
     private void initNodes(Session_ session) {
         Set<Node> nodes = session.getAvailableNodes();
-        logger.info("Assigned "+nodes.size()+" for session "+session.getId());
+        logger.info("Assigned " + nodes.size() + " for session " + session.getId());
         int numtiles = Integer.valueOf(session.getProperty(PROP_PRIVATE_TILES));
         String[] story = session.getProperty(PROP_STORY).split("&");
         List<Node> rndnodes = new ArrayList<Node>(nodes);
@@ -536,7 +554,8 @@ public class LoomStandalonePlugin implements Plugin {
         return result;
 
     }
-     //TODO: Please please improve me
+
+    //TODO: Please please improve me
     public int getRemainingSessions(Experiment e) {
         List<Session_> known = new ArrayList<Session_>();
         for (Session_ s : e.getSessions()) {
@@ -552,7 +571,7 @@ public class LoomStandalonePlugin implements Plugin {
                 Set<String> sessionids = new HashSet<String>();
                 for (int i = 0; i < pending.length(); i++) {
                     JSONObject props = pending.getJSONObject(i);
-                    sessionids.add( props.getString(PROP_SESSION_ID));
+                    sessionids.add(props.getString(PROP_SESSION_ID));
 
                 }
                 for (Session_ s : known) {
@@ -566,7 +585,7 @@ public class LoomStandalonePlugin implements Plugin {
             }
 
         } else if (e.getProperty(Plugin.PROP_SESSION_COUNT) != null) {
-            return Math.max(0,Integer.parseInt(e.getProperty(Plugin.PROP_SESSION_COUNT))-known.size());
+            return Math.max(0, Integer.parseInt(e.getProperty(Plugin.PROP_SESSION_COUNT)) - known.size());
         }
         return 0;
     }
