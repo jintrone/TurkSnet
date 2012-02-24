@@ -74,7 +74,7 @@ public class Experiment {
     }
 
 
-
+     @Transient
     public RunStrategy getStrategyInstance() {
         return RunStrategy.Type.valueOf(getProperty(Plugin.PROP_RUN_STRATEGY)).instance();
     }

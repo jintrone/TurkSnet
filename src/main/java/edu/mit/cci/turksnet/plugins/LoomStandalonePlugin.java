@@ -45,6 +45,7 @@ public class LoomStandalonePlugin implements Plugin {
     private static final String PROP_TRAINING_STORY = "training_story";
     private static final String PROP_TRAINING_DATA = "training";
     private static final String PROP_TRAINING_TURNLENGTH = "training_turnlength";
+    private static final String PROP_DEBUG_WAIT = "debug_wait";
 
 
     private static Logger logger = Logger.getLogger(LoomStandalonePlugin.class);
@@ -153,6 +154,14 @@ public class LoomStandalonePlugin implements Plugin {
         Map<String, String> storymap = getStoryMap(n.getSession_().getProperty(PROP_STORY));
         n.setPublicData_(internalFormatData(storymap, results));
         n.addScore(getScore(n.getSession_().getProperty(PROP_STORY), n.getPublicData_()));
+        if (n.getSession_().getExperiment().getProperty(PROP_DEBUG_WAIT)!=null ) {
+            try {
+                Thread.sleep(Long.parseLong(n.getSession_().getExperiment().getProperty(PROP_DEBUG_WAIT)));
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+
 
     }
 
