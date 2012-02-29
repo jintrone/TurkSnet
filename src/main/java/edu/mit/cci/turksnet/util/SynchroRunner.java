@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,8 +32,7 @@ public class SynchroRunner implements RunStrategy {
 
     private static Logger log = Logger.getLogger(SynchroRunner.class);
 
-
-    private Set<Long> queue = Collections.synchronizedSet(new HashSet<Long>());
+    private Map<Long, Boolean[]> queue = Collections.synchronizedMap(new HashMap<Long, Boolean[]>());
 
     private final WorkerQueue wq = new MemoryBasedQueue();
 
@@ -62,8 +60,9 @@ public class SynchroRunner implements RunStrategy {
         gameState = GameState.IN_TURN;
         turnEnd = System.currentTimeMillis() + turnLength;
         session.setIteration(session.getIteration() + 1);
+        log.debug("Start turn " + session.getIteration() + " with " + turnLength + " sec remaining");
         for (Node n : session.getAvailableNodes()) {
-            queue.add(n.getId());
+            queue.get(n.getId())[0] = true;
         }
 
 
@@ -95,16 +94,27 @@ public class SynchroRunner implements RunStrategy {
 
 
         } else if (gameState == GameState.WAITING_FOR_RESULTS) {
-            if (queue.isEmpty()) {
-                gameState = GameState.DONE_TURN;
-            } else {
-                for (Long n : new HashSet<Long>(queue)) {
-                    Node node = Node.findNode(n);
+            gameState = GameState.DONE_TURN;
+            for (long ent : new HashSet<Long>(queue.keySet())) {
+                Node node = Node.findNode(ent);
+                if (queue.get(node.getId())[0]) {
                     if (!wq.isActive(node.getWorker().getId(), TIMEOUT)) {
-                        session.logNodeEvent(node, "timeout");
-                        session.getExperiment().getActualPlugin().automateNodeTurn(node);
+                        Boolean[] lock = queue.get(node.getId());
+
+                        synchronized (lock) {
+                            if (lock[0]) {
+                                session.logNodeEvent(node, "timeout");
+                                session.getExperiment().getActualPlugin().automateNodeTurn(node);
+                                lock[0] = false;
+                            } else {
+                                 log.warn("Skip node automation; already updated?");
+                            }
+                        }
+                    } else {
+                        gameState = GameState.WAITING_FOR_RESULTS;
                     }
                 }
+
             }
 
         } else if (gameState == GameState.DONE_TURN || gameState == null) {
@@ -115,7 +125,7 @@ public class SynchroRunner implements RunStrategy {
                 startTurn();
             }
         } else if (gameState == GameState.DONE_GAME) {
-            log.info("Completing session "+session.getId());
+            log.info("Completing session " + session.getId());
             cleanupSession(Session_.Status.COMPLETE);
             return false;
         } else if (gameState == GameState.FORCE_DONE_GAME) {
@@ -131,7 +141,7 @@ public class SynchroRunner implements RunStrategy {
         session = Session_.findSession_(session.getId());
         session.setStatus(status);
         session.flush();
-        for (Node n:session.getNodesAsList()) {
+        for (Node n : session.getNodesAsList()) {
             finalizeTurnForWorker(n.getWorker());
         }
         wq.clear();
@@ -142,6 +152,10 @@ public class SynchroRunner implements RunStrategy {
 
 
         turnLength = 1000l * Integer.parseInt(session.getProperty(Plugin.PROP_TURN_LENGTH_SECONDS));
+        //init lock queue
+        for (Node n : session.getAvailableNodes()) {
+            queue.put(n.getId(), new Boolean[]{false});
+        }
         final Timer t = new Timer(true);
         t.schedule(getTimerTask(t), 1000l);
     }
@@ -193,11 +207,15 @@ public class SynchroRunner implements RunStrategy {
     @Override
     @Transactional
     public void updateNode(Node node, String results) throws ClassNotFoundException, IllegalAccessException, InstantiationException, JSONException {
-        log.debug("Process results; queue length " + queue.size());
-        node.getSession_().getExperiment().getActualPlugin().processResults(node, results);
-        node.getSession_().logNodeEvent(node, "results");
-        queue.remove(node.getId());
-        log.debug("Queue after processing: " + queue.size());
+        synchronized (queue.get(node.getId())) {
+            if (queue.get(node.getId())[0]) {
+                node.getSession_().getExperiment().getActualPlugin().processResults(node, results);
+                node.getSession_().logNodeEvent(node, "results");
+                queue.get(node.getId())[0] = false;
+            } else {
+                log.warn("Skip update node; already automated?");
+            }
+        }
     }
 
     //will update worker - request driven
