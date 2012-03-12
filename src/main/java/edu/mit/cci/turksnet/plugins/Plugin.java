@@ -27,9 +27,9 @@ public interface Plugin {
 
     String getLoginApp() throws Exception;
 
-    JSONObject getTrainingData(Worker w, Experiment e, Map parameterMap);
+    JSONObject getTrainingData(Worker w, Experiment e, Map parameterMap) throws JSONException;
 
-    void addTrainingData(Worker w, Experiment e, Map parameterMap);
+    JSONObject addTrainingData(Worker w, Experiment e, Map parameterMap) throws JSONException;
 
     Map<String,Object> getFinalInfo(Node n);
 

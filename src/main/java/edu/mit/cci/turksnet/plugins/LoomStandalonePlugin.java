@@ -42,9 +42,6 @@ public class LoomStandalonePlugin implements Plugin {
     public static final String PROP_STORY = "story";
     private static final String PROP_PRIVATE_TILES = "private_tile_count";
     private static final String PROP_NET_DEGREE = "network_degree";
-    private static final String PROP_TRAINING_STORY = "training_story";
-    private static final String PROP_TRAINING_DATA = "training";
-    private static final String PROP_TRAINING_TURNLENGTH = "training_turnlength";
     private static final String PROP_DEBUG_WAIT = "debug_wait";
 
 
@@ -154,7 +151,7 @@ public class LoomStandalonePlugin implements Plugin {
         Map<String, String> storymap = getStoryMap(n.getSession_().getProperty(PROP_STORY));
         n.setPublicData_(internalFormatData(storymap, results));
         n.addScore(getScore(n.getSession_().getProperty(PROP_STORY), n.getPublicData_()));
-        if (n.getSession_().getExperiment().getProperty(PROP_DEBUG_WAIT)!=null ) {
+        if (n.getSession_().getExperiment().getProperty(PROP_DEBUG_WAIT) != null) {
             try {
                 Thread.sleep(Long.parseLong(n.getSession_().getExperiment().getProperty(PROP_DEBUG_WAIT)));
             } catch (InterruptedException e) {
@@ -241,92 +238,101 @@ public class LoomStandalonePlugin implements Plugin {
         return configureApplicationString("LoginRegister");
     }
 
+
+    private String extractStoryFromTraining(JSONObject obj) throws JSONException {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i <= obj.length(); i++) {
+            if (i > 1) builder.append("&");
+            builder.append(i).append("='").append(obj.getString(i + ""));
+        }
+        return builder.toString();
+    }
+
+
     @Override
+    public JSONObject addTrainingData(Worker w, Experiment e, Map parameterMap) throws JSONException {
+
+         JSONArray trainingdata = new JSONArray(e.getTrainingProps());
+         JSONObject result = null;
+        int trainingItem = Integer.parseInt(((String[]) parameterMap.get("trainingitem"))[0]);
+        if (trainingItem >= trainingdata.length()) {
+            result = new JSONObject();
+            result.put("status", "error");
+            return result;
+        }
+          commitTrainingData(w, trainingItem,e,  parameterMap);
+
+
+
+
+
+        result = trainingdata.getJSONObject(trainingItem);
+        if (result.getString("type").equals("full")) {
+            String story = extractStoryFromTraining(result.getJSONObject("story"));
+            JSONObject obj = new JSONObject(w.getTraining());
+            result = scoreTraining(obj.getString(trainingItem+""), story);
+        }
+        result.put("status", "ok");
+        return result;
+    }
+
     @Transactional
-    public void addTrainingData(Worker w, Experiment e, Map parameterMap) {
+    private void commitTrainingData(Worker w, int trainingItem, Experiment e, Map parameterMap) throws JSONException {
         String current = w.getTraining();
         String incoming = ((String[]) parameterMap.get("data"))[0];
         logger.debug("Set training data:" + incoming);
         if (current == null || current.isEmpty()) {
-            w.setTraining(incoming);
+            JSONObject obj = new JSONObject();
+            obj.put(trainingItem+"",incoming);
+            w.setTraining(obj.toString());
         } else {
-            w.setTraining(w.getTraining() + "&" + incoming);
+            JSONObject obj = new JSONObject(w.getTraining());
+            if (obj.has(""+trainingItem)) {
+                String existing = obj.getString(""+trainingItem);
+                obj.put(""+trainingItem,existing+"&"+incoming);
+
+            } else {
+               obj.put(""+trainingItem,incoming);
+            }
+           w.setTraining(obj.toString());
         }
         w.flush();
-
     }
 
-    private String getLastTrainingData(String fulldata) {
-        String[] splitdata = fulldata.split("&");
-        if (splitdata != null && splitdata.length > 0) {
-            return splitdata[splitdata.length - 1];
-        }
-        return "";
-    }
 
     @Override
-    public JSONObject getTrainingData(Worker w, Experiment e, Map parameterMap) {
-
-        Map<String, String> storymap = getStoryMap(e.getProperty(PROP_TRAINING_STORY));
-
-
-        int step = Integer.parseInt(((String[]) parameterMap.get("step"))[0]);
-
-
-        String private_data = internalFormatData(storymap, e.getProperty(PROP_TRAINING_DATA + "_n0"));
-        String public_data = "";
-        if (step == 1) {
-            public_data = private_data;
-
-        } else if (step < 4) {
-            public_data = internalFormatData(storymap, getLastTrainingData(w.getTraining()));
-
-
-        } else {
-
-            try {
-                String story = e.getProperty(PROP_TRAINING_STORY);
-                JSONObject result = scoreTraining(w, e.getProperty(PROP_TRAINING_STORY));
-                result.put("answer", new JSONArray(getStoryAsList(story)));
-                return result;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            return null;
-        }
-
-
-        Map<Long, String> neighbors = new HashMap<Long, String>();
-        neighbors.put(1l, internalFormatData(storymap, e.getProperty(PROP_TRAINING_DATA + "_n1_s" + step)));
-        neighbors.put(2l, internalFormatData(storymap, e.getProperty(PROP_TRAINING_DATA + "_n2_s" + step)));
-        JSONObject result = Node.getJsonDataUtil(public_data, private_data, neighbors);
-
+    public JSONObject getTrainingData(Worker w, Experiment e, Map parameterMap) throws JSONException {
+        JSONObject result = new JSONObject();
+        JSONArray trainingdata = null;
         try {
-            if (e.getProperty(PROP_TRAINING_TURNLENGTH)!=null) {
-            result.put("turnlength",e.getProperty(PROP_TRAINING_TURNLENGTH));
-            }
-            JSONObject scoremap = scoreTraining(w, e.getProperty(PROP_TRAINING_STORY));
-            for (Iterator<String> i = scoremap.keys(); i.hasNext(); ) {
-                String key = i.next();
-                result.put(key, scoremap.get(key));
-            }
-            return result;
+            trainingdata = new JSONArray(e.getTrainingProps());
         } catch (JSONException e1) {
             e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+
+            result.put("status", "error");
+            return result;
+
         }
-        return null;
+        int trainingItem = Integer.parseInt(((String[]) parameterMap.get("trainingitem"))[0]);
+        if (trainingItem >= trainingdata.length()) {
+            result.put("status", "done");
+        } else {
+            result = trainingdata.getJSONObject(trainingItem);
+        }
+        return result;
     }
 
-    public JSONObject scoreTraining(Worker w, String story) throws JSONException {
+
+    public JSONObject scoreTraining(String trainingdata, String story) throws JSONException {
 
         JSONObject result = new JSONObject();
         List<Integer> storyorder = getStoryOrder(story);
 
         List<Float> scores = new ArrayList<Float>();
         float total = 0f;
-        String trainingdata = w.getTraining();
+
         if (trainingdata != null && !trainingdata.isEmpty()) {
-            for (String interim : w.getTraining().split("&")) {
+            for (String interim: trainingdata.split("&")) {
                 List<Integer> order = new ArrayList<Integer>();
                 for (String s : interim.split(";")) {
                     order.add(Integer.parseInt(s));
@@ -451,7 +457,7 @@ public class LoomStandalonePlugin implements Plugin {
             graph = GraphGenerator.generateBowtieCircle(nodecount);
         } else if ("wheel".equals(graphtype)) {
             nodecount = (nodecount / 2) * 2;
-            graph = GraphGenerator.generateWheel(nodecount,degree );
+            graph = GraphGenerator.generateWheel(nodecount, degree);
         } else if ("square-tesselation".equals(graphtype)) {
             if (nodecount / 2 * 2 != nodecount) {
                 nodecount--;

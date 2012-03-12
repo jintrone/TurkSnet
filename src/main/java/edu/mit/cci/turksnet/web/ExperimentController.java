@@ -6,6 +6,7 @@ import edu.mit.cci.turksnet.plugins.Plugin;
 import edu.mit.cci.turksnet.util.TestException;
 import edu.mit.cci.turksnet.util.U;
 import org.apache.log4j.Logger;
+import org.apache.sling.commons.json.JSONException;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -331,7 +332,7 @@ public class ExperimentController {
 
     @RequestMapping(value = "/{id}/trainingdata", method = RequestMethod.GET)
     @ResponseBody
-    public String getTrainingData(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, HttpServletRequest request, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public String getTrainingData(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, HttpServletRequest request, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException {
         Worker worker = Worker.findWorker(workerid);
         Experiment e = Experiment.findExperiment(id);
         Plugin p = e.getActualPlugin();
@@ -341,12 +342,12 @@ public class ExperimentController {
 
     @RequestMapping(value = "/{id}/trainingdata", method = RequestMethod.POST)
     @ResponseBody
-    public String setTrainingData(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, HttpServletRequest request, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public String setTrainingData(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, HttpServletRequest request, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException {
         Worker worker = Worker.findWorker(workerid);
         Experiment e = Experiment.findExperiment(id);
         Plugin p = e.getActualPlugin();
-        p.addTrainingData(worker, e, request.getParameterMap());
-        return "{\"status\":\"ok\"}";
+        return U.safejson(p.addTrainingData(worker, e, request.getParameterMap()));
+
     }
 
 

@@ -5,6 +5,7 @@
 
     <spring:theme code="styleSheet" var="roo_css"/>
     <spring:url value="/${roo_css}" var="roo_css_url"/>
+    <spring:url value="/resources/styles/stripped.css" var="stripped_css"/>
     <spring:url value="/resources/images/favicon.ico" var="favicon"/>
     <spring:url value="/resources/javascript/jquery-ui.js" var="jquery_ui_url"/>
     <spring:url value="/resources/javascript/jquery.js" var="jquery_url"/>
@@ -21,7 +22,7 @@
 
 
     <link rel="SHORTCUT ICON" href="${favicon}"/>
-
+    <link rel="stylesheet" type="text/css" href="${stripped_css}"><!--fooey--></link>
     <!-- Get the user local from the page context (it was set by Spring MVC's locale resolver) -->
     <c:set var="userLocale">
         <c:out value="${pageContext.response.locale}" default="en"/>

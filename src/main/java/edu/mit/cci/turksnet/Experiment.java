@@ -39,6 +39,10 @@ public class Experiment {
     @Column(columnDefinition = "LONGTEXT")
     private String sessionProps;
 
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String trainingProps;
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(style = "SS")
     private Date startDate;
@@ -94,6 +98,14 @@ public class Experiment {
 
     public void setSessionProps(String props) {
         this.sessionProps = props;
+    }
+
+    public String getTrainingProps() {
+        return trainingProps;
+    }
+
+    public void setTrainingProps(String props) {
+        this.trainingProps = props;
     }
 
     public Map<String, String> getPropsAsMap() {

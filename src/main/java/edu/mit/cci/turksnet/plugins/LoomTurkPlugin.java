@@ -77,8 +77,9 @@ public class LoomTurkPlugin implements Plugin {
     }
 
     @Override
-    public void addTrainingData(Worker w, Experiment e, Map parameterMap) {
+    public JSONObject addTrainingData(Worker w, Experiment e, Map parameterMap) {
         //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override

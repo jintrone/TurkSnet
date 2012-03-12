@@ -5,6 +5,7 @@
     <page:show id="ps_edu_mit_cci_turksnet_Experiment" object="${experiment}" path="/experiments" z="4X7nBj1B5cYaszcgCCKZgXfGv6Y=">
         <field:display field="properties" id="s_edu_mit_cci_turksnet_Experiment_properties" object="${experiment}" z="DcrKkrzRHX4KaP1kaHjWb5uj2k8="/>
         <field:display field="sessionProps" id="c_edu_mit_cci_turksnet_Experiment_sessionProps" object="${experiment}" z="user-managed"/>
+        <field:display field="trainingProps" id="c_edu_mit_cci_turksnet_Experiment_trainingProps" object="${experiment}" z="user-managed"/>
         <field:display field="network" id="s_edu_mit_cci_turksnet_Experiment_network" object="${experiment}" z="DxSn1S8O6tcIoLtyQZWza0ig9s4="/>
 
         <field:display field="pluginClazz" id="s_edu_mit_cci_turksnet_Experiment_pluginClazz" object="${experiment}" z="pJjmWOFY9jju8vLVNS1acji7Ca0="/>

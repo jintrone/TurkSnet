@@ -7,7 +7,6 @@ import edu.mit.cci.turksnet.Worker;
 import org.apache.sling.commons.json.JSONObject;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +41,9 @@ public class TestPlugin implements Plugin {
     }
 
     @Override
-    public void addTrainingData(Worker w, Experiment e, Map parameterMap) {
+    public JSONObject addTrainingData(Worker w, Experiment e, Map parameterMap) {
         //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
