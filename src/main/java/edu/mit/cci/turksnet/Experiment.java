@@ -6,8 +6,6 @@ import edu.mit.cci.turksnet.plugins.Plugin;
 import edu.mit.cci.turksnet.util.RunStrategy;
 import edu.mit.cci.turksnet.util.WaitingRoomManager;
 import org.apache.log4j.Logger;
-import org.apache.sling.commons.json.JSONException;
-import org.apache.sling.commons.json.JSONObject;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
@@ -46,6 +44,17 @@ public class Experiment {
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(style = "SS")
     private Date startDate;
+
+
+    public String getNextSession() {
+        return nextSession;
+    }
+
+    public void setNextSession(String nextSession) {
+        this.nextSession = nextSession;
+    }
+
+    private String nextSession;
 
     @ValidClass
     private String pluginClazz;
@@ -178,7 +187,7 @@ public class Experiment {
 
 
     public int getAvailableSessionCount() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        return getActualPlugin().getRemainingSessions(this);
+        return getActualPlugin().getRemainingSessionCount(this);
 
     }
 

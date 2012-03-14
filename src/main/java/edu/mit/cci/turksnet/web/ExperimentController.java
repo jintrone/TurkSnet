@@ -1,6 +1,7 @@
 package edu.mit.cci.turksnet.web;
 
 import edu.mit.cci.turksnet.Experiment;
+import edu.mit.cci.turksnet.Session_;
 import edu.mit.cci.turksnet.Worker;
 import edu.mit.cci.turksnet.plugins.Plugin;
 import edu.mit.cci.turksnet.util.TestException;
@@ -36,8 +37,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RooWebScaffold(path = "experiments", formBackingObject = Experiment.class)
 @RequestMapping("/experiments")
@@ -87,7 +90,16 @@ public class ExperimentController {
             return "experiments/notavailable";
         } else {
             model.addAttribute("path", "/experiments/" + id + "/force");
-            model.addAttribute("sessions", e.getSessions());
+            Map<Session_,String> sessions = new LinkedHashMap<Session_, String>();
+            for (Session_ s:e.getSessions()) {
+
+                if (s.getProperty(Plugin.PROP_SESSION_ID)!=null) {
+                    sessions.put(s,s.getProperty(Plugin.PROP_SESSION_ID));
+                }
+            }
+            model.addAttribute("nextSession",e.getNextSession()==null?"None":e.getNextSession());
+            model.addAttribute("sessions",sessions);
+            model.addAttribute("availableSessionNames",e.getActualPlugin().getRemainingSessionNames(e));
             model.addAttribute("remainingSessions", e.getAvailableSessionCount());
             model.addAttribute("waiting", e.getWaitingRoomManager(id).getWaiting(true));
             model.addAttribute("desired", e.getProperty(Plugin.PROP_NODE_COUNT));
@@ -116,6 +128,26 @@ public class ExperimentController {
         } else {
             e.setStartDate(null);
         }
+        return "redirect://experiments/" + encodeUrlPathSegment("" + id, request) + "/manage";
+
+    }
+
+    @RequestMapping(value = "/{id}/force_next", method = RequestMethod.POST)
+    public String setNextSession(@PathVariable("id") Long id,  @RequestParam("session_id") String nextSession, HttpServletRequest request) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Experiment e = Experiment.findExperiment(id);
+
+        if (nextSession.equals("")) {
+            e.setNextSession(null);
+        } else {
+            Set<String> names = e.getActualPlugin().getRemainingSessionNames(e);
+            if (names.contains(nextSession)) {
+                e.setNextSession(nextSession);
+
+            } else {
+                e.setNextSession(null);
+            }
+        }
+        e.flush();
         return "redirect://experiments/" + encodeUrlPathSegment("" + id, request) + "/manage";
 
     }
@@ -157,7 +189,7 @@ public class ExperimentController {
     private boolean checkAvailable(Long experimentId) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Experiment e = Experiment.findExperiment(experimentId);
         Plugin p = e.getActualPlugin();
-        return (p.getRemainingSessions(e) > 0);
+        return (p.getRemainingSessionCount(e) > 0);
 
 
     }

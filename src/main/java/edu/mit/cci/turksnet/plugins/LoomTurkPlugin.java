@@ -14,6 +14,7 @@ import edu.mit.cci.turksnet.util.U;
 import edu.uci.ics.jung.algorithms.generators.Lattice2DGenerator;
 import edu.uci.ics.jung.graph.util.Pair;
 import org.apache.log4j.Logger;
+import org.apache.sling.commons.json.JSONArray;
 import org.apache.sling.commons.json.JSONException;
 import org.apache.sling.commons.json.JSONObject;
 
@@ -88,10 +89,15 @@ public class LoomTurkPlugin implements Plugin {
     }
 
     @Override
-    public int getRemainingSessions(Experiment e) {
+    public int getRemainingSessionCount(Experiment e) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public Set<String> getRemainingSessionNames(Experiment e) {
+       return Collections.emptySet();
+
+    }
 
 
     public Session_ createSession(Experiment experiment,List<Worker> workers, boolean force) throws SessionCreationException {

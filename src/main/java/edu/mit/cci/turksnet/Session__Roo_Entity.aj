@@ -91,7 +91,7 @@ privileged aspect Session__Roo_Entity {
     }
     
     public static List<Session_> Session_.findAllSession_s() {
-        return entityManager().createQuery("select o from Session_ o", Session_.class).getResultList();
+        return entityManager().createQuery("select o from Session_ o order by created", Session_.class).getResultList();
     }
     
     public static Session_ Session_.findSession_(Long id) {

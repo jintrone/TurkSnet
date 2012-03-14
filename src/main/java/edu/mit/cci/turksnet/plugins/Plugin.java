@@ -10,6 +10,7 @@ import org.apache.sling.commons.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: jintrone
@@ -33,7 +34,9 @@ public interface Plugin {
 
     Map<String,Object> getFinalInfo(Node n);
 
-    int getRemainingSessions(Experiment e);
+    int getRemainingSessionCount(Experiment e);
+
+    Set<String> getRemainingSessionNames(Experiment e);
 
 
 

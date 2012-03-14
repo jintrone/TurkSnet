@@ -76,6 +76,7 @@ public class LoomStandalonePlugin implements Plugin {
         session.setCreated(new Date());
         session.setIteration(-1);
         List<Session_> known = new ArrayList<Session_>();
+        String nextSession = e.getNextSession();
         for (Session_ s : e.getSessions()) {
             if (s.getStatus() != Session_.Status.ABORTED) {
                 known.add(s);
@@ -92,11 +93,15 @@ public class LoomStandalonePlugin implements Plugin {
                     sessionids.add(s.getProperty(PROP_SESSION_ID));
                 }
 
+                if (nextSession!=null && sessionids.contains(nextSession)) {
+                    nextSession = null;
+                }
+
                 int i = 0;
                 for (; i < sessions.length(); i++) {
                     JSONObject props = sessions.getJSONObject(i);
                     String sessionid = props.getString(PROP_SESSION_ID);
-                    if (!sessionids.contains(sessionid)) {
+                    if ((nextSession==null || sessionid.equals(nextSession)) && !sessionids.contains(sessionid)) {
                         session.setProperties(props.toString());
                         break;
                     }
@@ -576,7 +581,7 @@ public class LoomStandalonePlugin implements Plugin {
     }
 
     //TODO: Please please improve me
-    public int getRemainingSessions(Experiment e) {
+    public int getRemainingSessionCount(Experiment e) {
         List<Session_> known = new ArrayList<Session_>();
         for (Session_ s : e.getSessions()) {
             if (s.getStatus() != Session_.Status.ABORTED) {
@@ -584,31 +589,49 @@ public class LoomStandalonePlugin implements Plugin {
             }
         }
         if (e.getSessionProps() != null) {
-            try {
-
-                JSONArray pending = null;
-                pending = new JSONArray(e.getSessionProps());
-                Set<String> sessionids = new HashSet<String>();
-                for (int i = 0; i < pending.length(); i++) {
-                    JSONObject props = pending.getJSONObject(i);
-                    sessionids.add(props.getString(PROP_SESSION_ID));
-
-                }
-                for (Session_ s : known) {
-                    sessionids.remove(s.getProperty(PROP_SESSION_ID));
-                }
-                return (sessionids.size());
-
-
-            } catch (JSONException e1) {
-                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+           return getRemainingSessionNames(e).size();
 
         } else if (e.getProperty(Plugin.PROP_SESSION_COUNT) != null) {
             return Math.max(0, Integer.parseInt(e.getProperty(Plugin.PROP_SESSION_COUNT)) - known.size());
         }
         return 0;
     }
+
+    @Override
+    public Set<String> getRemainingSessionNames(Experiment e) {
+       Set<String> available = new HashSet<String>();
+        if (e.getSessionProps() != null) {
+            try {
+
+                JSONArray pending = null;
+                pending = new JSONArray(e.getSessionProps());
+
+                for (int i = 0; i < pending.length(); i++) {
+
+                    JSONObject props = pending.getJSONObject(i);
+                    if (props.has(PROP_SESSION_ID)) {
+                        available.add(props.getString(PROP_SESSION_ID));
+                    }
+
+                }
+
+            } catch (JSONException e1) {
+                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        }
+        for (Session_ s : e.getSessions()) {
+            if (s.getStatus() != Session_.Status.ABORTED) {
+               if (s.getProperty(PROP_SESSION_ID)!=null) {
+                   available.remove(s.getProperty(PROP_SESSION_ID));
+               }
+            }
+        }
+        return available;
+
+    }
+
+
 
 
     @Override

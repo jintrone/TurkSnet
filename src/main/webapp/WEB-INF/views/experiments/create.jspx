@@ -7,6 +7,7 @@
         <field:textarea field="sessionProps" id="c_edu_mit_cci_turksnet_Experiment_sessionProps" z="user-managed"/>
         <field:textarea field="trainingProps" id="c_edu_mit_cci_turksnet_Experiment_trainingProps" z="user-managed"/>
         <field:textarea field="javaScript" id="c_edu_mit_cci_turksnet_Experiment_javaScript" z="user-managed"/>
+        <field:input field="nextSession" id="c_edu_mit_cci_turksnet_Experiment_nextSession"  z="user-managed"/>
         <field:input field="pluginClazz" id="c_edu_mit_cci_turksnet_Experiment_pluginClazz" z="H9aj3KRemSlfnRvLzRSCDrOjoE8="/>
         <field:input field="network" id="c_edu_mit_cci_turksnet_Experiment_network" z="E9pISY2sxqo/KJn5z0NNHBHbWfQ="/>
 

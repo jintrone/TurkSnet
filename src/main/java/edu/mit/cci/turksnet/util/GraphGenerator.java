@@ -77,6 +77,8 @@ public class GraphGenerator {
         return DefaultJungEdge.getFactory().create();
     }
 
+
+
     public static DefaultUndirectedJungGraph generateBowtie(int nodes) {
         DefaultUndirectedJungGraph graph = (DefaultUndirectedJungGraph) DefaultUndirectedJungGraph.getFactory().create();
         if (nodes < 6) {
@@ -188,6 +190,34 @@ public class GraphGenerator {
         }
         return graph;
     }
+    //degree 4, high clustering, low path
+    public static DefaultUndirectedJungGraph generatePinWheel(int nodes) {
+        assert 6*(nodes/6)==nodes;
+         DefaultUndirectedJungGraph graph = (DefaultUndirectedJungGraph) DefaultUndirectedJungGraph.getFactory().create();
+         int count = 0;
+        List<DefaultJungNode> outer = new ArrayList<DefaultJungNode>();
+        List<DefaultJungNode> inner = new ArrayList<DefaultJungNode>();
+        List<DefaultJungNode> lateral = new ArrayList<DefaultJungNode>();
+        while (count<nodes) {
+            DefaultJungNode[] t = addTri(graph);
+            outer.add(t[0]);
+            inner.add(t[1]);
+            lateral.add(t[2]);
+            count+=3;
+        }
+        for (int i=0;i<lateral.size();i++) {
+            graph.addEdge(e(),lateral.get((i+1)%lateral.size()),inner.get(i));
+            graph.addEdge(e(),lateral.get((i+1)%lateral.size()),outer.get(i));
+        }
+        for (int i=0;i<lateral.size()/2;i++) {
+            graph.addEdge(e(),inner.get(i),inner.get(i+(lateral.size()/2)));
+        }
+
+        for (int i=0;i<outer.size();i+=2) {
+            graph.addEdge(e(),outer.get(i),outer.get((i+1)%outer.size()));
+        }
+        return graph;
+    }
 
     public static double averageCluatering(DefaultUndirectedJungGraph graph) {
         Map<DefaultJungNode, Double> result = Metrics.clusteringCoefficients(graph);
@@ -249,29 +279,43 @@ public class GraphGenerator {
     public static void main(String[] x) {
         String[] headers = new String[]{"TYPE", "SIZE", "DEGREE", "AVG.PATH", "CLUSTERING"};
         printArray(headers);
-        DefaultUndirectedJungGraph graph = generateLatticeGraph(50, 4);
-        printGraph("RING-LATTICE", 4, graph);
+        DefaultUndirectedJungGraph graph = null;
 
 
-        graph = generateSquareLatticeGraph(50, 3);
+        // for (int i =3;i<)
 
-        printGraph("SQUARE-TESSELATION", 3, graph);
-        graph = generateSquareLatticeGraph(50, 4);
-        printGraph("SQUARE-TESSELATION", 4, graph);
-        graph = generateSquareLatticeGraph(50, 5);
-        printGraph("SQUARE-TESSELATION", 5, graph);
         graph = generateBowtie(50);
         printGraph("BOWTIE", 3, graph);
-        graph = generateBowtie(49);
-        printGraph("BOWTIE", 3, graph);
-        graph = generateBowtie(48);
-        printGraph("BOWTIE", 3, graph);
-        graph = generateBowtie(47);
-        printGraph("BOWTIE", 3, graph);
-        graph = generateBowtie(46);
-        printGraph("BOWTIE", 3, graph);
-        graph = generateBowtie(45);
-        printGraph("BOWTIE", 3, graph);
+
+        graph = generateWheel(50, 3);
+        printGraph("WHEEL", 3, graph);
+
+        graph = generateBowtieCircle(50);
+        printGraph("BOWTIE-CIRCLE", 3, graph);
+
+
+        graph = generateLatticeGraph(50, 4);
+        printGraph("RING-LATTICE", 4, graph);
+
+        graph = generateWheel(50, 4);
+        printGraph("WHEEL", 4, graph);
+
+        graph = generatePinWheel(48);
+        printGraph("PINWHEEL", 4, graph);
+
+        graph = generateSquareLatticeGraph(50, 4);
+        printGraph("SQUARE_LATTICE", 4, graph);
+
+
+//        graph = generateLatticeGraph(50, 5);
+//        printGraph("RING-LATTICE", 5, graph);
+
+        graph = generateWheel(50, 5);
+        printGraph("WHEEL", 5, graph);
+
+        graph = generateSquareLatticeGraph(50, 5);
+        printGraph("SQUARE_LATTICE", 5, graph);
+
 
     }
 
