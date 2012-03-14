@@ -98,15 +98,17 @@ public class LoomStandalonePlugin implements Plugin {
                 }
 
                 int i = 0;
+                boolean flag = false;
                 for (; i < sessions.length(); i++) {
                     JSONObject props = sessions.getJSONObject(i);
                     String sessionid = props.getString(PROP_SESSION_ID);
                     if ((nextSession==null || sessionid.equals(nextSession)) && !sessionids.contains(sessionid)) {
                         session.setProperties(props.toString());
+                        flag = true;
                         break;
                     }
                 }
-                if (i == sessions.length()) {
+                if (!flag) {
                     logger.error("No sessions available! (using specific session properties)");
                     return null;
                 }
