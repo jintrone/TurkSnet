@@ -37,6 +37,11 @@
             return ${sessionid}
         }
 
+        function getExperimentId() {
+            return ${experimentid}
+        }
+
+
         function getWorkerId() {
             return ${workerid}
         }

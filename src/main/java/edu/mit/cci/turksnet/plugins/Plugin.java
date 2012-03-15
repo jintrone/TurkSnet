@@ -41,7 +41,7 @@ public interface Plugin {
 
 
     public static enum Event {
-        VISIT, LOGIN, REGISTER, QUALIFICATIONS_SUBMITTED, TRAINING_SUBMITTED
+        VISIT, LOGIN, REGISTER, QUALIFICATIONS_SUBMITTED, SESSION_FINISHED, TRAINING_SUBMITTED
 
     }
 
@@ -86,7 +86,7 @@ public interface Plugin {
 
     Map<String, Object> getScoreInformation(Node n);
 
-    public Destination getDestinationForEvent(Worker w, Event e);
+    public Destination getDestinationForEvent(Experiment ex, Worker w, Event e) throws JSONException;
 
 
 }

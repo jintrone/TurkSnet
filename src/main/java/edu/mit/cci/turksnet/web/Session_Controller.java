@@ -110,6 +110,7 @@ public class Session_Controller {
             log.error(e);
         }
         //@TODO fixme - this is a pretty bad hack.  need to figure out fixes
+        model.addAttribute("experimentid",session.getExperiment().getId());
         model.addAttribute("sessionid", session.getId());
         model.addAttribute("appData", app.replace("${flash_lib_dir}", "/turksnet/resources/flash/").replace("${timestamp}",System.currentTimeMillis()+""));
         model.addAttribute("workerid",workerid);

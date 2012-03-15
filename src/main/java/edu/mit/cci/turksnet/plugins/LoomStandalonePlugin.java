@@ -77,6 +77,9 @@ public class LoomStandalonePlugin implements Plugin {
         session.setIteration(-1);
         List<Session_> known = new ArrayList<Session_>();
         String nextSession = e.getNextSession();
+        if (nextSession!=null && nextSession.trim().isEmpty()) {
+            nextSession = null;
+        }
         for (Session_ s : e.getSessions()) {
             if (s.getStatus() != Session_.Status.ABORTED) {
                 known.add(s);
@@ -93,7 +96,7 @@ public class LoomStandalonePlugin implements Plugin {
                     sessionids.add(s.getProperty(PROP_SESSION_ID));
                 }
 
-                if (nextSession!=null && sessionids.contains(nextSession)) {
+                if (nextSession != null && sessionids.contains(nextSession)) {
                     nextSession = null;
                 }
 
@@ -102,7 +105,7 @@ public class LoomStandalonePlugin implements Plugin {
                 for (; i < sessions.length(); i++) {
                     JSONObject props = sessions.getJSONObject(i);
                     String sessionid = props.getString(PROP_SESSION_ID);
-                    if ((nextSession==null || sessionid.equals(nextSession)) && !sessionids.contains(sessionid)) {
+                    if ((nextSession == null || sessionid.equals(nextSession)) && !sessionids.contains(sessionid)) {
                         session.setProperties(props.toString());
                         flag = true;
                         break;
@@ -259,25 +262,22 @@ public class LoomStandalonePlugin implements Plugin {
     @Override
     public JSONObject addTrainingData(Worker w, Experiment e, Map parameterMap) throws JSONException {
 
-         JSONArray trainingdata = new JSONArray(e.getTrainingProps());
-         JSONObject result = null;
+        JSONArray trainingdata = new JSONArray(e.getTrainingProps());
+        JSONObject result = null;
         int trainingItem = Integer.parseInt(((String[]) parameterMap.get("trainingitem"))[0]);
         if (trainingItem >= trainingdata.length()) {
             result = new JSONObject();
             result.put("status", "error");
             return result;
         }
-          commitTrainingData(w, trainingItem,e,  parameterMap);
-
-
-
+        commitTrainingData(w, trainingItem, e, parameterMap);
 
 
         result = trainingdata.getJSONObject(trainingItem);
         if (result.getString("type").equals("full")) {
             String story = extractStoryFromTraining(result.getJSONObject("story"));
             JSONObject obj = new JSONObject(w.getTraining());
-            result = scoreTraining(obj.getString(trainingItem+""), story);
+            result = scoreTraining(obj.getString(trainingItem + ""), story);
         }
         result.put("status", "ok");
         return result;
@@ -290,20 +290,42 @@ public class LoomStandalonePlugin implements Plugin {
         logger.debug("Set training data:" + incoming);
         if (current == null || current.isEmpty()) {
             JSONObject obj = new JSONObject();
-            obj.put(trainingItem+"",incoming);
+            obj.put(trainingItem + "", incoming);
             w.setTraining(obj.toString());
         } else {
             JSONObject obj = new JSONObject(w.getTraining());
-            if (obj.has(""+trainingItem)) {
-                String existing = obj.getString(""+trainingItem);
-                obj.put(""+trainingItem,existing+"&"+incoming);
+            if (obj.has("" + trainingItem)) {
+                String existing = obj.getString("" + trainingItem);
+                obj.put("" + trainingItem, existing + "&" + incoming);
 
             } else {
-               obj.put(""+trainingItem,incoming);
+                obj.put("" + trainingItem, incoming);
             }
-           w.setTraining(obj.toString());
+            w.setTraining(obj.toString());
         }
         w.flush();
+    }
+
+
+    public boolean doneTraining(Experiment ex, Worker w) throws JSONException {
+
+        if (w.getTraining() == null) {
+            return (ex.getTrainingProps() == null);
+        }
+        JSONArray trainingitems = new JSONArray(ex.getTrainingProps());
+        JSONObject obj = new JSONObject(w.getTraining());
+        return (obj.length() >= trainingitems.length());
+
+
+    }
+
+    public int getNextTrainingItem(Worker w) throws JSONException {
+
+        if (w.getTraining() == null) {
+            return 0;
+        } else {
+            return new JSONObject(w.getTraining()).length();
+        }
     }
 
 
@@ -320,11 +342,12 @@ public class LoomStandalonePlugin implements Plugin {
             return result;
 
         }
-        int trainingItem = Integer.parseInt(((String[]) parameterMap.get("trainingitem"))[0]);
+        int trainingItem = getNextTrainingItem(w);
         if (trainingItem >= trainingdata.length()) {
             result.put("status", "done");
         } else {
             result = trainingdata.getJSONObject(trainingItem);
+            result.put("trainingitem",trainingItem);
         }
         return result;
     }
@@ -339,7 +362,7 @@ public class LoomStandalonePlugin implements Plugin {
         float total = 0f;
 
         if (trainingdata != null && !trainingdata.isEmpty()) {
-            for (String interim: trainingdata.split("&")) {
+            for (String interim : trainingdata.split("&")) {
                 List<Integer> order = new ArrayList<Integer>();
                 for (String s : interim.split(";")) {
                     order.add(Integer.parseInt(s));
@@ -591,7 +614,7 @@ public class LoomStandalonePlugin implements Plugin {
             }
         }
         if (e.getSessionProps() != null) {
-           return getRemainingSessionNames(e).size();
+            return getRemainingSessionNames(e).size();
 
         } else if (e.getProperty(Plugin.PROP_SESSION_COUNT) != null) {
             return Math.max(0, Integer.parseInt(e.getProperty(Plugin.PROP_SESSION_COUNT)) - known.size());
@@ -601,7 +624,7 @@ public class LoomStandalonePlugin implements Plugin {
 
     @Override
     public Set<String> getRemainingSessionNames(Experiment e) {
-       Set<String> available = new HashSet<String>();
+        Set<String> available = new HashSet<String>();
         if (e.getSessionProps() != null) {
             try {
 
@@ -624,9 +647,9 @@ public class LoomStandalonePlugin implements Plugin {
         }
         for (Session_ s : e.getSessions()) {
             if (s.getStatus() != Session_.Status.ABORTED) {
-               if (s.getProperty(PROP_SESSION_ID)!=null) {
-                   available.remove(s.getProperty(PROP_SESSION_ID));
-               }
+                if (s.getProperty(PROP_SESSION_ID) != null) {
+                    available.remove(s.getProperty(PROP_SESSION_ID));
+                }
             }
         }
         return available;
@@ -634,23 +657,31 @@ public class LoomStandalonePlugin implements Plugin {
     }
 
 
-
-
     @Override
-    public Destination getDestinationForEvent(Worker w, Event e) {
+    public Destination getDestinationForEvent(Experiment ex, Worker w, Event e) throws JSONException {
         if (e == Event.LOGIN || e == Event.REGISTER) {
             if (w.getQualifications() == null) {
                 return Destination.QUALIFICATIONS;
-            } else if (w.getTraining() == null) {
+            } else if (!doneTraining(ex, w)) {
                 return Destination.TRAINING;
+
             } else return Destination.WAITING;
         }
-        if (e == Event.QUALIFICATIONS_SUBMITTED) {
+        if (e == Event.QUALIFICATIONS_SUBMITTED && !doneTraining(ex, w)) {
             return Destination.TRAINING;
         }
         if (e == Event.TRAINING_SUBMITTED) {
             return Destination.WAITING;
         }
+        if (e == Event.SESSION_FINISHED) {
+            if (getRemainingSessionCount(ex) > 0) {
+                return Destination.WAITING;
+            } else {
+                return Destination.LOGIN;
+            }
+
+        }
+
         return Destination.WAITING;
     }
 

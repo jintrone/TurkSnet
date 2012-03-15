@@ -330,7 +330,7 @@ public class ExperimentController {
 
     @RequestMapping(value = "/{id}/qualifications", method = RequestMethod.POST)
     @ResponseBody
-    public String postQualifications(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, @RequestParam("data") String data) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public String postQualifications(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, @RequestParam("data") String data) throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException {
         Worker worker = Worker.findWorker(workerid);
         if (worker == null) {
             return "redirect:/experiments/" + id + "/join";
@@ -340,16 +340,16 @@ public class ExperimentController {
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("status", "success");
         Plugin p = Experiment.findExperiment(id).getActualPlugin();
-        result.put("forward", p.getDestinationForEvent(worker, Plugin.Event.QUALIFICATIONS_SUBMITTED).url(id));
+        result.put("forward", p.getDestinationForEvent(Experiment.findExperiment(id),worker, Plugin.Event.QUALIFICATIONS_SUBMITTED).url(id));
         return U.jsonify(result);
     }
 
     @RequestMapping(value = "/{id}/next", method = RequestMethod.GET)
-    public String next(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, @RequestParam("event") String event, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public String next(@PathVariable("id") Long id, @RequestParam("workerid") Long workerid, @RequestParam("event") String event, Model model) throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException {
         Worker worker = Worker.findWorker(workerid);
         Experiment e = Experiment.findExperiment(id);
         Plugin p = e.getActualPlugin();
-        Plugin.Destination d = p.getDestinationForEvent(worker, Plugin.Event.valueOf(event));
+        Plugin.Destination d = p.getDestinationForEvent(e,worker, Plugin.Event.valueOf(event));
         return configureResponse(id, p, d, worker, model);
     }
 

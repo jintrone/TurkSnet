@@ -326,9 +326,10 @@ public class LoomTurkPlugin implements Plugin {
     }
 
     @Override
-    public Destination getDestinationForEvent(Worker w, Event e) {
+    public Destination getDestinationForEvent(Experiment ex, Worker w, Event e) throws JSONException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
 
     private static List<Integer> getStoryOrder(String story) {
       List<Integer> result = new ArrayList<Integer>();
