@@ -39,11 +39,10 @@ public class GraphGenerator {
         return graph;
     }
 
-    public static DefaultUndirectedJungGraph generateLatticeGraph(int nodes, int degree) {
+    public static DefaultUndirectedJungGraph generateLatticeGraph(int nodes, int degree) throws GraphCreationException {
         if (2 * (degree / 2) != degree) {
             // return generateOddLatticeGraph(nodes,degree);
-            System.err.println("Not supported");
-            return null;
+            throw new GraphCreationException("Degree must be even: "+degree);
         } else return generateEvenLatticeGraph(nodes, degree);
     }
 
@@ -146,11 +145,11 @@ public class GraphGenerator {
 
     }
 
-    public static DefaultUndirectedJungGraph generateBowtieCircle(int nodes) {
+    public static DefaultUndirectedJungGraph generateBowtieCircle(int nodes) throws GraphCreationException {
         DefaultUndirectedJungGraph graph = (DefaultUndirectedJungGraph) DefaultUndirectedJungGraph.getFactory().create();
         if (nodes < 6) {
-            System.err.println("Bowtie circle requires > 6 nodes");
-            return null;
+            throw new GraphCreationException("Bowtie circle requires > 6 nodes");
+
         }
         List<DefaultJungNode[]> a = new ArrayList<DefaultJungNode[]>();
 
@@ -188,8 +187,10 @@ public class GraphGenerator {
     }
 
 
-    public static DefaultUndirectedJungGraph generateEvenLatticeGraph(int nodes, int degree) {
-        assert 2 * (degree / 2) == degree;
+    public static DefaultUndirectedJungGraph generateEvenLatticeGraph(int nodes, int degree) throws GraphCreationException {
+        if (2 * (degree / 2) != degree) {
+            throw new GraphCreationException("Degree must be even: "+degree);
+        }
         DefaultUndirectedJungGraph graph = (DefaultUndirectedJungGraph) DefaultUndirectedJungGraph.getFactory().create();
 
         for (int i = 0; i < nodes; i++) {
@@ -210,8 +211,11 @@ public class GraphGenerator {
     }
 
     //degree 4, high clustering, low path
-    public static DefaultUndirectedJungGraph generatePinWheel(int nodes, int degree) {
-        assert 6 * (nodes / 6) == nodes;
+    public static DefaultUndirectedJungGraph generatePinWheel(int nodes, int degree) throws GraphCreationException {
+        if (nodes < 6) {
+            throw new GraphCreationException("Must have at least 6 nodes");
+        }
+        checkDegree(4,5,degree);
 
         DefaultUndirectedJungGraph graph = (DefaultUndirectedJungGraph) DefaultUndirectedJungGraph.getFactory().create();
         int count = 0;
@@ -285,11 +289,9 @@ public class GraphGenerator {
         printArray(new String[]{type, graph.getVertexCount() + "", avgDegree(graph) + "", String.format("%.2f", averageShortestPath(graph)), String.format("%.2f", averageCluatering(graph))});
     }
 
-    public static DefaultUndirectedJungGraph generateWheel(int nodes, int degree) {
-        if (2 * (nodes / 2) != nodes) {
-            System.err.println("Wheel requires even number of nodes");
-            return null;
-        }
+    public static DefaultUndirectedJungGraph generateWheel(int nodes, int degree) throws GraphCreationException {
+        nodes = 2*nodes/2;
+        checkDegree(3,5,degree);
         DefaultUndirectedJungGraph ring = generateLatticeGraph(nodes, 2);
         List<DefaultJungNode> nodelist = new ArrayList<DefaultJungNode>(ring.getVertices());
         if (degree == 3) {
@@ -336,7 +338,7 @@ public class GraphGenerator {
     }
 
 
-    public static void main(String[] x) throws IOException {
+    public static void main(String[] x) throws IOException, GraphCreationException {
         String[] headers = new String[]{"TYPE", "SIZE", "DEGREE", "AVG.PATH", "CLUSTERING"};
         printArray(headers);
         DefaultUndirectedJungGraph graph = null;
