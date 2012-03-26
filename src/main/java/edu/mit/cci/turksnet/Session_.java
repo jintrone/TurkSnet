@@ -182,7 +182,7 @@ public class Session_ {
         SessionLog slog = new SessionLog();
         slog.setDate_(new Date());
         slog.setNode(n);
-        slog.setSession_(slog.getSession_());
+        slog.setSession_(this);
         slog.setType(type);
         slog.setNodePublicData(n.getPublicData_());
         slog.setNodePrivateData(n.getPrivateData_());

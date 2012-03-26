@@ -27,7 +27,8 @@ public class Worker {
 
     private String password;
 
-    private Long lastCheckin;
+    @Column(columnDefinition = "TIMESTAMP")
+    private Date lastCheckin;
 
     @Column(columnDefinition = "LONGTEXT")
     private String qualifications;
@@ -65,6 +66,14 @@ public class Worker {
 
         }
         return workerCheckin;
+    }
+
+
+    @Transactional
+    public void setLastLogon() {
+      lastCheckin = new Date();
+        flush();
+
     }
 
 

@@ -16,6 +16,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -310,7 +311,11 @@ public class ExperimentController {
         return U.jsonify(result);
     }
 
+
+
     public void loginSuccess(Experiment e, Worker w, Map<String, Object> result) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+
+        w.setLastLogon();
         Plugin p = e.getActualPlugin();
         result.put("status", "success");
         result.put("workerid", w.getId());

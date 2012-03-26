@@ -1,12 +1,22 @@
 package edu.mit.cci.turksnet.util;
 
 import edu.mit.cci.snatools.util.jung.DefaultJungEdge;
+import edu.mit.cci.snatools.util.jung.DefaultJungGraph;
 import edu.mit.cci.snatools.util.jung.DefaultJungNode;
 import edu.mit.cci.snatools.util.jung.DefaultUndirectedJungGraph;
+import edu.mit.cci.turksnet.plugins.GraphCreationException;
 import edu.uci.ics.jung.algorithms.metrics.Metrics;
 import edu.uci.ics.jung.algorithms.shortestpath.UnweightedShortestPath;
+import edu.uci.ics.jung.algorithms.util.MapSettableTransformer;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.io.PajekNetWriter;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +47,16 @@ public class GraphGenerator {
         } else return generateEvenLatticeGraph(nodes, degree);
     }
 
-    public static DefaultUndirectedJungGraph generateSquareLatticeGraph(int nodes, int degree) {
+    public static void checkDegree(int min, int max, int value) throws GraphCreationException {
+        if (value <min || value > max) {
+            throw new GraphCreationException("Degree must be in the range ["+min+" - "+max+"]");
+        }
+    }
+
+    public static DefaultUndirectedJungGraph generateSquareLatticeGraph(int nodes, int degree) throws GraphCreationException {
+            checkDegree(3,5,degree);
+        nodes = nodes/2 * 2;
+
 
         DefaultUndirectedJungGraph graph = (DefaultUndirectedJungGraph) DefaultUndirectedJungGraph.getFactory().create();
 
@@ -78,12 +97,11 @@ public class GraphGenerator {
     }
 
 
-
-    public static DefaultUndirectedJungGraph generateBowtie(int nodes) {
+    public static DefaultUndirectedJungGraph generateBowtie(int nodes) throws GraphCreationException {
         DefaultUndirectedJungGraph graph = (DefaultUndirectedJungGraph) DefaultUndirectedJungGraph.getFactory().create();
         if (nodes < 6) {
-            System.err.println("Bowtie network requires > 6 nodes");
-            return null;
+            throw new GraphCreationException("Bowtie network requires > 6 nodes");
+
         }
         nodes -= 6;
         DefaultJungNode[] firsttri = addTri(graph);
@@ -190,32 +208,47 @@ public class GraphGenerator {
         }
         return graph;
     }
+
     //degree 4, high clustering, low path
-    public static DefaultUndirectedJungGraph generatePinWheel(int nodes) {
-        assert 6*(nodes/6)==nodes;
-         DefaultUndirectedJungGraph graph = (DefaultUndirectedJungGraph) DefaultUndirectedJungGraph.getFactory().create();
-         int count = 0;
+    public static DefaultUndirectedJungGraph generatePinWheel(int nodes, int degree) {
+        assert 6 * (nodes / 6) == nodes;
+
+        DefaultUndirectedJungGraph graph = (DefaultUndirectedJungGraph) DefaultUndirectedJungGraph.getFactory().create();
+        int count = 0;
         List<DefaultJungNode> outer = new ArrayList<DefaultJungNode>();
         List<DefaultJungNode> inner = new ArrayList<DefaultJungNode>();
         List<DefaultJungNode> lateral = new ArrayList<DefaultJungNode>();
-        while (count<nodes) {
+        while (count < nodes) {
             DefaultJungNode[] t = addTri(graph);
             outer.add(t[0]);
             inner.add(t[1]);
             lateral.add(t[2]);
-            count+=3;
+            count += 3;
         }
-        for (int i=0;i<lateral.size();i++) {
-            graph.addEdge(e(),lateral.get((i+1)%lateral.size()),inner.get(i));
-            graph.addEdge(e(),lateral.get((i+1)%lateral.size()),outer.get(i));
+        for (int i = 0; i < lateral.size(); i++) {
+            graph.addEdge(e(), lateral.get((i + 1) % lateral.size()), inner.get(i));
+            graph.addEdge(e(), lateral.get((i + 1) % lateral.size()), outer.get(i));
         }
-        for (int i=0;i<lateral.size()/2;i++) {
-            graph.addEdge(e(),inner.get(i),inner.get(i+(lateral.size()/2)));
+        for (int i = 0; i < inner.size() / 2; i++) {
+            graph.addEdge(e(), inner.get(i), inner.get(i + (inner.size() / 2)));
         }
 
-        for (int i=0;i<outer.size();i+=2) {
-            graph.addEdge(e(),outer.get(i),outer.get((i+1)%outer.size()));
+        for (int i = 0; i < outer.size(); i += 2) {
+            graph.addEdge(e(), outer.get(i), outer.get((i + 1) % outer.size()));
         }
+        if (degree == 5) {
+            for (int i = 0; i < lateral.size()/2; i++) {
+                graph.addEdge(e(), lateral.get(i), lateral.get(i+lateral.size()/2));
+            }
+            for (int i = 0; i < inner.size() ; i+=2) {
+                graph.addEdge(e(), inner.get(i), inner.get((i + 1) % inner.size()));
+            }
+
+            for (int i = 0; i < outer.size()/2; i ++) {
+                graph.addEdge(e(), outer.get(i), outer.get(i + outer.size()/2));
+            }
+        }
+
         return graph;
     }
 
@@ -246,8 +279,10 @@ public class GraphGenerator {
         return total / (double) count;
     }
 
-    public static void printGraph(String type, int deg, DefaultUndirectedJungGraph graph) {
-        printArray(new String[]{type, graph.getVertexCount() + "", deg + "", String.format("%.2f", averageShortestPath(graph)), String.format("%.2f", averageCluatering(graph))});
+    public static void printGraph(String type, DefaultUndirectedJungGraph graph) {
+
+
+        printArray(new String[]{type, graph.getVertexCount() + "", avgDegree(graph) + "", String.format("%.2f", averageShortestPath(graph)), String.format("%.2f", averageCluatering(graph))});
     }
 
     public static DefaultUndirectedJungGraph generateWheel(int nodes, int degree) {
@@ -261,13 +296,29 @@ public class GraphGenerator {
             for (int i = 0; i < nodelist.size() / 2; i++) {
                 ring.addEdge(e(), nodelist.get(i), nodelist.get(i + nodelist.size() / 2));
             }
-        } else if (degree == 4) {
-            for (int i = 0; i < nodelist.size() / 2; i++) {
+        } else if (degree > 3) {
 
-                int a = i + nodelist.size() / 3;
-                int b = (i + nodelist.size() - nodelist.size() / 3) % nodelist.size();
-                ring.addEdge(e(), nodelist.get(i), nodelist.get(a));
-                ring.addEdge(e(), nodelist.get(i), nodelist.get(b));
+            int delta = 2;
+            for (int i = 0; i < nodelist.size(); i++) {
+                //System.out.print(i+"-> ");
+                int a = (i + nodelist.size() / 2 - delta) % nodelist.size();
+                int b = (i + nodelist.size() / 2 + delta) % nodelist.size();
+                if (null == ring.findEdge(nodelist.get(i), nodelist.get(a))) {
+                    ring.addEdge(e(), nodelist.get(i), nodelist.get(a));
+                    //System.out.print("  "+a+"  ");
+                }
+                if (null == ring.findEdge(nodelist.get(i), nodelist.get(b))) {
+                    ring.addEdge(e(), nodelist.get(i), nodelist.get(b));
+                    //System.out.print("  "+b+"  ");
+                }
+                //System.out.println();
+            }
+
+            //ring.addEdge(e(),nodelist.get(nodelist.size()/2),nodelist.get(nodelist.size()-2));
+            if (degree == 5) {
+                for (int i = 0; i < nodelist.size() / 2; i++) {
+                    ring.addEdge(e(), nodelist.get(i), nodelist.get(i + nodelist.size() / 2));
+                }
             }
         }
         return ring;
@@ -275,48 +326,84 @@ public class GraphGenerator {
 
     }
 
+    public static float avgDegree(DefaultUndirectedJungGraph graph) {
+        float degree = 0.0f;
 
-    public static void main(String[] x) {
+        for (DefaultJungNode node:graph.getVertices()) {
+            degree+=graph.degree(node);
+        }
+        return degree/graph.getVertexCount();
+    }
+
+
+    public static void main(String[] x) throws IOException {
         String[] headers = new String[]{"TYPE", "SIZE", "DEGREE", "AVG.PATH", "CLUSTERING"};
         printArray(headers);
         DefaultUndirectedJungGraph graph = null;
 
 
         // for (int i =3;i<)
-
-        graph = generateBowtie(50);
-        printGraph("BOWTIE", 3, graph);
-
-        graph = generateWheel(50, 3);
-        printGraph("WHEEL", 3, graph);
-
-        graph = generateBowtieCircle(50);
-        printGraph("BOWTIE-CIRCLE", 3, graph);
+        System.out.println("\nDEGREE = 3\n-------------");
+        graph = generateWheel(30, 3);
+                printGraph("WHEEL (pc)", graph);
 
 
-        graph = generateLatticeGraph(50, 4);
-        printGraph("RING-LATTICE", 4, graph);
+        graph = generateBowtie(30);
+        printGraph("BOWTIE (PC)", graph);
 
-        graph = generateWheel(50, 4);
-        printGraph("WHEEL", 4, graph);
 
-        graph = generatePinWheel(48);
-        printGraph("PINWHEEL", 4, graph);
+        graph = generateBowtieCircle(30);
+        printGraph("BOWTIE-CIRCLE (pC)", graph);
 
-        graph = generateSquareLatticeGraph(50, 4);
-        printGraph("SQUARE_LATTICE", 4, graph);
 
+        System.out.println("\nDEGREE = 4\n-------------");
+
+        graph = generateWheel(30, 4);
+        writeGraph(graph, new FileOutputStream("WHEEL.50.4.net"));
+        printGraph("WHEEL (pc)", graph);
+
+
+        graph = generateLatticeGraph(30, 4);
+        printGraph("RING-LATTICE (PC)", graph);
+
+        graph = generatePinWheel(30,4);
+        printGraph("PINWHEEL (pC)", graph);
+
+//        graph = generateSquareLatticeGraph(50, 4);
+//        printGraph("SQUARE_LATTICE (PC)", 4, graph);
+
+
+        System.out.println("\nDEGREE = 5\n-------------");
 
 //        graph = generateLatticeGraph(50, 5);
 //        printGraph("RING-LATTICE", 5, graph);
 
-        graph = generateWheel(50, 5);
-        printGraph("WHEEL", 5, graph);
+        graph = generateWheel(30, 5);
+        printGraph("WHEEL (pc)", graph);
+        writeGraph(graph, new FileOutputStream("WHEEL.50.5.net"));
 
-        graph = generateSquareLatticeGraph(50, 5);
-        printGraph("SQUARE_LATTICE", 5, graph);
+        graph = generateSquareLatticeGraph(30, 5);
+        printGraph("SQUARE_LATTICE (PC)", graph);
 
 
+        graph = generatePinWheel(30,5);
+        printGraph("PINWHEEL (pC)", graph);
+        writeGraph(graph, new FileOutputStream("PINWHEEL.50.5.net"));
+
+
+    }
+
+    public static void writeGraph(Graph<DefaultJungNode, DefaultJungEdge> graph, OutputStream stream) throws IOException {
+        PajekNetWriter<DefaultJungNode, DefaultJungEdge> writer = new PajekNetWriter<DefaultJungNode, DefaultJungEdge>();
+        OutputStreamWriter os = new OutputStreamWriter(stream);
+        MapSettableTransformer<DefaultJungNode, String> s = new MapSettableTransformer<DefaultJungNode, String>(new HashMap<DefaultJungNode, String>());
+        MapSettableTransformer<DefaultJungEdge, Number> w = new MapSettableTransformer<DefaultJungEdge, Number>(new HashMap<DefaultJungEdge, Number>()) {
+            @Override
+            public Number transform(DefaultJungEdge input) {
+                return 1.0f;
+            }
+        };
+        writer.save(graph, os, s, w);
     }
 
 

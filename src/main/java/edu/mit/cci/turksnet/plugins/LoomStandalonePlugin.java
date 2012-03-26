@@ -488,7 +488,7 @@ public class LoomStandalonePlugin implements Plugin {
         } else if ("wheel".equals(graphtype)) {
             nodecount = (nodecount / 2) * 2;
             graph = GraphGenerator.generateWheel(nodecount, degree);
-        } else if ("square-tesselation".equals(graphtype)) {
+        } else if ("square-lattice".equals(graphtype)) {
             if (nodecount / 2 * 2 != nodecount) {
                 nodecount--;
             }
@@ -496,6 +496,8 @@ public class LoomStandalonePlugin implements Plugin {
         } else if ("ring-lattice".equals(graphtype)) {
             graph = GraphGenerator.generateLatticeGraph(nodecount, degree);
 
+        } else if ("pinwheel".equals(graphtype)) {
+           graph = GraphGenerator.generatePinWheel(nodecount, degree);
         } else {
             throw new GraphCreationException("Graph type not supported");
         }
