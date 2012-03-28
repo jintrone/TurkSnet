@@ -24,6 +24,10 @@ public class SessionLog {
     @ManyToOne
     private Node node;
 
+
+
+    private int iteration = -1;
+
      @Column(columnDefinition = "LONGTEXT")
     private String nodePrivateData;
 
@@ -35,4 +39,12 @@ public class SessionLog {
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(style = "S-")
     private Date date_;
+
+    public int getIteration() {
+        return iteration;
+    }
+
+    public void setIteration(int iteration) {
+        this.iteration = iteration;
+    }
 }

@@ -186,6 +186,7 @@ public class Session_ {
         slog.setType(type);
         slog.setNodePublicData(n.getPublicData_());
         slog.setNodePrivateData(n.getPrivateData_());
+        slog.setIteration(this.getIteration());
         slog.persist();
     }
 
