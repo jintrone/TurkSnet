@@ -261,6 +261,7 @@ public class ExperimentController {
             w = new Worker();
             w.setUsername(login);
             w.setPassword(password);
+            w.setParticipation(10);
             w.persist();
             loginSuccess(Experiment.findExperiment(id), w, result);
         }
@@ -280,7 +281,7 @@ public class ExperimentController {
             log.error("WARNING:  Multiple users registered under the same name!");
             result.put("status", "server_error");
         } else {
-            loginSuccess(Experiment.findExperiment(id), ws.get(0), result);
+            resolveLogin(Experiment.findExperiment(id), ws.get(0), result);
         }
         return U.jsonify(result);
     }
@@ -294,6 +295,7 @@ public class ExperimentController {
         Worker w;
         if (ws.isEmpty()) {
             w = new Worker();
+            w.setParticipation(10);
             w.setUsername(login);
             w.setPassword(password);
             w.persist();
@@ -304,11 +306,27 @@ public class ExperimentController {
                 result.put("status", "server_error");
             }
             w = ws.get(0);
+
         }
 
-        loginSuccess(Experiment.findExperiment(id), w, result);
+        resolveLogin(Experiment.findExperiment(id),w,result);
 
         return U.jsonify(result);
+    }
+
+    public void resolveLogin(Experiment e, Worker w, Map<String, Object> result) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+      if (w.getParticipation() != null && w.getParticipation() < 10) {
+            loginFailure(w,result);
+        }  else {
+            loginSuccess(e, w, result);
+        }
+    }
+
+    public void loginFailure(Worker w, Map<String,Object> result) {
+       w.setLastAttempt();
+       result.put("status", "failure");
+        result.put("reason", "Sorry, your past participation has been too low to continue.  Thanks for playing!");
+        result.put("workerid", w.getId());
     }
 
 

@@ -140,13 +140,13 @@ public class Analysis {
 
         for (Session_ s : Session_.findAllSession_s()) {
 
-            //System.err.println("Session "+s.getProperty(Plugin.PROP_SESSION_ID));
+            System.err.println("Session "+s.getProperty(Plugin.PROP_SESSION_ID));
             PrintStream out = new PrintStream(new FileOutputStream("Session "+s.getProperty(Plugin.PROP_SESSION_ID)+".csv"));
             List<Map<String,String>> csv = new ArrayList<Map<String, String>>();
             for (Node n : s.getNodesAsList()) {
                 Map<String,String> row = new HashMap<String, String>();
                 csv.add(row);
-                row.put("Worker",n.getWorker().getUsername());
+                row.put("Worker",n.getWorker()==null?"--NULL--":n.getWorker().getUsername());
                 List<SessionLog> logs = new ArrayList<SessionLog>();
                 List<Date> dates = new ArrayList<Date>();
                 List<String> statuses = new ArrayList<String>();
@@ -181,15 +181,15 @@ public class Analysis {
 
                 List<Float> scores = plugin.getSessionScores(logs);
                // List<Float> datause = getDataUse(logs);
-                System.err.println(n.getWorker().getUsername() + "\n**************");
+                System.err.println(n.getWorker()==null?"!!!!!!!!!!--NULL WORKER--!!!!!!!!!!!!!":n.getWorker().getUsername() + "\n**************");
                 for (int i = 0; i < scores.size(); i++) {
-                    //row.put("Step"+i,scores.get(i)+"");
+                    row.put("Step"+i,scores.get(i)+"");
                     System.err.println(dates.get(i)+":"+statuses.get(i) + " -- " + scores.get(i));
 
                 }
             }
-            //dump(headers,csv,out);
-           // out.close();
+            dump(headers,csv,out);
+           out.close();
 
         }
     }

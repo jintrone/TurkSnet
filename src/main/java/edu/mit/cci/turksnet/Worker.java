@@ -30,11 +30,16 @@ public class Worker {
     @Column(columnDefinition = "TIMESTAMP")
     private Date lastCheckin;
 
+     @Column(columnDefinition = "TIMESTAMP")
+    private Date lastAttempt;
+
     @Column(columnDefinition = "LONGTEXT")
     private String qualifications;
 
     @Column(columnDefinition = "LONGTEXT")
     private String training;
+
+    private Integer participation;
 
     @ManyToOne
     @Nullable
@@ -76,6 +81,13 @@ public class Worker {
 
     }
 
+    @Transactional
+    public void setLastAttempt() {
+      lastAttempt = new Date();
+        flush();
+
+    }
+
 
     public void checkin() {
 //        checkins.put(getId(),new Date());
@@ -97,6 +109,14 @@ public class Worker {
 
         }
         return total;
+    }
+
+    public Integer getParticipation() {
+        return participation;
+    }
+
+    public void setParticipation(Integer i) {
+       this.participation = i;
     }
 
     @Transactional

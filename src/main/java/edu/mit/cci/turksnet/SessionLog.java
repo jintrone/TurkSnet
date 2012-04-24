@@ -26,7 +26,7 @@ public class SessionLog {
 
 
 
-    private int iteration = -1;
+    private Integer iteration = -1;
 
      @Column(columnDefinition = "LONGTEXT")
     private String nodePrivateData;
@@ -40,11 +40,11 @@ public class SessionLog {
     @DateTimeFormat(style = "S-")
     private Date date_;
 
-    public int getIteration() {
+    public Integer getIteration() {
         return iteration;
     }
 
-    public void setIteration(int iteration) {
+    public void setIteration(Integer iteration) {
         this.iteration = iteration;
     }
 }
