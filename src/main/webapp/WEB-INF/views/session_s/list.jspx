@@ -7,15 +7,15 @@
             
             
             <table:column id="c_edu_mit_cci_turksnet_Session__created" property="created" z="8uGV+pD0wSAnJqtBzzIjUZvgOr0="/>
-        <table:column id="c_edu_mit_cci_turksnet_Session__active" property="active" z="eVdYXwwKBqADIHux9766lxRJkGk="/>
+        <table:column id="c_edu_mit_cci_turksnet_Session__status" property="status" z="eVdYXwwKBqADIHux9766lxRJkGk="/>
         
         
-        <table:column id="c_edu_mit_cci_turksnet_Session__network" property="network" z="ohYNURWQuZ5rsKq7QX6iNz0hfZ0="/>
+        <!--<table:column id="c_edu_mit_cci_turksnet_Session__network" property="network" z="ohYNURWQuZ5rsKq7QX6iNz0hfZ0="/>
         
             
         <table:column id="c_edu_mit_cci_turksnet_Session__propertiesAsMap" property="propertiesAsMap" z="5SQfZ3rm173jFtfBSkeVJbMJDuI="/>
         <table:column id="c_edu_mit_cci_turksnet_Session__log" property="log" z="Ua0WunAwgrsB/CQ1SeeA+LYjA1c="/>
-        
+         -->
         <table:column id="c_edu_mit_cci_turksnet_Session__experiment" property="experiment" z="8Htqbr2xClQQQCNonExzHo+q8a0="/>
         </table:table>
     </page:list>

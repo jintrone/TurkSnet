@@ -222,7 +222,7 @@ public class GraphGenerator {
         List<DefaultJungNode> outer = new ArrayList<DefaultJungNode>();
         List<DefaultJungNode> inner = new ArrayList<DefaultJungNode>();
         List<DefaultJungNode> lateral = new ArrayList<DefaultJungNode>();
-        while (count < nodes) {
+        while (count < nodes-2) {
             DefaultJungNode[] t = addTri(graph);
             outer.add(t[0]);
             inner.add(t[1]);
@@ -345,17 +345,17 @@ public class GraphGenerator {
 
 
         // for (int i =3;i<)
-        System.out.println("\nDEGREE = 3\n-------------");
-        graph = generateWheel(30, 3);
-                printGraph("WHEEL (pc)", graph);
-
-
-        graph = generateBowtie(30);
-        printGraph("BOWTIE (PC)", graph);
-
-
-        graph = generateBowtieCircle(30);
-        printGraph("BOWTIE-CIRCLE (pC)", graph);
+//        System.out.println("\nDEGREE = 3\n-------------");
+//        graph = generateWheel(30, 3);
+//                printGraph("WHEEL (pc)", graph);
+//
+//
+//        graph = generateBowtie(30);
+//        printGraph("BOWTIE (PC)", graph);
+//
+//
+//        graph = generateBowtieCircle(30);
+//        printGraph("BOWTIE-CIRCLE (pC)", graph);
 
 
         System.out.println("\nDEGREE = 4\n-------------");
@@ -368,7 +368,7 @@ public class GraphGenerator {
         graph = generateLatticeGraph(30, 4);
         printGraph("RING-LATTICE (PC)", graph);
 
-        graph = generatePinWheel(30,4);
+        graph = generatePinWheel(32,4);
         printGraph("PINWHEEL (pC)", graph);
 
 //        graph = generateSquareLatticeGraph(50, 4);
@@ -380,15 +380,15 @@ public class GraphGenerator {
 //        graph = generateLatticeGraph(50, 5);
 //        printGraph("RING-LATTICE", 5, graph);
 
-        graph = generateWheel(30, 5);
-        printGraph("WHEEL (pc)", graph);
-        writeGraph(graph, new FileOutputStream("WHEEL.50.5.net"));
+//        graph = generateWheel(30, 5);
+//        printGraph("WHEEL (pc)", graph);
+//        writeGraph(graph, new FileOutputStream("WHEEL.50.5.net"));
+//
+//        graph = generateSquareLatticeGraph(30, 5);
+//        printGraph("SQUARE_LATTICE (PC)", graph);
 
-        graph = generateSquareLatticeGraph(30, 5);
-        printGraph("SQUARE_LATTICE (PC)", graph);
 
-
-        graph = generatePinWheel(30,5);
+        graph = generatePinWheel(35,5);
         printGraph("PINWHEEL (pC)", graph);
         writeGraph(graph, new FileOutputStream("PINWHEEL.50.5.net"));
 

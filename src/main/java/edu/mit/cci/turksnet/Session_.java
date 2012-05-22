@@ -15,6 +15,7 @@ import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.support.SessionStatus;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
@@ -83,6 +84,15 @@ public class Session_ {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         return null;
+    }
+
+    public void cleanup(Status status) {
+        this.setStatus(status);
+        this.flush();
+        for (Node n : getNodesAsList()) {
+            n.getWorker().finalizeTurn();
+        }
+        //To change body of created methods use File | Settings | File Templates.
     }
 
     public static enum Status {WAITING,RUNNING,ABORTED,COMPLETE}
@@ -223,8 +233,11 @@ public class Session_ {
     public void halt() throws Exception {
         if (getRunner() != null) {
             getRunner().haltOnNext();
+            runners.remove(this.getId());
         } else {
             log.warn("Requested runner to halt, but no runner available");
+            cleanup(Status.ABORTED);
+
         }
     }
 

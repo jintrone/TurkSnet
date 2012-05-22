@@ -6,7 +6,7 @@
         
         
         <field:input field="created" id="c_edu_mit_cci_turksnet_Session__created" z="8PlVwQr+eHHFcfpOT+M1ZKqtk54="/>
-    <field:checkbox field="active" id="c_edu_mit_cci_turksnet_Session__active" z="BjWFZE2shwxRFrrqqYQ3SgBW/Fw="/>
+    <field:input field="status" id="c_edu_mit_cci_turksnet_Session__status" z="BjWFZE2shwxRFrrqqYQ3SgBW/Fw="/>
     <field:select field="experiment" id="c_edu_mit_cci_turksnet_Session__experiment" itemValue="id" items="${experiments}" path="/experiments" z="EV4rno05FlhE4HRqWvUxd3OU60E="/>
     <field:input field="iteration" id="c_edu_mit_cci_turksnet_Session__iteration" z="jt5LvtwApVheahJxIO+VxgO4M6o="/>
         
@@ -21,6 +21,6 @@
     <field:input field="format" id="c_edu_mit_cci_turksnet_Session__format" z="tx5EMO+dHdBhkNV+YuZL0u0ATO8="/>
     <field:input field="qualificationRequirements" id="c_edu_mit_cci_turksnet_Session__qualificationRequirements" z="TVsTmNVj8H3vFpMxgsaKMvfhcuM="/>
     <field:input field="propertiesAsMap" id="c_edu_mit_cci_turksnet_Session__propertiesAsMap" z="hGaGweSegYDRo1NatqIwBOYzmqo="/>
-        <field:input field="test" id="c_edu_mit_cci_turksnet_Session__test" z="jq2M9ceVY1HN62fVyoVqIWakPkA="/>
+
     </form:update>
 </div>

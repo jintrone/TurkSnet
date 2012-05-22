@@ -138,5 +138,10 @@ public class Worker {
         }
     }
 
-
+     @Transactional
+    public void finalizeTurn() {
+         Worker.entityManager().refresh(this, LockModeType.PESSIMISTIC_WRITE);
+        setCurrentAssignment(null);
+        flush();
+    }
 }

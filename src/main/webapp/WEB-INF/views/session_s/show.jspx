@@ -6,7 +6,7 @@
         
         
     <field:display field="created" id="s_edu_mit_cci_turksnet_Session__created" object="${session_}" z="2vi72tB5ZNaoBOlImC7GLGm9Z7I="/>
-    <field:display field="active" id="s_edu_mit_cci_turksnet_Session__active" object="${session_}" z="yzRiWJZuE+APe2JbBEPXYPJDso4="/>
+    <field:display field="status" id="s_edu_mit_cci_turksnet_Session__status" object="${session_}" z="yzRiWJZuE+APe2JbBEPXYPJDso4="/>
     <field:display field="experiment" id="s_edu_mit_cci_turksnet_Session__experiment" object="${session_}" z="ajtVuFgsU3q1WoQOXy+CLdSJT/U="/>
     <field:display field="iteration" id="s_edu_mit_cci_turksnet_Session__iteration" object="${session_}" z="8sYScoyLrKajB8H5PIXTBmeas4Q="/>
         
@@ -23,7 +23,7 @@
     <field:display field="qualificationRequirements" id="s_edu_mit_cci_turksnet_Session__qualificationRequirements" object="${session_}" z="DhFkwrPBqi9IC9cppBH+7Lb3N2o="/>
 
     <field:display field="propertiesAsMap" id="s_edu_mit_cci_turksnet_Session__propertiesAsMap" object="${session_}" render="false" z="user-managed"/>
-    <field:display field="test" id="s_edu_mit_cci_turksnet_Session__test" object="${session_}" render="false" z="user-managed"/>
+
     </page:show>
     <form:run id="run_this_experiment" label="Restart the session" path="/session_s/${session_.id}/run">
      </form:run>

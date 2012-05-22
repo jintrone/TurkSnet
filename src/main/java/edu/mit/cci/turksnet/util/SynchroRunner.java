@@ -139,11 +139,8 @@ public class SynchroRunner implements RunStrategy {
     @Transactional
     private void cleanupSession(Session_.Status status) {
         session = Session_.findSession_(session.getId());
-        session.setStatus(status);
-        session.flush();
-        for (Node n : session.getNodesAsList()) {
-            finalizeTurnForWorker(n.getWorker());
-        }
+        session.cleanup(status);
+
         wq.clear();
     }
 
@@ -230,7 +227,8 @@ public class SynchroRunner implements RunStrategy {
             result.put("remaining", Math.max(0, turnEnd - System.currentTimeMillis()));
         } else if (gameState == GameState.DONE_GAME) {
             log.debug("Finalizing turn for worker");
-            finalizeTurnForWorker(Worker.findWorker(workerid));
+            Worker.findWorker(workerid).finalizeTurn();
+            //finalizeTurnForWorker(Worker.findWorker(workerid));
 
 
         }
@@ -238,14 +236,7 @@ public class SynchroRunner implements RunStrategy {
 
     }
 
-    @Transactional
-    private void finalizeTurnForWorker(Worker w) {
-        Worker.entityManager().refresh(w, LockModeType.PESSIMISTIC_WRITE);
-        w.setCurrentAssignment(null);
-        w.flush();
 
-
-    }
 
 
 }

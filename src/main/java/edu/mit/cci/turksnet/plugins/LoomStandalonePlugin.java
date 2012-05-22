@@ -505,6 +505,7 @@ public class LoomStandalonePlugin implements Plugin {
 
         Map<DefaultJungNode, Node> nodes = new HashMap<DefaultJungNode, Node>();
 
+
         for (DefaultJungNode vertex : graph.getVertices()) {
             Node node = new Node();
             node.setSession_(s);
